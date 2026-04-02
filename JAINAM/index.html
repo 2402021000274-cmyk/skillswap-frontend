@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Swap - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="authWrapper">
+        <nav class="navbar">
+            <a href="#" class="logo">Skill Swap</a>
+            <ul class="nav-links">
+                <li><a onclick="switchAuthView('homeView', this)" class="auth-nav-link active">Home</a></li>
+                <li><a onclick="switchAuthView('aboutView', this)" class="auth-nav-link">About Us</a></li>
+                <li><a onclick="switchAuthView('howItWorksView', this)" class="auth-nav-link">How it Works</a></li>
+            </ul>
+        </nav>
+
+        <div class="left-section">
+            <div class="overlay"></div>
+            <div class="content-box">
+                <h1>Learn New Skills.<br>Share Your Passion.</h1>
+                <p>Join the world's best community for skill exchange. Connect, collaborate, and grow together.</p>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <div class="top-scroll-mask"></div>
+            <div id="messageBox" class="message-box" style="padding: 10px; margin: 0 auto 10px; max-width: 480px;"></div>
+
+            <div id="homeView" class="auth-view active">
+                <div id="loginForm">
+                    <h2 class="form-title">Welcome Back</h2>
+                    <p class="form-subtitle">Enter your details to access your account.</p>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="input-group">
+                            <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" required>
+                        </div>
+                        <div class="input-group" style="margin-bottom: 5px;">
+                            <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" required>
+                            <i class="fas fa-eye eye-icon" onclick="togglePass('loginPass', this)"></i>
+                        </div>
+                        <div style="text-align: right; margin-bottom: 20px;">
+                            <span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span>
+                        </div>
+                        <button type="submit" class="btn-submit" style="margin-top: 0;">Login</button>
+                    </form>
+                    <div class="toggle-text">Don't have an account? <span onclick="showSubForm('registerForm')">Register Now</span></div>
+                </div>
+
+                <div id="forgotPasswordForm" class="hidden" style="width: 100%;">
+                    <h2 class="form-title">Reset Password</h2>
+                    <p class="form-subtitle">Enter your registered email to receive an OTP.</p>
+                    <form onsubmit="handleSendForgotOTP(event)">
+                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" required></div>
+                        <button type="submit" class="btn-submit">Send OTP</button>
+                    </form>
+                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
+                </div>
+
+                <div id="verifyForgotOTPForm" class="hidden" style="width: 100%;">
+                    <h2 class="form-title">Set New Password</h2>
+                    <form onsubmit="handleResetPassword(event)">
+                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" required></div>
+                        <div class="input-group">
+                            <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" required>
+                            <i class="fas fa-eye eye-icon" onclick="togglePass('forgotNewPassInput', this)"></i>
+                        </div>
+                        <button type="submit" class="btn-submit">Reset Password</button>
+                    </form>
+                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Cancel</span></div>
+                </div>
+
+                <div id="otpForm" class="hidden" style="width: 100%;">
+                    <h2 class="form-title">Two-Factor Auth</h2>
+                    <form onsubmit="handleVerifyOTP(event)">
+                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" required></div>
+                        <button type="submit" class="btn-submit">Verify & Login</button>
+                    </form>
+                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
+                </div>
+
+                <div id="registerForm" class="hidden" style="width: 100%;">
+                    <h2 class="form-title">Create Account</h2>
+                    <form onsubmit="handleRegister(event)">
+                        <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" required></div>
+                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" required></div>
+                        <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" required></div>
+                        <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regPass" placeholder="Password" required><i class="fas fa-eye eye-icon" onclick="togglePass('regPass', this)"></i></div>
+                        <button type="submit" class="btn-submit">Verify Email</button>
+                    </form>
+                    <div class="toggle-text">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
+                </div>
+
+                <div id="regOtpForm" class="hidden" style="width: 100%;">
+                    <h2 class="form-title">Verify Email</h2>
+                    <form onsubmit="handleVerifyRegOTP(event)">
+                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" required></div>
+                        <button type="submit" class="btn-submit">Verify OTP</button>
+                    </form>
+                    <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
+                </div>
+
+                <div id="profileSetupForm" class="hidden" style="width: 100%;">
+                    <h2 class="form-title">Complete Profile</h2>
+                    <form onsubmit="handleProfileSave(event)">
+                        <div class="profile-pic-wrapper">
+                            <div class="profile-pic-container" onclick="document.getElementById('profileInput').click()">
+                                <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile">
+                            </div>
+                            <input type="file" id="profileInput" accept="image/*" onchange="previewImage(event, 'profilePreview')" style="display:none;">
+                            <div class="add-photo-btn" onclick="document.getElementById('profileInput').click()"><i class="fas fa-camera-retro"></i> Add Photo</div>
+                        </div>
+
+                        <div class="role-selection">
+                            <label class="role-box active" onclick="selectRole('teach')">
+                                <input type="radio" name="userRole" value="teach" checked style="display:none;">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <span>Teach & Learn</span>
+                            </label>
+                            <label class="role-box" onclick="selectRole('learn')">
+                                <input type="radio" name="userRole" value="learn" style="display:none;">
+                                <i class="fas fa-book-reader"></i>
+                                <span>Only Learner</span>
+                            </label>
+                        </div>
+
+                        <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="profName" readonly></div>
+                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="profEmail" readonly></div>
+                        <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" required></div>
+                        
+                        <div id="skillInputContainer">
+                            <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter"></div>
+                            <div id="skillsList" class="skills-list"></div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Save Profile & Login</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="aboutView" class="auth-view" style="justify-content: flex-start; padding-top: 40px; max-width: 550px;">
+                <h2 class="info-header" style="text-align: center; margin-bottom: 30px;">About Skill Swap</h2>
+                
+                <div class="about-card">
+                    <i class="fas fa-globe"></i>
+                    <h3>Our Vision</h3>
+                    <p>Skill Swap is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
+                </div>
+                
+                <div class="about-card">
+                    <i class="fas fa-users"></i>
+                    <h3>Community Driven</h3>
+                    <p>Whether you are a professional developer, a language enthusiast, or a beginner looking for guidance, our platform connects you with the right mentor without any money involved.</p>
+                </div>
+
+                <div class="about-card">
+                    <i class="fas fa-coins"></i>
+                    <h3>Time-Banking System</h3>
+                    <p>We use a unique Credit System. Earn credits by teaching your skills to others, and spend those credits to learn new skills from experts. It's a fair, time-for-time trade.</p>
+                </div>
+            </div>
+
+            <div id="howItWorksView" class="auth-view" style="justify-content: flex-start; padding-top: 40px;">
+                <h2 class="info-header">How it Works</h2>
+                <div class="step-card"><div class="step-icon"><i class="fas fa-user-plus"></i></div><div class="step-content"><h3>1. Create Profile</h3><p>Sign up, choose your role, and list the skills you want to teach or learn.</p></div></div>
+                <div class="step-card"><div class="step-icon"><i class="fas fa-search"></i></div><div class="step-content"><h3>2. Find a Match</h3><p>Discover users around the platform who match your learning interests.</p></div></div>
+                <div class="step-card"><div class="step-icon"><i class="fas fa-exchange-alt"></i></div><div class="step-content"><h3>3. Start Swapping</h3><p>Connect via live chat, exchange knowledge, and grow together.</p></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js?v=2"></script>
+    <script src="auth.js?v=3"></script>
+</body>
+</html>
