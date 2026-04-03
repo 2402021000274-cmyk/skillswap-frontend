@@ -126,7 +126,6 @@ function handleVerifyRegOTP(e) {
     } else { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP! Please try again.</span>"; }
 }
 
-// 🟢 BUG FIX: IMAGE COMPRESSOR ADDED HERE
 function previewImage(event, targetId) {
     const file = event.target.files[0];
     if(!file) return;
@@ -135,9 +134,8 @@ function previewImage(event, targetId) {
     reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-            // Photo resize karne ka logic taaki save ho sake
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 250; // profile pic ke liye 250px kaafi hai
+            const MAX_WIDTH = 250; 
             const scaleSize = MAX_WIDTH / img.width;
             canvas.width = MAX_WIDTH;
             canvas.height = img.height * scaleSize;
@@ -145,7 +143,6 @@ function previewImage(event, targetId) {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             
-            // Compress karke wapas code me dena
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
             document.getElementById(targetId).src = compressedBase64;
             currentProfilePic = compressedBase64;
@@ -309,4 +306,59 @@ async function handleResetPassword(e) {
         messageBox.innerHTML = "<span class='error-msg'>Server Error</span>";
         btn.innerText = "Reset Password"; btn.disabled = false;
     }
+}
+
+// ==========================================
+// 🟢 LIVE CAMERA FOR REGISTRATION (NAYA CODE)
+// ==========================================
+let regCameraStream = null;
+
+async function startRegCamera() {
+    const modal = document.getElementById('regCameraModal');
+    const video = document.getElementById('regCameraFeed');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    try {
+        regCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        video.srcObject = regCameraStream;
+    } catch (err) {
+        alert("❌ Camera access denied! Please allow camera permissions in your browser.");
+        stopRegCamera();
+    }
+}
+
+function stopRegCamera() {
+    const modal = document.getElementById('regCameraModal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+    if (regCameraStream) {
+        regCameraStream.getTracks().forEach(track => track.stop());
+        regCameraStream = null;
+    }
+}
+
+function takeRegSnapshot() {
+    const video = document.getElementById('regCameraFeed');
+    const canvas = document.createElement('canvas');
+    
+    const SIZE = 250;
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    
+    const minDim = Math.min(video.videoWidth, video.videoHeight);
+    const startX = (video.videoWidth - minDim) / 2;
+    const startY = (video.videoHeight - minDim) / 2;
+    
+    ctx.drawImage(video, startX, startY, minDim, minDim, 0, 0, SIZE, SIZE);
+    
+    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+    document.getElementById('profilePreview').src = compressedBase64;
+    currentProfilePic = compressedBase64; // Registration wali pic variable
+    
+    stopRegCamera();
 }
