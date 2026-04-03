@@ -660,7 +660,16 @@ function openMyProfile(element) {
         document.getElementById('editAddress').value = user.address || "";
         editProfilePic = user.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
         document.getElementById('editProfilePreview').src = editProfilePic;
-        editSkillsArray = [...(user.skills || [])];
+        
+        // 🟢 BUG FIX: Purane aur naye skills properly dikhane ka logic
+        if (user.skills && user.skills.length > 0) {
+            editSkillsArray = [...user.skills];
+        } else if (user.skill && user.skill !== "Learner Only") {
+            editSkillsArray = [user.skill]; 
+        } else {
+            editSkillsArray = [];
+        }
+        
         renderEditSkills();
     }
 }
