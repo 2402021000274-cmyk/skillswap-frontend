@@ -16,9 +16,6 @@ let isFirstDataLoad = true;
 let isSyncPaused = false;
 let cloudUpdateTimeout = null;
 
-// ==========================================
-// 🟢 🟢 NAYA: SOCKET.IO INSTANT MESSAGING 🟢 🟢
-// ==========================================
 const socket = typeof io !== 'undefined' ? io(API_BASE_URL) : null;
 if(socket) {
     socket.on('connect', () => {
@@ -26,25 +23,20 @@ if(socket) {
         if(myEmail) { socket.emit('register-user', myEmail); }
     });
 
-    // Jab koi naya message instantly aaye
     socket.on('receive-msg', (data) => {
-        syncWithDatabase(); // Database se instant naya text uthao
+        syncWithDatabase(); 
         
-        // Agar main us se chat nahi kar raha, toh notification (toast) dikhao
         if (currentChatPartnerEmail !== data.from) {
             let senderName = usersDB.find(u => u.email === data.from)?.name || "User";
             showToast(`💬 Naya message: ${senderName} ne bheja`);
         }
     });
 
-    // Jab koi online ya offline jaye
     socket.on('user-status-update', (data) => {
-        syncWithDatabase(); // Instant green dot (online) update hoga
+        syncWithDatabase(); 
     });
 }
-// ==========================================
 
-// 🟢 INJECT CSS FOR WHATSAPP-STYLE TOAST
 const style = document.createElement('style');
 style.innerHTML = `
     @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -52,7 +44,6 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// 🟢 WHATSAPP-STYLE NOTIFICATION FUNCTION
 function showToast(message) {
     let toastBox = document.getElementById('toastBox');
     if(!toastBox) {
@@ -82,7 +73,6 @@ function showToast(message) {
     }, 4500);
 }
 
-// 🟢 CLOUD UPDATE FUNCTION
 async function updateCloudUser(userObj) {
     isSyncPaused = true; 
     clearTimeout(cloudUpdateTimeout);
@@ -98,7 +88,6 @@ async function updateCloudUser(userObj) {
     cloudUpdateTimeout = setTimeout(() => { isSyncPaused = false; }, 1500);
 }
 
-// 🛠️ MONGODB SYNC LOGIC
 async function syncWithDatabase() {
     if(isSyncPaused) return; 
 
@@ -117,7 +106,6 @@ if (document.getElementById('dashboardWrapper')) {
     syncWithDatabase();
 }
 
-// 🟢 LIVE SYSTEM (Har 2.5 second mein)
 setInterval(() => {
     if(document.getElementById('dashboardWrapper') && sessionStorage.getItem('loggedInUserEmail')) {
         syncWithDatabase(); 
@@ -597,7 +585,6 @@ function sendLiveMessage() {
     updateCloudUser(usersDB[myIndex]); 
     updateCloudUser(usersDB[partnerIndex]); 
 
-    // 🟢 NAYA: Bhejne ke baad instantly socket ko pata chal jayega
     if(socket) {
         socket.emit('send-msg', { to: currentChatPartnerEmail, from: myEmail, text: text });
     }
@@ -661,7 +648,6 @@ function openMyProfile(element) {
         editProfilePic = user.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
         document.getElementById('editProfilePreview').src = editProfilePic;
         
-        // 🟢 BUG FIX: Purane aur naye skills properly dikhane ka logic
         if (user.skills && user.skills.length > 0) {
             editSkillsArray = [...user.skills];
         } else if (user.skill && user.skill !== "Learner Only") {
@@ -674,10 +660,33 @@ function openMyProfile(element) {
     }
 }
 
+// 🟢 BUG FIX: IMAGE COMPRESSOR ADDED HERE
 function previewEditImage(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    
     const reader = new FileReader();
-    reader.onload = function() { document.getElementById('editProfilePreview').src = reader.result; editProfilePic = reader.result; };
-    if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Photo resize karne ka logic taaki data save ho sake bina limit cross kiye
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 250; // profile pic ke liye chota size best hai
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Compress karke image ko wapas code me dena
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById('editProfilePreview').src = compressedBase64;
+            editProfilePic = compressedBase64;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
 if(document.getElementById('editSkillInput')){
@@ -793,7 +802,7 @@ function verifyAndChangePassword() {
     if(newPassword.length < 4) { msgBox.innerText = "❌ Password too short."; msgBox.style.color = "#ef4444"; return; }
     const userIndex = usersDB.findIndex(u => u.email === sessionStorage.getItem('loggedInUserEmail'));
     if(userIndex !== -1) {
-        usersDB[userIndex].password = newPassword; // 🟢 BUG FIX: Yahan 'pass' ki jagah 'password' aayega
+        usersDB[userIndex].password = newPassword; 
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
         updateCloudUser(usersDB[userIndex]); 
 
