@@ -205,6 +205,7 @@ async function handleProfileSave(e) {
                 address: userAddress, // 🟢 FIX: Address ab Database me jayega
                 role: selectedRole, // Role database me bhej diya
                 skill: finalSkill,
+                skills: userSkillsArray, // 🟢 BUG FIX: Registration ke time skills ka pura array ab theek se jayega
                 profilePic: currentProfilePic
             })
         });
