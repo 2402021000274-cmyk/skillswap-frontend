@@ -793,7 +793,7 @@ function verifyAndChangePassword() {
     if(newPassword.length < 4) { msgBox.innerText = "❌ Password too short."; msgBox.style.color = "#ef4444"; return; }
     const userIndex = usersDB.findIndex(u => u.email === sessionStorage.getItem('loggedInUserEmail'));
     if(userIndex !== -1) {
-        usersDB[userIndex].pass = newPassword;
+        usersDB[userIndex].password = newPassword; // 🟢 BUG FIX: Yahan 'pass' ki jagah 'password' aayega
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
         updateCloudUser(usersDB[userIndex]); 
 
