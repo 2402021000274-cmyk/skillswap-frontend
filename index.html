@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill Swap - Login</title>
+    <title>Skill Hub - Login</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -12,7 +12,9 @@
 
     <div id="authWrapper">
         <nav class="navbar">
-            <a href="#" class="logo">Skill Swap</a>
+            <a href="#" class="logo" style="background: transparent; padding: 0; box-shadow: none;">
+                <img src="logo.jpeg" alt="Skill Hub" style="height: 55px; border-radius: 8px; display: block;">
+            </a>
             <ul class="nav-links">
                 <li><a onclick="switchAuthView('homeView', this)" class="auth-nav-link active">Home</a></li>
                 <li><a onclick="switchAuthView('aboutView', this)" class="auth-nav-link">About Us</a></li>
@@ -147,13 +149,13 @@
             </div>
 
             <div id="aboutView" class="auth-view" style="justify-content: flex-start; padding-top: 40px; max-width: 1000px; padding-left: 20px; padding-right: 20px;">
-                <h2 class="info-header" style="text-align: center; margin-bottom: 30px;">About Skill Swap</h2>
+                <h2 class="info-header" style="text-align: center; margin-bottom: 30px;">About Skill Hub</h2>
                 
                 <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 50px;">
                     <div class="about-card" style="flex: 1; min-width: 250px;">
                         <i class="fas fa-globe"></i>
                         <h3>Our Vision</h3>
-                        <p>Skill Swap is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
+                        <p>Skill Hub is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
                     </div>
                     
                     <div class="about-card" style="flex: 1; min-width: 250px;">
@@ -169,7 +171,7 @@
                     </div>
                 </div>
 
-                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">Why Choose Skill Swap?</h2>
+                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">Why Choose Skill Hub?</h2>
                 <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px; font-weight: 500;">Explore the detailed features and benefits of joining our platform.</p>
 
                 <div class="about-grid">
@@ -178,7 +180,7 @@
                         <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" alt="Concept">
                         <div class="card-content">
                             <h3><i class="fas fa-lightbulb"></i> The Core Concept</h3>
-                            <p>Skill Swap is a revolutionary time-banking platform where your knowledge is your currency. Exchange your expertise directly with others and grow together.</p>
+                            <p>Skill Hub is a revolutionary time-banking platform where your knowledge is your currency. Exchange your expertise directly with others and grow together.</p>
                         </div>
                     </div>
 
@@ -250,12 +252,12 @@
                         <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop" alt="Free Access">
                         <div class="card-content">
                             <h3><i class="fas fa-door-open"></i> 100% Free Access</h3>
-                            <p>We believe education should be accessible to everyone. Skill Swap completely removes financial barriers, making high-quality mentorship absolutely free.</p>
+                            <p>We believe education should be accessible to everyone. Skill Hub completely removes financial barriers, making high-quality mentorship absolutely free.</p>
                         </div>
                     </div>
 
                 </div>
-                </div>
+            </div>
 
             <div id="howItWorksView" class="auth-view" style="justify-content: flex-start; padding-top: 40px;">
                 <h2 class="info-header">How it Works</h2>
