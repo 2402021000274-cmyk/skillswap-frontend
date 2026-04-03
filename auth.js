@@ -31,10 +31,9 @@ function showSubForm(formId) {
     messageBox.innerText = ""; 
 }
 
-// 🟢 NAYA LOGIN: Direct Backend Se Aur Email Ke Sath
 async function handleLogin(e) {
     e.preventDefault();
-    const email = document.getElementById('loginEmail').value.trim(); // Yahan Email check hoga
+    const email = document.getElementById('loginEmail').value.trim(); 
     const pass = document.getElementById('loginPass').value;
     
     const btn = e.target.querySelector('button[type="submit"]');
@@ -127,13 +126,35 @@ function handleVerifyRegOTP(e) {
     } else { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP! Please try again.</span>"; }
 }
 
+// 🟢 BUG FIX: IMAGE COMPRESSOR ADDED HERE
 function previewImage(event, targetId) {
+    const file = event.target.files[0];
+    if(!file) return;
+    
     const reader = new FileReader();
-    reader.onload = function() { document.getElementById(targetId).src = reader.result; currentProfilePic = reader.result; };
-    if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Photo resize karne ka logic taaki save ho sake
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 250; // profile pic ke liye 250px kaafi hai
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Compress karke wapas code me dena
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+            document.getElementById(targetId).src = compressedBase64;
+            currentProfilePic = compressedBase64;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
-// 🟢 NAYA FUNCTION: Role Select (Learner ya Teach) UI Logic
 function selectRole(role) {
     document.querySelectorAll('.role-box').forEach(box => box.classList.remove('active'));
     const selectedInput = document.querySelector(`input[value="${role}"]`);
@@ -142,9 +163,9 @@ function selectRole(role) {
 
     const skillContainer = document.getElementById('skillInputContainer');
     if(role === 'learn') {
-        skillContainer.style.display = 'none'; // Agar Learner hai toh skill input chupa do
+        skillContainer.style.display = 'none'; 
     } else {
-        skillContainer.style.display = 'block'; // Agar Teacher/Learner hai toh dikhao
+        skillContainer.style.display = 'block'; 
     }
 }
 
@@ -170,15 +191,11 @@ function renderSkills() {
 }
 function removeSkill(index) { userSkillsArray.splice(index, 1); renderSkills(); }
 
-// 🟢 FIX: PROFILE SAVE HOTE WAQT ROLE BHI DATABASE ME JAYEGA
 async function handleProfileSave(e) {
     e.preventDefault();
     const selectedRole = document.querySelector('input[name="userRole"]:checked').value;
-    
-    // 🟢 BUG FIX: Yahan Address capture karna zaruri tha jo miss ho gaya tha
     const userAddress = document.getElementById('profAddress').value.trim();
     
-    // Agar Teach karna hai, toh kam se kam ek skill zaruri hai
     if(selectedRole === 'teach' && userSkillsArray.length === 0) { 
         alert("Please add at least one skill to teach!"); 
         return; 
@@ -202,10 +219,10 @@ async function handleProfileSave(e) {
                 email: currentTempUser.email,
                 password: currentTempUser.pass, 
                 phone: currentTempUser.phone,
-                address: userAddress, // 🟢 FIX: Address ab Database me jayega
-                role: selectedRole, // Role database me bhej diya
+                address: userAddress, 
+                role: selectedRole, 
                 skill: finalSkill,
-                skills: userSkillsArray, // 🟢 BUG FIX: Registration ke time skills ka pura array ab theek se jayega
+                skills: userSkillsArray, 
                 profilePic: currentProfilePic
             })
         });
