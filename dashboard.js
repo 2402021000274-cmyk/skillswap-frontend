@@ -3,16 +3,13 @@ let editProfilePic = "";
 let currentChatPartnerEmail = null;
 let currentSearchQuery = ""; 
 
-// Real-time tracking variables
 let lastDiscoverHTML = "";
 let lastSwapsHTML = "";
 let lastNotisHTML = "";
 
-// 🟢 BUG FIX: Toast Tracker
 let notifiedItems = new Set();
 let isFirstDataLoad = true;
 
-// 🟢 BUG FIX: Race Condition Lock
 let isSyncPaused = false;
 let cloudUpdateTimeout = null;
 
@@ -660,7 +657,6 @@ function openMyProfile(element) {
     }
 }
 
-// 🟢 BUG FIX: IMAGE COMPRESSOR ADDED HERE
 function previewEditImage(event) {
     const file = event.target.files[0];
     if(!file) return;
@@ -669,9 +665,8 @@ function previewEditImage(event) {
     reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-            // Photo resize karne ka logic taaki data save ho sake bina limit cross kiye
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 250; // profile pic ke liye chota size best hai
+            const MAX_WIDTH = 250;
             const scaleSize = MAX_WIDTH / img.width;
             canvas.width = MAX_WIDTH;
             canvas.height = img.height * scaleSize;
@@ -679,7 +674,6 @@ function previewEditImage(event) {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             
-            // Compress karke image ko wapas code me dena
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
             document.getElementById('editProfilePreview').src = compressedBase64;
             editProfilePic = compressedBase64;
@@ -819,4 +813,64 @@ function logout() {
     setOnlineStatus(false); 
     sessionStorage.removeItem('loggedInUserEmail');
     setTimeout(() => { window.location.href = "index.html"; }, 300);
+}
+
+// ==========================================
+// 🟢 LIVE CAMERA FEATURE (NAYA CODE)
+// ==========================================
+let cameraStream = null;
+
+async function startCamera() {
+    const modal = document.getElementById('cameraModal');
+    const video = document.getElementById('cameraFeed');
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    
+    try {
+        // Front camera access mangna browser se
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+        video.srcObject = cameraStream;
+    } catch (err) {
+        alert("❌ Camera access denied! Please allow camera permissions in your browser.");
+        stopCamera();
+    }
+}
+
+function stopCamera() {
+    const modal = document.getElementById('cameraModal');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+}
+
+function takeSnapshot() {
+    const video = document.getElementById('cameraFeed');
+    const canvas = document.createElement('canvas');
+    
+    const SIZE = 250;
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Mirror the image horizontally so it matches what user sees
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    
+    // Crop center of the video feed perfectly square
+    const minDim = Math.min(video.videoWidth, video.videoHeight);
+    const startX = (video.videoWidth - minDim) / 2;
+    const startY = (video.videoHeight - minDim) / 2;
+    
+    ctx.drawImage(video, startX, startY, minDim, minDim, 0, 0, SIZE, SIZE);
+    
+    // Convert to base64 aur size compress karna
+    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+    document.getElementById('editProfilePreview').src = compressedBase64;
+    editProfilePic = compressedBase64;
+    
+    stopCamera(); // Photo lene ke baad band kardo
 }
