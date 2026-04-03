@@ -816,7 +816,7 @@ function logout() {
 }
 
 // ==========================================
-// 🟢 LIVE CAMERA FEATURE (NAYA CODE)
+// 🟢 LIVE CAMERA FEATURE 
 // ==========================================
 let cameraStream = null;
 
@@ -827,7 +827,6 @@ async function startCamera() {
     modal.style.display = 'flex';
     
     try {
-        // Front camera access mangna browser se
         cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         video.srcObject = cameraStream;
     } catch (err) {
@@ -856,21 +855,30 @@ function takeSnapshot() {
     
     const ctx = canvas.getContext('2d');
     
-    // Mirror the image horizontally so it matches what user sees
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
     
-    // Crop center of the video feed perfectly square
     const minDim = Math.min(video.videoWidth, video.videoHeight);
     const startX = (video.videoWidth - minDim) / 2;
     const startY = (video.videoHeight - minDim) / 2;
     
     ctx.drawImage(video, startX, startY, minDim, minDim, 0, 0, SIZE, SIZE);
     
-    // Convert to base64 aur size compress karna
     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
     document.getElementById('editProfilePreview').src = compressedBase64;
     editProfilePic = compressedBase64;
     
-    stopCamera(); // Photo lene ke baad band kardo
+    stopCamera(); 
+}
+
+// ==========================================
+// 🟢 CUSTOM LOGOUT CONFIRMATION BOX LOGIC
+// ==========================================
+function showLogoutConfirm(e) {
+    e.preventDefault(); 
+    document.getElementById('logoutConfirmBox').style.display = 'flex';
+}
+
+function hideLogoutConfirm() {
+    document.getElementById('logoutConfirmBox').style.display = 'none';
 }
