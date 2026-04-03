@@ -175,6 +175,9 @@ async function handleProfileSave(e) {
     e.preventDefault();
     const selectedRole = document.querySelector('input[name="userRole"]:checked').value;
     
+    // 🟢 BUG FIX: Yahan Address capture karna zaruri tha jo miss ho gaya tha
+    const userAddress = document.getElementById('profAddress').value.trim();
+    
     // Agar Teach karna hai, toh kam se kam ek skill zaruri hai
     if(selectedRole === 'teach' && userSkillsArray.length === 0) { 
         alert("Please add at least one skill to teach!"); 
@@ -199,6 +202,7 @@ async function handleProfileSave(e) {
                 email: currentTempUser.email,
                 password: currentTempUser.pass, 
                 phone: currentTempUser.phone,
+                address: userAddress, // 🟢 FIX: Address ab Database me jayega
                 role: selectedRole, // Role database me bhej diya
                 skill: finalSkill,
                 profilePic: currentProfilePic
