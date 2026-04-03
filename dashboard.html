@@ -25,9 +25,21 @@
                 <li><a onclick="switchDashView('view-settings', this)"><i class="fas fa-sliders-h"></i> Settings</a></li>
                 <li><a id="navProfileLink" onclick="openMyProfile(this)"><i class="fas fa-user-circle"></i> My Profile</a></li>
             </ul>
-            <a href="#" class="sidebar-menu logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Sign Out
-            </a>
+            
+            <div style="position: relative; margin-top: auto; width: 100%;">
+                <a href="#" class="sidebar-menu logout-btn" onclick="showLogoutConfirm(event)" style="margin-top: 0;">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+                
+                <div id="logoutConfirmBox" style="display: none; position: absolute; bottom: calc(100% + 10px); left: 0; width: 100%; background: var(--bg-card); border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2); z-index: 100; flex-direction: column; gap: 10px; text-align: center;">
+                    <span style="font-size: 13px; font-weight: 700; color: var(--text-main);">Ready to leave?</span>
+                    <div style="display: flex; gap: 8px; justify-content: center;">
+                        <button onclick="logout()" style="flex: 1; padding: 6px; border-radius: 6px; border: none; background: #ef4444; color: white; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s;">Yes</button>
+                        <button onclick="hideLogoutConfirm()" style="flex: 1; padding: 6px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s;">No</button>
+                    </div>
+                </div>
+            </div>
+            
         </div>
 
         <div class="main-content">
