@@ -35,7 +35,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .logo { font-size: 24px; font-weight: 800; color: #fff; text-decoration: none; background: rgba(0, 0, 0, 0.3); padding: 5px 15px; border-radius: 5px; }
 .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; }
 
-/* 🛠️ YAHAN FIX KIYA HAI: Navigation links ka color ab dynamic hoga */
+/* Navigation links ka color ab dynamic hoga */
 .nav-links a { text-decoration: none; color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); padding: 8px 18px; border-radius: 8px; }
 .nav-links a:hover { transform: translateY(-4px) scale(1.05); color: var(--primary-color); background: var(--primary-light); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 .nav-links a.active { color: #fff; background: var(--primary-color); box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); }
@@ -179,11 +179,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 .color-dot:hover { transform: scale(1.1); }
 .danger-btn { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
 .danger-btn:hover { background: #ef4444; color: #fff; }
-/* ... APKI PURANI SAARI CSS (Upar ka hissa waisa hi rakhein) ... */
 
-/* =========================================
-   LIVE CHAT & NOTIFICATION STYLES (NEW)
-   ========================================= */
+/* Live Chat & Notification */
 .chat-container { display: flex; height: 500px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-sm); }
 .chat-sidebar { width: 300px; border-right: 1px solid var(--border-color); overflow-y: auto; background: var(--bg-main); }
 .chat-window { flex: 1; display: flex; flex-direction: column; background: var(--bg-card); }
@@ -206,73 +203,52 @@ input:checked + .slider:before { transform: translateX(20px); }
 .chat-user-item h4 { font-size: 14px; color: var(--text-main); font-weight: 800; margin-bottom: 3px; }
 .chat-user-item p { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;}
 .unread-noti { background: var(--primary-light) !important; border-left: 4px solid var(--primary-color); }
-/* =========================================
-   📱 MOBILE RESPONSIVENESS (RESPONSIVE DESIGN)
-   ========================================= */
 
+/* Responsive Design */
 @media screen and (max-width: 900px) {
-    /* Auth Page (Login/Register) Mobile view */
     #authWrapper { flex-direction: column; }
-    .left-section { display: none; /* Mobile me image section hide kar denge taaki form clear dikhe */ }
+    .left-section { display: none; }
     .right-section { flex: 1; width: 100%; padding: 20px 15px; }
     .navbar { position: relative; padding: 15px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 10px; justify-content: center;}
     .logo { color: var(--primary-color); background: var(--primary-light); }
     .nav-links a { font-size: 13px; padding: 6px 10px; }
     .auth-view { padding-top: 20px; min-height: auto; }
-
-    /* Dashboard Mobile View */
     #dashboardWrapper { flex-direction: column; overflow-y: auto; }
-    
-    /* Sidebar ko mobile par horizontal menu bana diya */
     .sidebar { width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; padding: 10px; justify-content: space-between; border-right: none; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 100; overflow-x: auto; gap: 5px;}
     .sidebar-logo { width: 100%; margin-bottom: 10px; justify-content: center; font-size: 18px; }
     .menu-label { display: none; }
     .sidebar-menu { display: flex; flex-direction: row; margin-bottom: 0; gap: 5px; }
     .sidebar-menu a { padding: 8px 10px; font-size: 12px; border-radius: 6px; border: none !important; }
     .logout-btn { margin-top: 0; padding: 8px 10px; font-size: 12px; }
-    
-    /* Main Content & Header */
     .main-content { overflow-y: visible; }
     .dashboard-header { flex-direction: column; padding: 15px; gap: 15px; align-items: flex-start; }
     .search-bar { width: 100%; }
     .header-actions { width: 100%; justify-content: space-between; }
     .dashboard-body { padding: 15px; }
     .dashboard-title-row h2 { font-size: 20px; }
-
-    /* Dashboard Grids ko stack kar diya (ek ke niche ek) */
     .metrics-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     div[style*="grid-template-columns: 2fr 1fr"] { display: flex !important; flex-direction: column; }
     div[style*="grid-template-columns: 1fr 1fr"] { display: flex !important; flex-direction: column; }
     .chart-section { padding: 15px; }
-
-    /* Discover Skills Card */
     .dynamic-grid { grid-template-columns: 1fr; }
-
-    /* Chat System for Mobile */
     .chat-container { flex-direction: column; height: 650px; }
     .chat-sidebar { width: 100%; height: auto; max-height: 120px; border-right: none; border-bottom: 1px solid var(--border-color); display: flex; overflow-x: auto; overflow-y: hidden; }
     .chat-user-item { flex-direction: column; text-align: center; min-width: 80px; padding: 10px; border-bottom: none; border-right: 1px solid var(--border-color); }
     .chat-user-item.active { border-left: none; border-top: 3px solid var(--primary-color); background: var(--bg-card); }
     .chat-user-item img { width: 35px; height: 35px; margin-bottom: 5px; }
-    .chat-user-item div { display: none; /* Text hide kar diya taaki choti screen par clean dikhe */ }
-    
-    /* Settings & Profile Mobile */
+    .chat-user-item div { display: none; }
     .settings-grid { grid-template-columns: 1fr; }
     .input-group { margin-bottom: 15px !important; }
 }
 
-/* Extra small screens (Bohat chote phone) ke liye */
 @media screen and (max-width: 480px) {
     .metrics-grid { grid-template-columns: 1fr; }
     .content-box h1 { font-size: 35px; }
     .form-title { font-size: 26px; }
+    .role-selection { flex-direction: column; }
 }
 
-
-/* =========================================
-   NEW: ROLE SELECTION & ABOUT US CARDS
-   ========================================= */
-
+/* Role Selection & Old About Cards */
 .role-selection { display: flex; gap: 15px; margin-bottom: 25px; width: 100%; }
 .role-box { flex: 1; border: 2px solid var(--border-color); border-radius: 12px; padding: 18px 10px; text-align: center; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg-input); color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .role-box i { font-size: 26px; transition: 0.3s; }
@@ -280,13 +256,20 @@ input:checked + .slider:before { transform: translateX(20px); }
 .role-box:hover { border-color: var(--primary-light); background: var(--bg-card); transform: translateY(-2px); }
 .role-box.active { border-color: var(--primary-color); background: var(--primary-light); color: var(--primary-color); box-shadow: 0 4px 12px var(--primary-light); }
 .role-box.active i { transform: scale(1.1); }
-
 .about-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px 25px; margin-bottom: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; text-align: center; transition: 0.3s; width: 100%; }
 .about-card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.08); border-color: var(--primary-color); }
 .about-card i { font-size: 32px; color: var(--primary-color); background: var(--primary-light); width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin-bottom: 18px; }
 .about-card h3 { font-size: 20px; color: var(--text-main); margin-bottom: 12px; font-weight: 800; }
 .about-card p { font-size: 14.5px; color: var(--text-muted); line-height: 1.7; font-weight: 500; }
 
-@media screen and (max-width: 480px) {
-    .role-selection { flex-direction: column; }
-}
+/* =========================================
+   🟢 NEW: ABOUT US IMAGE GRID (10 DETAILED BOXES)
+   ========================================= */
+.about-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; width: 100%; margin-bottom: 40px; }
+.about-image-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); transition: 0.3s; display: flex; flex-direction: column; }
+.about-image-card:hover { transform: translateY(-5px); box-shadow: 0 12px 20px rgba(0,0,0,0.08); border-color: var(--primary-color); }
+.about-image-card img { width: 100%; height: 180px; object-fit: cover; border-bottom: 3px solid var(--primary-color); }
+.about-image-card .card-content { padding: 25px; display: flex; flex-direction: column; flex: 1; }
+.about-image-card .card-content h3 { font-size: 18px; color: var(--text-main); margin-bottom: 10px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+.about-image-card .card-content h3 i { color: var(--primary-color); font-size: 20px; }
+.about-image-card .card-content p { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 500; }
