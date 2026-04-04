@@ -117,6 +117,7 @@
                                 </div>
                                 <button id="videoCallBtn" onclick="startVideoCall()" style="display:none; background:var(--primary-gradient); color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:bold; box-shadow:var(--shadow-sm); transition:0.3s;"><i class="fas fa-video"></i> Video Call</button>
                             </div>
+
                             <div class="chat-messages" id="chatMessages">
                                 <div style="text-align:center; color:var(--text-muted); margin:auto;">Select a user to start messaging</div>
                             </div>
@@ -252,10 +253,13 @@
             <video id="remoteVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
             <video id="localVideo" autoplay playsinline muted style="position: absolute; bottom: 20px; right: 20px; width: 150px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color); background: #222; transform: scaleX(-1); box-shadow: 0 5px 15px rgba(0,0,0,0.5);"></video>
         </div>
-        <div style="display: flex; gap: 25px; margin-top: 30px;">
-            <button id="toggleMicBtn" onclick="toggleMic()" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;"><i class="fas fa-microphone"></i></button>
-            <button id="toggleCamBtn" onclick="toggleCamera()" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;"><i class="fas fa-video"></i></button>
-            <button onclick="endCall()" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: #ef4444; color: white; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); transition: 0.3s;"><i class="fas fa-phone-slash"></i></button>
+        
+        <div style="display: flex; gap: 30px; margin-top: 30px;">
+            <button id="toggleMicBtn" onclick="toggleMic()" style="width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--bg-card); color: var(--primary-color); font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; justify-content: center;"><i class="fas fa-microphone"></i></button>
+            
+            <button id="toggleCamBtn" onclick="toggleCamera()" style="width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--bg-card); color: var(--primary-color); font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; justify-content: center;"><i class="fas fa-video"></i></button>
+            
+            <button onclick="endCall()" style="width: 65px; height: 65px; border-radius: 50%; border: none; background: #ef4444; color: white; font-size: 26px; cursor: pointer; box-shadow: 0 5px 15px rgba(239,68,68,0.4); transition: 0.3s; display: flex; align-items: center; justify-content: center;"><i class="fas fa-phone" style="transform: rotate(135deg);"></i></button>
         </div>
     </div>
 
