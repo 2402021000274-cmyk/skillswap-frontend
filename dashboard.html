@@ -42,7 +42,6 @@
                     </div>
                 </div>
             </div>
-            
         </div>
 
         <div class="main-content">
@@ -107,12 +106,16 @@
                     <div class="chat-container">
                         <div class="chat-sidebar" id="chatList"></div>
                         <div class="chat-window">
-                            <div class="chat-header">
-                                <img id="chatPartnerPic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="display:none;">
-                                <div>
-                                    <h3 id="chatPartnerName">Select a conversation</h3>
-                                    <span id="chatPartnerStatus" class="status-indicator"></span>
+                            
+                            <div class="chat-header" style="display:flex; justify-content:space-between; width:100%;">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <img id="chatPartnerPic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" style="display:none;">
+                                    <div>
+                                        <h3 id="chatPartnerName">Select a conversation</h3>
+                                        <span id="chatPartnerStatus" class="status-indicator"></span>
+                                    </div>
                                 </div>
+                                <button id="videoCallBtn" onclick="startVideoCall()" style="display:none; background:var(--primary-gradient); color:white; border:none; padding:8px 15px; border-radius:10px; cursor:pointer; font-weight:bold; box-shadow:var(--shadow-sm); transition:0.3s;"><i class="fas fa-video"></i> Video Call</button>
                             </div>
                             <div class="chat-messages" id="chatMessages">
                                 <div style="text-align:center; color:var(--text-muted); margin:auto;">Select a user to start messaging</div>
@@ -226,6 +229,33 @@
         <div style="display: flex; gap: 20px; margin-top: 30px;">
             <button type="button" class="btn-submit" onclick="takeSnapshot()" style="width: auto; padding: 12px 25px; margin: 0; background: #10b981;"><i class="fas fa-camera"></i> Capture</button>
             <button type="button" class="btn-submit" onclick="stopCamera()" style="width: auto; padding: 12px 25px; margin: 0; background: #ef4444;"><i class="fas fa-times"></i> Cancel</button>
+        </div>
+    </div>
+
+    <div id="incomingCallModal" style="display:none; position: fixed; top: 30px; right: 30px; background: var(--bg-card); padding: 25px; border-radius: 15px; border: 2px solid var(--primary-color); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4); z-index: 999999; flex-direction: column; align-items: center; gap: 15px; animation: slideInRight 0.3s ease;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="width: 50px; height: 50px; background: var(--primary-light); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; animation: popIn 1s infinite alternate;"><i class="fas fa-video"></i></div>
+            <div>
+                <h4 style="color: var(--text-main); margin-bottom: 5px;">Incoming Video Call</h4>
+                <p id="callerNameText" style="color: var(--text-muted); font-size: 14px; font-weight: bold;">User is calling...</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; width: 100%;">
+            <button onclick="acceptCall()" style="flex: 1; padding: 10px; background: #10b981; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(16,185,129,0.3);"><i class="fas fa-phone"></i> Accept</button>
+            <button onclick="rejectCall()" style="flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(239,68,68,0.3);"><i class="fas fa-phone-slash"></i> Decline</button>
+        </div>
+    </div>
+
+    <div id="videoCallModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11,15,25,0.95); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+        <h2 id="callStatusText" style="color: white; margin-bottom: 20px;">Calling...</h2>
+        <div style="position: relative; width: 90%; max-width: 1000px; height: 70vh; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);">
+            <video id="remoteVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <video id="localVideo" autoplay playsinline muted style="position: absolute; bottom: 20px; right: 20px; width: 150px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color); background: #222; transform: scaleX(-1); box-shadow: 0 5px 15px rgba(0,0,0,0.5);"></video>
+        </div>
+        <div style="display: flex; gap: 25px; margin-top: 30px;">
+            <button id="toggleMicBtn" onclick="toggleMic()" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;"><i class="fas fa-microphone"></i></button>
+            <button id="toggleCamBtn" onclick="toggleCamera()" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: rgba(255,255,255,0.15); color: white; font-size: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;"><i class="fas fa-video"></i></button>
+            <button onclick="endCall()" style="width: 60px; height: 60px; border-radius: 50%; border: none; background: #ef4444; color: white; font-size: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(239,68,68,0.4); transition: 0.3s;"><i class="fas fa-phone-slash"></i></button>
         </div>
     </div>
 
