@@ -57,9 +57,13 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 
 /* ================= Auth Layout (Login Page) ================= */
 #authWrapper { display: flex; width: 100%; height: 100vh; }
-.navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; z-index: 100; background: transparent; }
+
+/* 🟢 FIXED: align-items ko flex-start kiya taaki logo aur nav-links alag-alag control ho sakein */
+.navbar { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 60px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 100; background: transparent; }
 .logo { font-size: 24px; font-weight: 800; color: #fff; text-decoration: none; }
-.nav-links { list-style: none; display: flex; gap: 15px; align-items: center; }
+
+/* 🟢 FIXED: margin-top: 6px se Navigation exactly 90px header box ke center mein aa jayega */
+.nav-links { list-style: none; display: flex; gap: 15px; align-items: center; margin-top: 6px; }
 
 /* Lift Animation for Nav Links */
 .nav-links a { display: inline-block; text-decoration: none; color: var(--text-main); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); padding: 10px 20px; border-radius: 12px; }
@@ -300,6 +304,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .settings-title { font-size: 16px; color: var(--text-main); font-weight: 800; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px;}
 .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
+/* Custom Switch Toggle (Restored Original Logic) */
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); border-radius: 34px; transition: .4s; }
@@ -307,9 +312,11 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 input:checked + .slider { background: var(--primary-gradient); }
 input:checked + .slider:before { transform: translateX(20px); }
 
+/* Settings Theme Dots (Restored Circle Shape) */
 .color-dot { width: 35px; height: 35px; border-radius: 50%; border: 3px solid var(--bg-card); box-shadow: 0 0 0 2px var(--border-color); transition: all 0.3s ease; cursor: pointer; }
 .color-dot:hover { transform: scale(1.15); box-shadow: 0 0 0 3px var(--border-color); }
 
+/* Danger Button (Restored) */
 .danger-btn { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
 .danger-btn:hover { background: #ef4444; color: #fff; }
 
@@ -321,7 +328,11 @@ input:checked + .slider:before { transform: translateX(20px); }
     .metrics-grid { grid-template-columns: 1fr 1fr; }
     .content-box h1 { font-size: 45px; }
     .auth-view { max-width: 100%; padding: 20px; }
+    
+    /* 🟢 NEW: Mobile View pe bhi navigation ko center mein theek se set karne ke liye */
+    .nav-links { margin-top: 10px; justify-content: center; width: 100%; }
 }
+
 @media screen and (max-width: 480px) {
     .metrics-grid { grid-template-columns: 1fr; }
     .content-box h1 { font-size: 35px; }
