@@ -13,6 +13,20 @@ let isFirstDataLoad = true;
 let isSyncPaused = false;
 let cloudUpdateTimeout = null;
 
+// ==========================================
+// 🟢 WEBRTC VIDEO CALL VARIABLES
+// ==========================================
+let peerConnection;
+let localStream;
+let remoteStream;
+let incomingCallPartner = null;
+let isCalling = false;
+
+const rtcConfig = {
+    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+};
+// ==========================================
+
 const socket = typeof io !== 'undefined' ? io(API_BASE_URL) : null;
 if(socket) {
     socket.on('connect', () => {
@@ -22,7 +36,6 @@ if(socket) {
 
     socket.on('receive-msg', (data) => {
         syncWithDatabase(); 
-        
         if (currentChatPartnerEmail !== data.from) {
             let senderName = usersDB.find(u => u.email === data.from)?.name || "User";
             showToast(`💬 Naya message: ${senderName} ne bheja`);
@@ -31,6 +44,41 @@ if(socket) {
 
     socket.on('user-status-update', (data) => {
         syncWithDatabase(); 
+    });
+
+    // 🟢 VIDEO CALL SOCKET LISTENERS
+    socket.on('call-made', async (data) => {
+        incomingCallPartner = data.from;
+        let callerUser = usersDB.find(u => u.email === data.from);
+        document.getElementById('callerNameText').innerText = (callerUser ? callerUser.name : "User") + " is calling...";
+        document.getElementById('incomingCallModal').style.display = "flex";
+        window.incomingOffer = data.offer;
+        try {
+            let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+            audio.play();
+        } catch(e){}
+    });
+
+    socket.on('answer-made', async (data) => {
+        document.getElementById('callStatusText').innerText = "Connected";
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+    });
+
+    socket.on('call-rejected', () => {
+        document.getElementById('callStatusText').innerText = "Call Declined";
+        setTimeout(() => endCall(false), 2000);
+    });
+
+    socket.on('call-ended', () => {
+        endCall(false); 
+    });
+
+    socket.on('ice-candidate', async (data) => {
+        if(peerConnection) {
+            try {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            } catch(e) { console.error("Error adding ice candidate", e); }
+        }
     });
 }
 
@@ -227,7 +275,6 @@ function refreshDynamicData(isLiveUpdate = false) {
                 foundSkills = true;
                 let icon = getSkillIcon(skill);
                 
-                // 🟢 PRIVACY LOCK: Check Swap Status for the Message Button
                 let isSwapAccepted = false;
                 if (me.swaps) {
                     let existingSwap = me.swaps.find(s => s.partnerEmail === otherUser.email && s.status === 'Active');
@@ -464,7 +511,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
     updateCloudUser(usersDB[meIndex]); 
     
-    // Clear chat partner if the active swap is removed
     if(currentChatPartnerEmail && usersDB[targetIndex] && currentChatPartnerEmail === usersDB[targetIndex].email) {
         currentChatPartnerEmail = null;
     }
@@ -498,7 +544,6 @@ function renderChatSidebar() {
     
     let chatPartners = new Set();
     
-    // 🟢 LOCK: Sidebar mein sirf wahi aayenge jinka swap ACTIVE hai
     if(me.swaps) {
         me.swaps.forEach(s => {
             if(s.status === 'Active') {
@@ -556,6 +601,9 @@ function renderChatWindow() {
     document.getElementById('chatPartnerStatus').innerText = partnerUser.isOnline ? "Online" : "Offline";
     document.getElementById('chatPartnerStatus').style.color = partnerUser.isOnline ? "#10b981" : "var(--text-muted)";
     document.getElementById('chatInputArea').style.display = "flex";
+    
+    // 🟢 SHOW VIDEO CALL BUTTON
+    document.getElementById('videoCallBtn').style.display = "block";
 
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const me = usersDB.find(u => u.email === myEmail);
@@ -601,7 +649,6 @@ function sendLiveMessage() {
     const myIndex = usersDB.findIndex(u => u.email === myEmail);
     const partnerIndex = usersDB.findIndex(u => u.email === currentChatPartnerEmail);
 
-    // 🟢 SECURITY LOCK: Double check sending message logic
     let isSwapAccepted = false;
     if (usersDB[myIndex].swaps) {
         let existingSwap = usersDB[myIndex].swaps.find(s => s.partnerEmail === currentChatPartnerEmail && s.status === 'Active');
@@ -636,7 +683,6 @@ function sendLiveMessage() {
     }
 
     input.value = ""; 
-    
     refreshDynamicData(); 
     setTimeout(() => {
         const msgBox = document.getElementById('chatMessages');
@@ -864,9 +910,6 @@ function logout() {
     setTimeout(() => { window.location.href = "index.html"; }, 300);
 }
 
-// ==========================================
-// 🟢 LIVE CAMERA FEATURE 
-// ==========================================
 let cameraStream = null;
 
 async function startCamera() {
@@ -879,7 +922,7 @@ async function startCamera() {
         cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         video.srcObject = cameraStream;
     } catch (err) {
-        alert("❌ Camera access denied! Please allow camera permissions in your browser.");
+        alert("❌ Camera access denied!");
         stopCamera();
     }
 }
@@ -897,32 +940,22 @@ function stopCamera() {
 function takeSnapshot() {
     const video = document.getElementById('cameraFeed');
     const canvas = document.createElement('canvas');
-    
     const SIZE = 250;
-    canvas.width = SIZE;
-    canvas.height = SIZE;
-    
+    canvas.width = SIZE; canvas.height = SIZE;
     const ctx = canvas.getContext('2d');
-    
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
+    ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
     
     const minDim = Math.min(video.videoWidth, video.videoHeight);
     const startX = (video.videoWidth - minDim) / 2;
     const startY = (video.videoHeight - minDim) / 2;
     
     ctx.drawImage(video, startX, startY, minDim, minDim, 0, 0, SIZE, SIZE);
-    
     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
     document.getElementById('editProfilePreview').src = compressedBase64;
     editProfilePic = compressedBase64;
-    
     stopCamera(); 
 }
 
-// ==========================================
-// 🟢 CUSTOM LOGOUT CONFIRMATION BOX LOGIC
-// ==========================================
 function showLogoutConfirm(e) {
     e.preventDefault(); 
     document.getElementById('logoutConfirmBox').style.display = 'flex';
@@ -930,4 +963,161 @@ function showLogoutConfirm(e) {
 
 function hideLogoutConfirm() {
     document.getElementById('logoutConfirmBox').style.display = 'none';
+}
+
+
+// ==========================================
+// 🟢 NEW: WEBRTC VIDEO CALL ENGINE
+// ==========================================
+async function startVideoCall() {
+    if(!currentChatPartnerEmail) return;
+    
+    document.getElementById('videoCallModal').style.display = "flex";
+    document.getElementById('callStatusText').innerText = "Calling " + usersDB.find(u => u.email === currentChatPartnerEmail).name + "...";
+    isCalling = true;
+
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('localVideo').srcObject = localStream;
+        
+        setupPeerConnection();
+
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+
+        const myEmail = sessionStorage.getItem('loggedInUserEmail');
+        socket.emit('call-user', {
+            to: currentChatPartnerEmail,
+            from: myEmail,
+            offer: offer
+        });
+
+    } catch (err) {
+        alert("Camera ya Mic ki permission nahi mili!");
+        endCall(true);
+    }
+}
+
+async function acceptCall() {
+    document.getElementById('incomingCallModal').style.display = "none";
+    document.getElementById('videoCallModal').style.display = "flex";
+    document.getElementById('callStatusText').innerText = "Connecting...";
+    
+    currentChatPartnerEmail = incomingCallPartner; // Chat partner update
+    switchDashView('view-messages', document.querySelectorAll('.sidebar-menu a')[3]); // Chat view open
+
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        document.getElementById('localVideo').srcObject = localStream;
+        
+        setupPeerConnection();
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(window.incomingOffer));
+
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        socket.emit('make-answer', {
+            to: incomingCallPartner,
+            answer: answer
+        });
+
+    } catch (err) {
+        alert("Camera ya Mic ki permission nahi mili!");
+        rejectCall();
+    }
+}
+
+function rejectCall() {
+    document.getElementById('incomingCallModal').style.display = "none";
+    if(incomingCallPartner) {
+        socket.emit('reject-call', { to: incomingCallPartner });
+    }
+    incomingCallPartner = null;
+}
+
+function setupPeerConnection() {
+    peerConnection = new RTCPeerConnection(rtcConfig);
+
+    localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+    });
+
+    peerConnection.ontrack = event => {
+        const remoteVideo = document.getElementById('remoteVideo');
+        if (!remoteStream) {
+            remoteStream = new MediaStream();
+            remoteVideo.srcObject = remoteStream;
+        }
+        remoteStream.addTrack(event.track);
+    };
+
+    peerConnection.onicecandidate = event => {
+        if (event.candidate) {
+            const myEmail = sessionStorage.getItem('loggedInUserEmail');
+            socket.emit('ice-candidate', {
+                to: currentChatPartnerEmail || incomingCallPartner,
+                candidate: event.candidate,
+                from: myEmail
+            });
+        }
+    };
+}
+
+function endCall(isLocalAction = true) {
+    document.getElementById('videoCallModal').style.display = "none";
+    document.getElementById('incomingCallModal').style.display = "none";
+    
+    if(isLocalAction && (currentChatPartnerEmail || incomingCallPartner)) {
+        socket.emit('end-call', { to: currentChatPartnerEmail || incomingCallPartner });
+    }
+
+    if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+    }
+    if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+    }
+    if (remoteStream) {
+        remoteStream.getTracks().forEach(track => track.stop());
+        remoteStream = null;
+    }
+    
+    isCalling = false;
+    incomingCallPartner = null;
+}
+
+function toggleMic() {
+    if(localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        audioTrack.enabled = !audioTrack.enabled;
+        const btn = document.getElementById('toggleMicBtn');
+        if(audioTrack.enabled) {
+            btn.innerHTML = '<i class="fas fa-microphone"></i>';
+            btn.style.background = "rgba(255,255,255,0.15)";
+            btn.style.color = "white";
+        } else {
+            btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+            btn.style.background = "#ef4444";
+            btn.style.color = "white";
+        }
+    }
+}
+
+function toggleCamera() {
+    if(localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        videoTrack.enabled = !videoTrack.enabled;
+        const btn = document.getElementById('toggleCamBtn');
+        if(videoTrack.enabled) {
+            btn.innerHTML = '<i class="fas fa-video"></i>';
+            btn.style.background = "rgba(255,255,255,0.15)";
+            btn.style.color = "white";
+        } else {
+            btn.innerHTML = '<i class="fas fa-video-slash"></i>';
+            btn.style.background = "#ef4444";
+            btn.style.color = "white";
+        }
+    }
 }
