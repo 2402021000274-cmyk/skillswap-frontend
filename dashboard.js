@@ -14,7 +14,7 @@ let isSyncPaused = false;
 let cloudUpdateTimeout = null;
 
 // ==========================================
-// 🟢 WEBRTC VIDEO CALL VARIABLES
+// 🟢 WEBRTC VIDEO CALL VARIABLES (LAG FIX)
 // ==========================================
 let peerConnection;
 let localStream;
@@ -22,8 +22,27 @@ let remoteStream;
 let incomingCallPartner = null;
 let isCalling = false;
 
+// 🟢 FIXED: Multiple STUN servers for better connectivity
 const rtcConfig = {
-    iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+    ]
+};
+
+// 🟢 FIXED: Video constraints to prevent Lag (Set to smooth HD instead of heavy 4K)
+const mediaConstraints = {
+    video: {
+        width: { ideal: 640 }, // Keeps it light and fast
+        height: { ideal: 480 },
+        frameRate: { ideal: 24, max: 30 }
+    },
+    audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+    }
 };
 // ==========================================
 
@@ -46,7 +65,6 @@ if(socket) {
         syncWithDatabase(); 
     });
 
-    // 🟢 VIDEO CALL SOCKET LISTENERS
     socket.on('call-made', async (data) => {
         incomingCallPartner = data.from;
         let callerUser = usersDB.find(u => u.email === data.from);
@@ -602,7 +620,6 @@ function renderChatWindow() {
     document.getElementById('chatPartnerStatus').style.color = partnerUser.isOnline ? "#10b981" : "var(--text-muted)";
     document.getElementById('chatInputArea').style.display = "flex";
     
-    // 🟢 SHOW VIDEO CALL BUTTON
     document.getElementById('videoCallBtn').style.display = "block";
 
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -967,7 +984,7 @@ function hideLogoutConfirm() {
 
 
 // ==========================================
-// 🟢 NEW: WEBRTC VIDEO CALL ENGINE
+// 🟢 WEBRTC VIDEO CALL ENGINE (OPTIMIZED)
 // ==========================================
 async function startVideoCall() {
     if(!currentChatPartnerEmail) return;
@@ -977,7 +994,8 @@ async function startVideoCall() {
     isCalling = true;
 
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        // 🟢 FIXED: Using constrained media parameters to prevent Lag
+        localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         document.getElementById('localVideo').srcObject = localStream;
         
         setupPeerConnection();
@@ -1003,11 +1021,12 @@ async function acceptCall() {
     document.getElementById('videoCallModal').style.display = "flex";
     document.getElementById('callStatusText').innerText = "Connecting...";
     
-    currentChatPartnerEmail = incomingCallPartner; // Chat partner update
-    switchDashView('view-messages', document.querySelectorAll('.sidebar-menu a')[3]); // Chat view open
+    currentChatPartnerEmail = incomingCallPartner;
+    switchDashView('view-messages', document.querySelectorAll('.sidebar-menu a')[3]); 
 
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        // 🟢 FIXED: Using constrained media parameters here as well
+        localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         document.getElementById('localVideo').srcObject = localStream;
         
         setupPeerConnection();
@@ -1088,6 +1107,7 @@ function endCall(isLocalAction = true) {
     incomingCallPartner = null;
 }
 
+// 🟢 FIXED: Toggle button styling updated for premium look
 function toggleMic() {
     if(localStream) {
         const audioTrack = localStream.getAudioTracks()[0];
@@ -1095,8 +1115,8 @@ function toggleMic() {
         const btn = document.getElementById('toggleMicBtn');
         if(audioTrack.enabled) {
             btn.innerHTML = '<i class="fas fa-microphone"></i>';
-            btn.style.background = "rgba(255,255,255,0.15)";
-            btn.style.color = "white";
+            btn.style.background = "var(--bg-card)";
+            btn.style.color = "var(--primary-color)";
         } else {
             btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
             btn.style.background = "#ef4444";
@@ -1105,6 +1125,7 @@ function toggleMic() {
     }
 }
 
+// 🟢 FIXED: Toggle button styling updated for premium look
 function toggleCamera() {
     if(localStream) {
         const videoTrack = localStream.getVideoTracks()[0];
@@ -1112,8 +1133,8 @@ function toggleCamera() {
         const btn = document.getElementById('toggleCamBtn');
         if(videoTrack.enabled) {
             btn.innerHTML = '<i class="fas fa-video"></i>';
-            btn.style.background = "rgba(255,255,255,0.15)";
-            btn.style.color = "white";
+            btn.style.background = "var(--bg-card)";
+            btn.style.color = "var(--primary-color)";
         } else {
             btn.innerHTML = '<i class="fas fa-video-slash"></i>';
             btn.style.background = "#ef4444";
