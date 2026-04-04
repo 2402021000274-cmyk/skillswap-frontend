@@ -185,7 +185,7 @@
                     </div>
 
                     <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=600&auto=format&fit=crop" alt="Credits">
+                        <img src="https://images.unsplash.com/photo-1580519542036-ed47f3e42214?q=80&w=600&auto=format&fit=crop" alt="Credits">
                         <div class="card-content">
                             <h3><i class="fas fa-coins"></i> Time is Money</h3>
                             <p>No actual money is involved. You earn virtual credits by dedicating your time to teach someone. Spend those exact credits to learn a new skill from another expert.</p>
@@ -209,7 +209,7 @@
                     </div>
 
                     <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?q=80&w=600&auto=format&fit=crop" alt="Live Chat">
+                        <img src="https://images.unsplash.com/photo-1577563908411-50cb989d6580?q=80&w=600&auto=format&fit=crop" alt="Live Chat">
                         <div class="card-content">
                             <h3><i class="fas fa-comment-dots"></i> Real-Time Chat</h3>
                             <p>Seamlessly connect with your swap partners using our built-in, WhatsApp-style instant messaging system. Discuss topics, share links, and schedule sessions easily.</p>
@@ -260,11 +260,19 @@
             </div>
 
             <div id="howItWorksView" class="auth-view" style="justify-content: flex-start; padding-top: 40px;">
-                <h2 class="info-header">How it Works</h2>
+                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">How it Works</h2>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px; font-weight: 500;">Your journey to mastering new skills in 3 simple steps.</p>
+                
                 <div class="step-card"><div class="step-icon"><i class="fas fa-user-plus"></i></div><div class="step-content"><h3>1. Create Profile</h3><p>Sign up, choose your role, and list the skills you want to teach or learn.</p></div></div>
                 <div class="step-card"><div class="step-icon"><i class="fas fa-search"></i></div><div class="step-content"><h3>2. Find a Match</h3><p>Discover users around the platform who match your learning interests.</p></div></div>
                 <div class="step-card"><div class="step-icon"><i class="fas fa-exchange-alt"></i></div><div class="step-content"><h3>3. Start Swapping</h3><p>Connect via live chat, exchange knowledge, and grow together.</p></div></div>
+                
+                <div style="margin-top: 20px; text-align: center; background: var(--bg-input); padding: 25px; border-radius: 12px; border: 1px dashed var(--primary-color);">
+                    <h3 style="color: var(--primary-color); margin-bottom: 15px; font-size: 16px;"><i class="fas fa-rocket"></i> Ready to start your journey?</h3>
+                    <button class="btn-solid" style="width: auto; padding: 12px 30px; margin-top: 0; display: inline-block;" onclick="switchAuthView('homeView', document.querySelectorAll('.nav-links a')[0]); showSubForm('registerForm')">Join Skill Hub Now</button>
+                </div>
             </div>
+            
         </div>
     </div>
 
