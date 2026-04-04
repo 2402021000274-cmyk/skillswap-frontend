@@ -226,6 +226,18 @@ function refreshDynamicData(isLiveUpdate = false) {
                 allSkills[sk] = (allSkills[sk] || 0) + 1;
                 foundSkills = true;
                 let icon = getSkillIcon(skill);
+                
+                // 🟢 PRIVACY LOCK: Check Swap Status for the Message Button
+                let isSwapAccepted = false;
+                if (me.swaps) {
+                    let existingSwap = me.swaps.find(s => s.partnerEmail === otherUser.email && s.status === 'Active');
+                    if (existingSwap) isSwapAccepted = true;
+                }
+
+                let messageBtnHTML = isSwapAccepted 
+                    ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
+                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 Swap accept hone ke baad hi message kar sakte ho!')"><i class="fas fa-lock"></i> Message</button>`;
+
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
                         <div class="top-badge">Available</div>
@@ -234,7 +246,7 @@ function refreshDynamicData(isLiveUpdate = false) {
                         <p style="margin-bottom: 20px;">User: <strong>${otherUser.name}</strong></p>
                         <div class="card-buttons">
                             <button class="btn-solid" onclick="requestSwap('${otherUser.email}', '${skill}')">Swap</button>
-                            <button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>
+                            ${messageBtnHTML}
                         </div>
                     </div>`;
             });
@@ -373,7 +385,7 @@ function requestSwap(targetEmail, skill) {
     usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
     usersDB[targetIndex].swaps = usersDB[targetIndex].swaps || [];
     
-    if(usersDB[meIndex].swaps.find(s => s.skill === skill && s.partner === usersDB[targetIndex].name)) { alert("You have already requested this swap!"); return; }
+    if(usersDB[meIndex].swaps.find(s => s.skill === skill && s.partnerEmail === usersDB[targetIndex].email)) { alert("You have already requested this swap!"); return; }
 
     usersDB[meIndex].swaps.push({ skill: skill, partner: usersDB[targetIndex].name, partnerEmail: usersDB[targetIndex].email, status: 'Pending' });
     usersDB[targetIndex].swaps.push({ skill: skill, partner: usersDB[meIndex].name, partnerEmail: usersDB[meIndex].email, status: 'Requested' });
@@ -405,7 +417,7 @@ function acceptSwap(mySwapIndex, partnerName, skill) {
         if(usersDB[targetIndex].credits < 1) { alert("The requester doesn't have enough credits anymore."); return; }
 
         usersDB[targetIndex].credits -= 1;
-        let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partner === usersDB[meIndex].name && s.skill === skill);
+        let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
         if(partnerSwapIndex !== -1) { usersDB[targetIndex].swaps[partnerSwapIndex].status = 'Active'; }
         usersDB[meIndex].swaps[mySwapIndex].status = 'Active';
 
@@ -422,7 +434,7 @@ function acceptSwap(mySwapIndex, partnerName, skill) {
         updateCloudUser(usersDB[targetIndex]); 
 
         refreshDynamicData();
-        alert("✅ Swap Accepted! 1 Credit deducted from the requester.");
+        alert("✅ Swap Accepted! You can now message them in Live Chat.");
     }
 }
 
@@ -436,7 +448,7 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
 
     if(targetIndex !== -1) {
-        usersDB[targetIndex].swaps = usersDB[targetIndex].swaps.filter(s => !(s.partner === usersDB[meIndex].name && s.skill === skill));
+        usersDB[targetIndex].swaps = usersDB[targetIndex].swaps.filter(s => !(s.partnerEmail === usersDB[meIndex].email && s.skill === skill));
         usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
         
         let notiText = "";
@@ -451,10 +463,30 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     usersDB[meIndex].swaps.splice(mySwapIndex, 1);
     localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
     updateCloudUser(usersDB[meIndex]); 
+    
+    // Clear chat partner if the active swap is removed
+    if(currentChatPartnerEmail && usersDB[targetIndex] && currentChatPartnerEmail === usersDB[targetIndex].email) {
+        currentChatPartnerEmail = null;
+    }
+    
     refreshDynamicData();
 }
 
 function openChatFromDiscover(targetEmail) {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const me = usersDB.find(u => u.email === myEmail);
+    
+    let isSwapAccepted = false;
+    if (me.swaps) {
+        let existingSwap = me.swaps.find(s => s.partnerEmail === targetEmail && s.status === 'Active');
+        if (existingSwap) isSwapAccepted = true;
+    }
+    
+    if (!isSwapAccepted) {
+        showToast('🔒 Swap accept hone ke baad hi message kar sakte ho!');
+        return;
+    }
+
     currentChatPartnerEmail = targetEmail;
     switchDashView('view-messages', document.querySelectorAll('.sidebar-menu a')[3]);
 }
@@ -465,14 +497,19 @@ function renderChatSidebar() {
     const chatList = document.getElementById('chatList');
     
     let chatPartners = new Set();
-    if(me.swaps) me.swaps.forEach(s => {
-        let p = usersDB.find(u => u.name === s.partner);
-        if(p) chatPartners.add(p.email);
-    });
-    if(me.chatHistory) Object.keys(me.chatHistory).forEach(email => chatPartners.add(email));
+    
+    // 🟢 LOCK: Sidebar mein sirf wahi aayenge jinka swap ACTIVE hai
+    if(me.swaps) {
+        me.swaps.forEach(s => {
+            if(s.status === 'Active') {
+                let p = usersDB.find(u => u.email === s.partnerEmail || u.name === s.partner);
+                if(p) chatPartners.add(p.email);
+            }
+        });
+    }
 
     if(chatPartners.size === 0) {
-        chatList.innerHTML = `<p style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">No chats yet. Request a swap to start messaging!</p>`;
+        chatList.innerHTML = `<p style="padding:20px; text-align:center; color:var(--text-muted); font-size:13px;">No active swaps yet. Request a swap to start messaging!</p>`;
         return;
     }
 
@@ -563,6 +600,18 @@ function sendLiveMessage() {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const myIndex = usersDB.findIndex(u => u.email === myEmail);
     const partnerIndex = usersDB.findIndex(u => u.email === currentChatPartnerEmail);
+
+    // 🟢 SECURITY LOCK: Double check sending message logic
+    let isSwapAccepted = false;
+    if (usersDB[myIndex].swaps) {
+        let existingSwap = usersDB[myIndex].swaps.find(s => s.partnerEmail === currentChatPartnerEmail && s.status === 'Active');
+        if (existingSwap) isSwapAccepted = true;
+    }
+
+    if (!isSwapAccepted) {
+        showToast('🔒 You can only send messages if the swap is Active!');
+        return;
+    }
 
     if(!usersDB[myIndex].chatHistory) usersDB[myIndex].chatHistory = {};
     if(!usersDB[partnerIndex].chatHistory) usersDB[partnerIndex].chatHistory = {};
