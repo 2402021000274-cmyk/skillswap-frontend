@@ -390,3 +390,72 @@ input:checked + .slider:before { transform: translateX(20px); }
     .form-title { font-size: 28px; }
     .chat-container { height: 80vh; }
 }
+
+/* ✨ AI TRANSLATOR UI STYLES */
+.ai-controls {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 15px;
+    border-radius: 30px;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#ai-lang-select {
+    background: transparent;
+    color: white;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+}
+
+#ai-lang-select option { background: #1e293b; }
+
+#toggle-ai-btn {
+    background: transparent;
+    border: none;
+    color: #10b981; 
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#toggle-ai-btn.active {
+    color: #ef4444; 
+    animation: pulse 1.5s infinite;
+}
+
+#ai-caption-box {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 12px;
+    max-width: 80%;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+}
+
+#caption-text {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
