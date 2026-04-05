@@ -7,6 +7,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="responsive-mobile.css">
 </head>
 <body>
 
@@ -18,20 +20,20 @@
             
             <div class="menu-label">Menu</div>
             <ul class="sidebar-menu">
-                <li><a onclick="switchDashView('view-dashboard', this)" class="active"><i class="fas fa-chart-pie"></i> Overview</a></li>
-                <li><a onclick="switchDashView('view-find-skills', this)"><i class="fas fa-search"></i> Discover Skills</a></li>
-                <li><a onclick="switchDashView('view-active-swaps', this)"><i class="fas fa-handshake"></i> My Swaps</a></li>
-                <li><a onclick="switchDashView('view-messages', this)"><i class="fas fa-comment-dots"></i> Live Chat</a></li>
+                <li><a onclick="switchDashView('view-dashboard', this)" class="active"><i class="fas fa-chart-pie"></i><span>Overview</span></a></li>
+                <li><a onclick="switchDashView('view-find-skills', this)"><i class="fas fa-search"></i><span>Discover Skills</span></a></li>
+                <li><a onclick="switchDashView('view-active-swaps', this)"><i class="fas fa-handshake"></i><span>My Swaps</span></a></li>
+                <li><a onclick="switchDashView('view-messages', this)"><i class="fas fa-comment-dots"></i><span>Live Chat</span></a></li>
             </ul>
             <div class="menu-label" style="margin-top: 15px;">Preferences</div>
             <ul class="sidebar-menu">
-                <li><a onclick="switchDashView('view-settings', this)"><i class="fas fa-sliders-h"></i> Settings</a></li>
-                <li><a id="navProfileLink" onclick="openMyProfile(this)"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                <li><a onclick="switchDashView('view-settings', this)"><i class="fas fa-sliders-h"></i><span>Settings</span></a></li>
+                <li><a id="navProfileLink" onclick="openMyProfile(this)"><i class="fas fa-user-circle"></i><span>My Profile</span></a></li>
             </ul>
             
             <div style="position: relative; margin-top: auto; width: 100%;">
                 <a href="#" class="sidebar-menu logout-btn" onclick="showLogoutConfirm(event)" style="margin-top: 0;">
-                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                    <i class="fas fa-sign-out-alt"></i><span>Sign Out</span>
                 </a>
                 
                 <div id="logoutConfirmBox" style="display: none; position: absolute; bottom: calc(100% + 10px); left: 0; width: 100%; background: var(--bg-card); border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2); z-index: 100; flex-direction: column; gap: 10px; text-align: center;">
