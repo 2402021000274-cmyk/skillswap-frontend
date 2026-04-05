@@ -7,8 +7,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    
-    <link rel="stylesheet" href="responsive-mobile.css">
 </head>
 <body>
 
@@ -20,20 +18,20 @@
             
             <div class="menu-label">Menu</div>
             <ul class="sidebar-menu">
-                <li><a onclick="switchDashView('view-dashboard', this)" class="active"><i class="fas fa-chart-pie"></i><span>Overview</span></a></li>
-                <li><a onclick="switchDashView('view-find-skills', this)"><i class="fas fa-search"></i><span>Discover Skills</span></a></li>
-                <li><a onclick="switchDashView('view-active-swaps', this)"><i class="fas fa-handshake"></i><span>My Swaps</span></a></li>
-                <li><a onclick="switchDashView('view-messages', this)"><i class="fas fa-comment-dots"></i><span>Live Chat</span></a></li>
+                <li><a onclick="switchDashView('view-dashboard', this)" class="active"><i class="fas fa-chart-pie"></i> Overview</a></li>
+                <li><a onclick="switchDashView('view-find-skills', this)"><i class="fas fa-search"></i> Discover Skills</a></li>
+                <li><a onclick="switchDashView('view-active-swaps', this)"><i class="fas fa-handshake"></i> My Swaps</a></li>
+                <li><a onclick="switchDashView('view-messages', this)"><i class="fas fa-comment-dots"></i> Live Chat</a></li>
             </ul>
             <div class="menu-label" style="margin-top: 15px;">Preferences</div>
             <ul class="sidebar-menu">
-                <li><a onclick="switchDashView('view-settings', this)"><i class="fas fa-sliders-h"></i><span>Settings</span></a></li>
-                <li><a id="navProfileLink" onclick="openMyProfile(this)"><i class="fas fa-user-circle"></i><span>My Profile</span></a></li>
+                <li><a onclick="switchDashView('view-settings', this)"><i class="fas fa-sliders-h"></i> Settings</a></li>
+                <li><a id="navProfileLink" onclick="openMyProfile(this)"><i class="fas fa-user-circle"></i> My Profile</a></li>
             </ul>
             
             <div style="position: relative; margin-top: auto; width: 100%;">
                 <a href="#" class="sidebar-menu logout-btn" onclick="showLogoutConfirm(event)" style="margin-top: 0;">
-                    <i class="fas fa-sign-out-alt"></i><span>Sign Out</span>
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
                 </a>
                 
                 <div id="logoutConfirmBox" style="display: none; position: absolute; bottom: calc(100% + 10px); left: 0; width: 100%; background: var(--bg-card); border: 1px solid #ef4444; border-radius: 8px; padding: 12px; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2); z-index: 100; flex-direction: column; gap: 10px; text-align: center;">
@@ -254,27 +252,9 @@
         <div style="position: relative; width: 90%; max-width: 1000px; height: 70vh; background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);">
             <video id="remoteVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
             <video id="localVideo" autoplay playsinline muted style="position: absolute; bottom: 20px; right: 20px; width: 150px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color); background: #222; transform: scaleX(-1); box-shadow: 0 5px 15px rgba(0,0,0,0.5);"></video>
-            
-            <div id="ai-caption-box" class="hidden">
-                <p id="caption-text">AI Translator is ready...</p>
-            </div>
         </div>
         
-        <div style="display: flex; gap: 30px; margin-top: 30px; align-items: center; flex-wrap: wrap; justify-content: center;">
-            
-            <div class="ai-controls">
-                <i class="fas fa-language" style="color: white;"></i>
-                <select id="ai-lang-select">
-                    <option value="en-US">English</option>
-                    <option value="hi-IN">Hindi (हिन्दी)</option>
-                    <option value="gu-IN">Gujarati (ગુજરાતી)</option>
-                    <option value="es-ES">Spanish</option>
-                </select>
-                <button id="toggle-ai-btn" title="Start AI Voice Translation">
-                    <i class="fas fa-robot"></i>
-                </button>
-            </div>
-
+        <div style="display: flex; gap: 30px; margin-top: 30px;">
             <button id="toggleMicBtn" onclick="toggleMic()" style="width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--bg-card); color: var(--primary-color); font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; justify-content: center;"><i class="fas fa-microphone"></i></button>
             
             <button id="toggleCamBtn" onclick="toggleCamera()" style="width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--bg-card); color: var(--primary-color); font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; justify-content: center;"><i class="fas fa-video"></i></button>
