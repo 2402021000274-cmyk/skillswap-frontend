@@ -14,7 +14,7 @@ let isSyncPaused = false;
 let cloudUpdateTimeout = null;
 
 // ==========================================
-// 🟢 WEBRTC VIDEO CALL VARIABLES (LAG FIX)
+// 🟢 WEBRTC VIDEO CALL VARIABLES
 // ==========================================
 let peerConnection;
 let localStream;
@@ -22,7 +22,6 @@ let remoteStream;
 let incomingCallPartner = null;
 let isCalling = false;
 
-// 🟢 FIXED: Multiple STUN servers for better connectivity
 const rtcConfig = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -31,10 +30,9 @@ const rtcConfig = {
     ]
 };
 
-// 🟢 FIXED: Video constraints to prevent Lag (Set to smooth HD instead of heavy 4K)
 const mediaConstraints = {
     video: {
-        width: { ideal: 640 }, // Keeps it light and fast
+        width: { ideal: 640 }, 
         height: { ideal: 480 },
         frameRate: { ideal: 24, max: 30 }
     },
@@ -57,7 +55,7 @@ if(socket) {
         syncWithDatabase(); 
         if (currentChatPartnerEmail !== data.from) {
             let senderName = usersDB.find(u => u.email === data.from)?.name || "User";
-            showToast(`💬 Naya message: ${senderName} ne bheja`);
+            showToast(`💬 New message from ${senderName}`);
         }
     });
 
@@ -301,7 +299,7 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let messageBtnHTML = isSwapAccepted 
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
-                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 Swap accept hone ke baad hi message kar sakte ho!')"><i class="fas fa-lock"></i> Message</button>`;
+                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages after the swap is accepted!')"><i class="fas fa-lock"></i> Message</button>`;
 
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
@@ -547,7 +545,7 @@ function openChatFromDiscover(targetEmail) {
     }
     
     if (!isSwapAccepted) {
-        showToast('🔒 Swap accept hone ke baad hi message kar sakte ho!');
+        showToast('🔒 You can only send messages after the swap is accepted!');
         return;
     }
 
@@ -673,7 +671,7 @@ function sendLiveMessage() {
     }
 
     if (!isSwapAccepted) {
-        showToast('🔒 You can only send messages if the swap is Active!');
+        showToast('🔒 You can only send messages after the swap is accepted!');
         return;
     }
 
@@ -878,12 +876,12 @@ async function deleteAccount() {
                 usersDB = usersDB.filter(u => u.email !== userEmail);
                 localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
                 
-                alert("🎉 Account MongoDB aur Local se permanently delete ho gaya!");
+                alert("🎉 Account has been permanently deleted!");
                 logout();
-            } else { alert("❌ Database se delete nahi ho paya."); }
+            } else { alert("❌ Failed to delete account from the database."); }
         } catch (error) {
             console.error("Delete Error:", error);
-            alert("Server connect nahi ho raha.");
+            alert("Unable to connect to the server. Please try again later.");
         }
     }
 }
@@ -939,7 +937,7 @@ async function startCamera() {
         cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         video.srcObject = cameraStream;
     } catch (err) {
-        alert("❌ Camera access denied!");
+        alert("❌ Camera access denied! Please allow permissions from the URL bar.");
         stopCamera();
     }
 }
@@ -982,7 +980,6 @@ function hideLogoutConfirm() {
     document.getElementById('logoutConfirmBox').style.display = 'none';
 }
 
-
 // ==========================================
 // 🟢 WEBRTC VIDEO CALL ENGINE
 // ==========================================
@@ -1010,7 +1007,7 @@ async function startVideoCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili! URL bar me Lock icon pe click karke Allow karein.");
+        alert("❌ Camera or Microphone permission denied! Please allow access from the URL bar.");
         endCall(true);
     }
 }
@@ -1039,7 +1036,7 @@ async function acceptCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili! URL bar me Lock icon pe click karke Allow karein.");
+        alert("❌ Camera or Microphone permission denied! Please allow access from the URL bar.");
         rejectCall();
     }
 }
@@ -1103,7 +1100,7 @@ function endCall(isLocalAction = true) {
     
     isCalling = false;
     incomingCallPartner = null;
-    stopAiTranslator(); // End call par AI bhi band kar do
+    stopAiTranslator(); 
 }
 
 function toggleMic() {
@@ -1139,7 +1136,6 @@ function toggleCamera() {
         }
     }
 }
-
 
 // ==========================================
 // 🚀 AI REAL-TIME TRANSLATOR ENGINE
@@ -1179,7 +1175,7 @@ if (SpeechRecognition) {
     recognition.onerror = (event) => {
         console.log("AI Listening Error:", event.error);
         if (event.error === 'not-allowed') {
-            alert("Microphone permission needed for AI Translator! Please allow it from the URL bar.");
+            alert("❌ Microphone permission denied! Please allow access from the URL bar.");
             stopAiTranslator();
         }
     };
