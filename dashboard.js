@@ -984,7 +984,7 @@ function hideLogoutConfirm() {
 
 
 // ==========================================
-// 🟢 WEBRTC VIDEO CALL ENGINE (OPTIMIZED)
+// 🟢 WEBRTC VIDEO CALL ENGINE
 // ==========================================
 async function startVideoCall() {
     if(!currentChatPartnerEmail) return;
@@ -994,7 +994,6 @@ async function startVideoCall() {
     isCalling = true;
 
     try {
-        // 🟢 FIXED: Using constrained media parameters to prevent Lag
         localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         document.getElementById('localVideo').srcObject = localStream;
         
@@ -1011,7 +1010,7 @@ async function startVideoCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili!");
+        alert("Camera ya Mic ki permission nahi mili! URL bar me Lock icon pe click karke Allow karein.");
         endCall(true);
     }
 }
@@ -1025,7 +1024,6 @@ async function acceptCall() {
     switchDashView('view-messages', document.querySelectorAll('.sidebar-menu a')[3]); 
 
     try {
-        // 🟢 FIXED: Using constrained media parameters here as well
         localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         document.getElementById('localVideo').srcObject = localStream;
         
@@ -1041,7 +1039,7 @@ async function acceptCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili!");
+        alert("Camera ya Mic ki permission nahi mili! URL bar me Lock icon pe click karke Allow karein.");
         rejectCall();
     }
 }
@@ -1105,9 +1103,9 @@ function endCall(isLocalAction = true) {
     
     isCalling = false;
     incomingCallPartner = null;
+    stopAiTranslator(); // End call par AI bhi band kar do
 }
 
-// 🟢 FIXED: Toggle button styling updated for premium look
 function toggleMic() {
     if(localStream) {
         const audioTrack = localStream.getAudioTracks()[0];
@@ -1125,7 +1123,6 @@ function toggleMic() {
     }
 }
 
-// 🟢 FIXED: Toggle button styling updated for premium look
 function toggleCamera() {
     if(localStream) {
         const videoTrack = localStream.getVideoTracks()[0];
@@ -1140,5 +1137,139 @@ function toggleCamera() {
             btn.style.background = "#ef4444";
             btn.style.color = "white";
         }
+    }
+}
+
+
+// ==========================================
+// 🚀 AI REAL-TIME TRANSLATOR ENGINE
+// ==========================================
+let recognition;
+let isAiActive = false;
+let myCurrentLanguage = 'en-US';
+
+const toggleAiBtn = document.getElementById('toggle-ai-btn');
+const aiLangSelect = document.getElementById('ai-lang-select');
+const aiCaptionBox = document.getElementById('ai-caption-box');
+const captionText = document.getElementById('caption-text');
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+        const lastResultIndex = event.results.length - 1;
+        const spokenText = event.results[lastResultIndex][0].transcript;
+        
+        console.log("AI Heard:", spokenText);
+        
+        if (currentChatPartnerEmail || incomingCallPartner) {
+            const targetEmail = currentChatPartnerEmail || incomingCallPartner;
+            socket.emit('send-ai-caption', {
+                to: targetEmail,
+                text: spokenText,
+                fromLang: myCurrentLanguage
+            });
+            showAiCaption(`You: ${spokenText}`);
+        }
+    };
+
+    recognition.onerror = (event) => {
+        console.log("AI Listening Error:", event.error);
+        if (event.error === 'not-allowed') {
+            alert("Microphone permission needed for AI Translator! Please allow it from the URL bar.");
+            stopAiTranslator();
+        }
+    };
+} else {
+    console.log("Browser doesn't support SpeechRecognition.");
+}
+
+if(toggleAiBtn) {
+    toggleAiBtn.addEventListener('click', () => {
+        if (!isAiActive) startAiTranslator();
+        else stopAiTranslator();
+    });
+}
+
+function startAiTranslator() {
+    if (!recognition) {
+        alert("Your browser doesn't support AI Translation. Please use Google Chrome.");
+        return;
+    }
+    myCurrentLanguage = aiLangSelect.value;
+    recognition.lang = myCurrentLanguage;
+    recognition.start();
+    isAiActive = true;
+    toggleAiBtn.classList.add('active');
+    showAiCaption("✨ AI Translator Active... Speak now!");
+}
+
+function stopAiTranslator() {
+    if (!recognition) return;
+    recognition.stop();
+    isAiActive = false;
+    toggleAiBtn.classList.remove('active');
+    hideAiCaption();
+}
+
+let captionTimeout;
+function showAiCaption(text) {
+    if(!aiCaptionBox) return;
+    aiCaptionBox.classList.remove('hidden');
+    captionText.innerText = text;
+    
+    clearTimeout(captionTimeout);
+    captionTimeout = setTimeout(() => hideAiCaption(), 5000);
+}
+
+function hideAiCaption() {
+    if(!aiCaptionBox) return;
+    aiCaptionBox.classList.add('hidden');
+    captionText.innerText = "";
+}
+
+// ==========================================
+// 🌐 RECEIVE & SPEAK TRANSLATED TEXT
+// ==========================================
+if(socket) {
+    socket.on('receive-ai-caption', async (data) => {
+        const originalText = data.text;
+        const fromLang = data.fromLang;
+        const myLang = aiLangSelect.value; 
+        
+        showAiCaption(`Translating... ✨`);
+
+        try {
+            let translatedText = originalText;
+            
+            if (fromLang !== myLang) {
+                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(originalText)}&langpair=${fromLang}|${myLang}`);
+                const result = await response.json();
+                translatedText = result.responseData.translatedText;
+            }
+
+            showAiCaption(`Partner: ${translatedText}`);
+            speakTranslatedText(translatedText, myLang);
+            
+        } catch (error) {
+            console.log("Translation failed:", error);
+            showAiCaption(`Partner: ${originalText} (Translation Error)`);
+        }
+    });
+}
+
+function speakTranslatedText(text, lang) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang; 
+        
+        const remoteVideo = document.getElementById('remoteVideo');
+        utterance.onstart = () => { if(remoteVideo) remoteVideo.volume = 0.1; };
+        utterance.onend = () => { if(remoteVideo) remoteVideo.volume = 1.0; };
+        
+        window.speechSynthesis.speak(utterance);
     }
 }
