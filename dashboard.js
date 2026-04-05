@@ -1197,10 +1197,16 @@ function startAiTranslator() {
     }
     myCurrentLanguage = aiLangSelect.value;
     recognition.lang = myCurrentLanguage;
-    recognition.start();
-    isAiActive = true;
-    toggleAiBtn.classList.add('active');
-    showAiCaption("✨ AI Translator Active... Speak now!");
+    try {
+        recognition.start();
+        isAiActive = true;
+        toggleAiBtn.classList.add('active');
+        showAiCaption(`✨ AI Listening in ${myCurrentLanguage}...`);
+        console.log("AI Engine Started for:", myCurrentLanguage);
+    } catch (err) {
+        console.error("AI Start Error:", err);
+        showAiCaption("❌ Error: Mic is already in use by Call");
+    }
 }
 
 function stopAiTranslator() {
@@ -1234,25 +1240,32 @@ if(socket) {
     socket.on('receive-ai-caption', async (data) => {
         const originalText = data.text;
         const fromLang = data.fromLang;
-        const myLang = aiLangSelect.value; 
+        const myLang = aiLangSelect.value; // Meri chuni hui bhasha
         
-        showAiCaption(`Translating... ✨`);
+        console.log(`Incoming: ${originalText} from ${fromLang} to ${myLang}`);
+        showAiCaption(`Translating to ${myLang}... ✨`);
 
         try {
-            let translatedText = originalText;
-            
             if (fromLang !== myLang) {
-                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(originalText)}&langpair=${fromLang}|${myLang}`);
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(originalText)}&langpair=${fromLang}|${myLang}`;
+                const response = await fetch(url);
                 const result = await response.json();
-                translatedText = result.responseData.translatedText;
+                
+                if(result.responseData && result.responseData.translatedText) {
+                    const translatedText = result.responseData.translatedText;
+                    showAiCaption(`Partner: ${translatedText}`);
+                    speakTranslatedText(translatedText, myLang);
+                } else {
+                    showAiCaption("❌ Translation Service Busy");
+                }
+            } else {
+                // Same language
+                showAiCaption(`Partner: ${originalText}`);
+                speakTranslatedText(originalText, myLang);
             }
-
-            showAiCaption(`Partner: ${translatedText}`);
-            speakTranslatedText(translatedText, myLang);
-            
         } catch (error) {
-            console.log("Translation failed:", error);
-            showAiCaption(`Partner: ${originalText} (Translation Error)`);
+            console.error("Translation API Error:", error);
+            showAiCaption("❌ API Connection Failed");
         }
     });
 }
