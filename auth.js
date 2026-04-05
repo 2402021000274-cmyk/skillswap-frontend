@@ -78,7 +78,7 @@ async function handleLogin(e) {
         }
     } catch (err) {
         console.error(err);
-        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server. Please try again.</span>";
+        messageBox.innerHTML = "<span class='error-msg'>Server connect nahi ho raha.</span>";
         btn.innerText = "Login"; 
         btn.disabled = false;
     }
@@ -240,7 +240,7 @@ async function handleProfileSave(e) {
         }, 1500);
 
     } catch (err) {
-        console.log("⚠️ Database error: Server is currently offline.", err);
+        console.log("⚠️ Database error: Server chalu nahi hai.", err);
         messageBox.innerHTML = "<span class='error-msg'>Server Error. Try again.</span>";
         btn.innerText = originalText; btn.disabled = false;
     }
@@ -309,7 +309,7 @@ async function handleResetPassword(e) {
 }
 
 // ==========================================
-// 🟢 LIVE CAMERA FOR REGISTRATION
+// 🟢 LIVE CAMERA FOR REGISTRATION (NAYA CODE)
 // ==========================================
 let regCameraStream = null;
 
@@ -358,7 +358,7 @@ function takeRegSnapshot() {
     
     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
     document.getElementById('profilePreview').src = compressedBase64;
-    currentProfilePic = compressedBase64; 
+    currentProfilePic = compressedBase64; // Registration wali pic variable
     
     stopRegCamera();
 }
