@@ -1175,9 +1175,11 @@ if (SpeechRecognition) {
     recognition.onerror = (event) => {
         console.log("AI Listening Error:", event.error);
         if (event.error === 'not-allowed') {
-            alert("❌ Microphone permission denied! Please allow access from the URL bar.");
-            stopAiTranslator();
+            showAiCaption("❌ Permission Denied: Check URL Lock Icon");
+        } else if (event.error === 'audio-capture' || event.error === 'aborted') {
+            showAiCaption("❌ Mic Busy: Video Call is blocking AI");
         }
+        stopAiTranslator();
     };
 } else {
     console.log("Browser doesn't support SpeechRecognition.");
@@ -1205,13 +1207,23 @@ function startAiTranslator() {
         console.log("AI Engine Started for:", myCurrentLanguage);
     } catch (err) {
         console.error("AI Start Error:", err);
-        showAiCaption("❌ Error: Mic is already in use by Call");
+        showAiCaption("⏳ Retrying Mic Connection...");
+        setTimeout(() => {
+            try { 
+                recognition.start(); 
+                isAiActive = true;
+                toggleAiBtn.classList.add('active');
+                showAiCaption(`✨ AI Listening in ${myCurrentLanguage}...`);
+            } catch(e) { 
+                showAiCaption("❌ Error: Mic is in use by Call"); 
+            }
+        }, 1000);
     }
 }
 
 function stopAiTranslator() {
     if (!recognition) return;
-    recognition.stop();
+    try { recognition.stop(); } catch(e) {}
     isAiActive = false;
     toggleAiBtn.classList.remove('active');
     hideAiCaption();
@@ -1272,6 +1284,7 @@ if(socket) {
 
 function speakTranslatedText(text, lang) {
     if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // Stop old speech
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = lang; 
         
