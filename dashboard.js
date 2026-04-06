@@ -136,11 +136,12 @@ function showToast(message) {
     }, 4500);
 }
 
-async function updateCloudUser(userObj) {
+// 🟢 FIX 1: targetEmail param add kiya taaki agar user email change kare toh DB correct purane user ko update kare
+async function updateCloudUser(userObj, targetEmail = userObj.email) {
     isSyncPaused = true; 
     clearTimeout(cloudUpdateTimeout);
     try {
-        await fetch(API_BASE_URL + '/update-user/' + userObj.email, {
+        await fetch(API_BASE_URL + '/update-user/' + encodeURIComponent(targetEmail), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '69420' },
             body: JSON.stringify(userObj),
@@ -155,7 +156,10 @@ async function syncWithDatabase() {
     if(isSyncPaused) return; 
 
     try {
-        const response = await fetch(API_BASE_URL + '/users', { headers: { "ngrok-skip-browser-warning": "69420" } });
+        const response = await fetch(API_BASE_URL + '/users', { 
+            headers: { "ngrok-skip-browser-warning": "69420" },
+            cache: "no-store" // 🟢 FIX 2: Browser ko cache save karne se roka taaki refresh pe naya data aaye
+        });
         if (response.ok) {
             const mongoUsers = await response.json();
             localStorage.setItem('skillSwapUsers', JSON.stringify(mongoUsers));
@@ -816,25 +820,38 @@ function renderEditSkills() {
 
 function removeEditSkill(index) { editSkillsArray.splice(index, 1); renderEditSkills(); }
 
+// 🟢 FIX 3: Profile update handler mein backend update logic thik kiya
 function handleProfileUpdate(e) {
     e.preventDefault();
     const currentEmail = sessionStorage.getItem('loggedInUserEmail');
     const userIndex = usersDB.findIndex(u => u.email === currentEmail);
     const newEmail = document.getElementById('editEmail').value.trim();
-    if(newEmail !== currentEmail && usersDB.some(u => u.email === newEmail)) { alert("❌ Email is already in use by another account!"); return; }
+    
+    if(newEmail !== currentEmail && usersDB.some(u => u.email === newEmail)) { 
+        alert("❌ Email is already in use by another account!"); 
+        return; 
+    }
 
     if(userIndex !== -1) {
+        const oldEmail = usersDB[userIndex].email; // DB query ke liye purana email zaroori hai
+
         usersDB[userIndex].name = document.getElementById('editName').value;
         usersDB[userIndex].email = newEmail;
         usersDB[userIndex].phone = document.getElementById('editPhone').value;
         usersDB[userIndex].address = document.getElementById('editAddress').value;
         usersDB[userIndex].skills = [...editSkillsArray];
         usersDB[userIndex].profilePic = editProfilePic;
+        
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
-        updateCloudUser(usersDB[userIndex]); 
+        
+        updateCloudUser(usersDB[userIndex], oldEmail); // Naya logic yahan kaam karega
 
-        if(newEmail !== currentEmail) { sessionStorage.setItem('loggedInUserEmail', newEmail); }
-        alert("🎉 Profile Updated Successfully!"); refreshDynamicData();
+        if(newEmail !== currentEmail) { 
+            sessionStorage.setItem('loggedInUserEmail', newEmail); 
+        }
+        
+        alert("🎉 Profile Updated Successfully!"); 
+        refreshDynamicData();
     }
 }
 
