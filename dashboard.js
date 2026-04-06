@@ -21,7 +21,7 @@ let localStream;
 let remoteStream;
 let incomingCallPartner = null;
 let isCalling = false;
-let pendingIceCandidates = []; // 🟢 FIXED: ICE Candidate Drop Issue
+let pendingIceCandidates = []; // 🟢 FIXED: ICE Queue add kiya for Black Screen Issue
 
 // 🟢 FIXED: Multiple STUN servers for better connectivity
 const rtcConfig = {
@@ -32,10 +32,10 @@ const rtcConfig = {
     ]
 };
 
-// 🟢 FIXED: Video constraints to prevent Lag (Set to smooth HD instead of heavy 4K)
+// 🟢 FIXED: Video constraints to prevent Lag
 const mediaConstraints = {
     video: {
-        width: { ideal: 640 }, // Keeps it light and fast
+        width: { ideal: 640 }, 
         height: { ideal: 480 },
         frameRate: { ideal: 24, max: 30 }
     },
@@ -99,7 +99,7 @@ if(socket) {
     });
 
     socket.on('ice-candidate', async (data) => {
-        // 🟢 FIXED: Queue ICE candidates if connection isn't ready yet
+        // 🟢 FIXED: Check connection state before adding candidate
         if(peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
             try {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
@@ -146,11 +146,11 @@ function showToast(message) {
     }, 4500);
 }
 
-async function updateCloudUser(userObj, targetEmail = userObj.email) {
+async function updateCloudUser(userObj) {
     isSyncPaused = true; 
     clearTimeout(cloudUpdateTimeout);
     try {
-        await fetch(API_BASE_URL + '/update-user/' + encodeURIComponent(targetEmail), {
+        await fetch(API_BASE_URL + '/update-user/' + userObj.email, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '69420' },
             body: JSON.stringify(userObj),
@@ -165,10 +165,7 @@ async function syncWithDatabase() {
     if(isSyncPaused) return; 
 
     try {
-        const response = await fetch(API_BASE_URL + '/users', { 
-            headers: { "ngrok-skip-browser-warning": "69420" },
-            cache: "no-store" 
-        });
+        const response = await fetch(API_BASE_URL + '/users', { headers: { "ngrok-skip-browser-warning": "69420" } });
         if (response.ok) {
             const mongoUsers = await response.json();
             localStorage.setItem('skillSwapUsers', JSON.stringify(mongoUsers));
@@ -834,32 +831,20 @@ function handleProfileUpdate(e) {
     const currentEmail = sessionStorage.getItem('loggedInUserEmail');
     const userIndex = usersDB.findIndex(u => u.email === currentEmail);
     const newEmail = document.getElementById('editEmail').value.trim();
-    
-    if(newEmail !== currentEmail && usersDB.some(u => u.email === newEmail)) { 
-        alert("❌ Email is already in use by another account!"); 
-        return; 
-    }
+    if(newEmail !== currentEmail && usersDB.some(u => u.email === newEmail)) { alert("❌ Email is already in use by another account!"); return; }
 
     if(userIndex !== -1) {
-        const oldEmail = usersDB[userIndex].email; 
-
         usersDB[userIndex].name = document.getElementById('editName').value;
         usersDB[userIndex].email = newEmail;
         usersDB[userIndex].phone = document.getElementById('editPhone').value;
         usersDB[userIndex].address = document.getElementById('editAddress').value;
         usersDB[userIndex].skills = [...editSkillsArray];
         usersDB[userIndex].profilePic = editProfilePic;
-        
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
-        
-        updateCloudUser(usersDB[userIndex], oldEmail); 
+        updateCloudUser(usersDB[userIndex]); 
 
-        if(newEmail !== currentEmail) { 
-            sessionStorage.setItem('loggedInUserEmail', newEmail); 
-        }
-        
-        alert("🎉 Profile Updated Successfully!"); 
-        refreshDynamicData();
+        if(newEmail !== currentEmail) { sessionStorage.setItem('loggedInUserEmail', newEmail); }
+        alert("🎉 Profile Updated Successfully!"); refreshDynamicData();
     }
 }
 
@@ -1035,7 +1020,7 @@ async function startVideoCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili!");
+        alert("Camera ya Mic ki permission nahi mili! Make sure no other app (like screen recorder) is using the mic.");
         endCall(true);
     }
 }
@@ -1070,19 +1055,19 @@ async function acceptCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili!");
+        alert("Camera ya Mic ki permission nahi mili! Make sure no other app (like screen recorder) is using the mic.");
         rejectCall();
     }
 }
 
 function rejectCall() {
     document.getElementById('incomingCallModal').style.display = "none";
-    document.getElementById('videoCallModal').style.display = "none"; // 🟢 FIXED: Hide video modal on reject
+    document.getElementById('videoCallModal').style.display = "none"; // 🟢 FIXED: Ensure modal closes
     if(incomingCallPartner) {
         socket.emit('reject-call', { to: incomingCallPartner });
     }
     incomingCallPartner = null;
-    pendingIceCandidates = []; // 🟢 FIXED: Clear queue
+    pendingIceCandidates = []; 
 }
 
 function setupPeerConnection() {
@@ -1092,7 +1077,6 @@ function setupPeerConnection() {
         peerConnection.addTrack(track, localStream);
     });
 
-    // 🟢 FIXED: More robust way to attach remote video stream
     peerConnection.ontrack = event => {
         const remoteVideo = document.getElementById('remoteVideo');
         if (event.streams && event.streams[0]) {
@@ -1139,9 +1123,17 @@ function endCall(isLocalAction = true) {
         remoteStream = null;
     }
     
+    // 🟢 FIXED: Clear video source to remove frozen frames on call cut
+    const localVid = document.getElementById('localVideo');
+    if (localVid) localVid.srcObject = null;
+    
+    const remoteVid = document.getElementById('remoteVideo');
+    if (remoteVid) remoteVid.srcObject = null;
+    
     isCalling = false;
     incomingCallPartner = null;
-    pendingIceCandidates = []; // 🟢 FIXED: Clear queue on end
+    pendingIceCandidates = []; 
+    document.getElementById('callStatusText').innerText = "Calling..."; // Reset text
 }
 
 function toggleMic() {
