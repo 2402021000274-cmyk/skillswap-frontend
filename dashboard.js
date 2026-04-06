@@ -21,6 +21,7 @@ let localStream;
 let remoteStream;
 let incomingCallPartner = null;
 let isCalling = false;
+let pendingIceCandidates = []; // 🟢 FIXED: ICE Candidate Drop Issue
 
 // 🟢 FIXED: Multiple STUN servers for better connectivity
 const rtcConfig = {
@@ -80,6 +81,12 @@ if(socket) {
     socket.on('answer-made', async (data) => {
         document.getElementById('callStatusText').innerText = "Connected";
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+        
+        // 🟢 FIXED: Process delayed network info
+        for (let candidate of pendingIceCandidates) {
+            try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
+        }
+        pendingIceCandidates = [];
     });
 
     socket.on('call-rejected', () => {
@@ -92,10 +99,13 @@ if(socket) {
     });
 
     socket.on('ice-candidate', async (data) => {
-        if(peerConnection) {
+        // 🟢 FIXED: Queue ICE candidates if connection isn't ready yet
+        if(peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
             try {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
             } catch(e) { console.error("Error adding ice candidate", e); }
+        } else {
+            pendingIceCandidates.push(data.candidate);
         }
     });
 }
@@ -136,7 +146,6 @@ function showToast(message) {
     }, 4500);
 }
 
-// 🟢 FIX 1: targetEmail param add kiya taaki agar user email change kare toh DB correct purane user ko update kare
 async function updateCloudUser(userObj, targetEmail = userObj.email) {
     isSyncPaused = true; 
     clearTimeout(cloudUpdateTimeout);
@@ -158,7 +167,7 @@ async function syncWithDatabase() {
     try {
         const response = await fetch(API_BASE_URL + '/users', { 
             headers: { "ngrok-skip-browser-warning": "69420" },
-            cache: "no-store" // 🟢 FIX 2: Browser ko cache save karne se roka taaki refresh pe naya data aaye
+            cache: "no-store" 
         });
         if (response.ok) {
             const mongoUsers = await response.json();
@@ -820,7 +829,6 @@ function renderEditSkills() {
 
 function removeEditSkill(index) { editSkillsArray.splice(index, 1); renderEditSkills(); }
 
-// 🟢 FIX 3: Profile update handler mein backend update logic thik kiya
 function handleProfileUpdate(e) {
     e.preventDefault();
     const currentEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -833,7 +841,7 @@ function handleProfileUpdate(e) {
     }
 
     if(userIndex !== -1) {
-        const oldEmail = usersDB[userIndex].email; // DB query ke liye purana email zaroori hai
+        const oldEmail = usersDB[userIndex].email; 
 
         usersDB[userIndex].name = document.getElementById('editName').value;
         usersDB[userIndex].email = newEmail;
@@ -844,7 +852,7 @@ function handleProfileUpdate(e) {
         
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
         
-        updateCloudUser(usersDB[userIndex], oldEmail); // Naya logic yahan kaam karega
+        updateCloudUser(usersDB[userIndex], oldEmail); 
 
         if(newEmail !== currentEmail) { 
             sessionStorage.setItem('loggedInUserEmail', newEmail); 
@@ -1011,7 +1019,6 @@ async function startVideoCall() {
     isCalling = true;
 
     try {
-        // 🟢 FIXED: Using constrained media parameters to prevent Lag
         localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         document.getElementById('localVideo').srcObject = localStream;
         
@@ -1042,12 +1049,17 @@ async function acceptCall() {
     switchDashView('view-messages', document.querySelectorAll('.sidebar-menu a')[3]); 
 
     try {
-        // 🟢 FIXED: Using constrained media parameters here as well
         localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
         document.getElementById('localVideo').srcObject = localStream;
         
         setupPeerConnection();
         await peerConnection.setRemoteDescription(new RTCSessionDescription(window.incomingOffer));
+
+        // 🟢 FIXED: Process delayed network info for the receiver
+        for (let candidate of pendingIceCandidates) {
+            try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
+        }
+        pendingIceCandidates = [];
 
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
@@ -1065,10 +1077,12 @@ async function acceptCall() {
 
 function rejectCall() {
     document.getElementById('incomingCallModal').style.display = "none";
+    document.getElementById('videoCallModal').style.display = "none"; // 🟢 FIXED: Hide video modal on reject
     if(incomingCallPartner) {
         socket.emit('reject-call', { to: incomingCallPartner });
     }
     incomingCallPartner = null;
+    pendingIceCandidates = []; // 🟢 FIXED: Clear queue
 }
 
 function setupPeerConnection() {
@@ -1078,13 +1092,18 @@ function setupPeerConnection() {
         peerConnection.addTrack(track, localStream);
     });
 
+    // 🟢 FIXED: More robust way to attach remote video stream
     peerConnection.ontrack = event => {
         const remoteVideo = document.getElementById('remoteVideo');
-        if (!remoteStream) {
-            remoteStream = new MediaStream();
+        if (event.streams && event.streams[0]) {
+            remoteVideo.srcObject = event.streams[0];
+        } else {
+            if (!remoteStream) {
+                remoteStream = new MediaStream();
+            }
+            remoteStream.addTrack(event.track);
             remoteVideo.srcObject = remoteStream;
         }
-        remoteStream.addTrack(event.track);
     };
 
     peerConnection.onicecandidate = event => {
@@ -1122,9 +1141,9 @@ function endCall(isLocalAction = true) {
     
     isCalling = false;
     incomingCallPartner = null;
+    pendingIceCandidates = []; // 🟢 FIXED: Clear queue on end
 }
 
-// 🟢 FIXED: Toggle button styling updated for premium look
 function toggleMic() {
     if(localStream) {
         const audioTrack = localStream.getAudioTracks()[0];
@@ -1142,7 +1161,6 @@ function toggleMic() {
     }
 }
 
-// 🟢 FIXED: Toggle button styling updated for premium look
 function toggleCamera() {
     if(localStream) {
         const videoTrack = localStream.getVideoTracks()[0];
