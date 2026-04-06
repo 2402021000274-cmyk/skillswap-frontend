@@ -1169,3 +1169,100 @@ function toggleCamera() {
         }
     }
 }
+// ==========================================
+// 🟢 AI TRANSLATOR (VOICE-TO-VOICE) LOGIC
+// ==========================================
+let isAIOn = false;
+let recognition;
+const synth = window.speechSynthesis;
+
+// 1. Button Logic (ON/OFF)
+function toggleAITranslator() {
+    isAIOn = !isAIOn;
+    const btn = document.getElementById('toggleAIBtn');
+    
+    if (isAIOn) {
+        btn.innerHTML = '<i class="fas fa-robot"></i> AI ON';
+        btn.style.background = "#10b981"; // Green color
+        startAITranslationProcess();
+    } else {
+        btn.innerHTML = '<i class="fas fa-robot"></i> AI OFF';
+        btn.style.background = "var(--primary-color)";
+        if(recognition) recognition.stop();
+    }
+}
+
+// 2. Listening & Translating Logic
+function startAITranslationProcess() {
+    window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!window.SpeechRecognition) {
+        alert("Your browser doesn't support AI Translation. Please use Google Chrome.");
+        toggleAITranslator(); // Turn off if not supported
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    
+    // Set language from Dropdown (Default Hindi)
+    recognition.lang = document.getElementById('myLanguage').value || 'hi-IN'; 
+
+    recognition.onresult = async (event) => {
+        const lastIndex = event.results.length - 1;
+        const spokenText = event.results[lastIndex][0].transcript;
+        const targetLang = document.getElementById('targetLanguage').value || 'en-US';
+
+        console.log("Original Voice:", spokenText);
+
+        try {
+            // Google Translate (Free Public API API for testing)
+            const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang.split('-')[0]}&dt=t&q=${encodeURI(spokenText)}`);
+            const data = await response.json();
+            const translatedText = data[0][0][0];
+
+            console.log("Translated Text:", translatedText);
+
+            // Determine partner's email (Handles both caller and receiver scenarios)
+            let partnerEmail = incomingCallPartner || currentChatPartnerEmail; 
+            
+            if (partnerEmail) {
+                // Send to backend
+                socket.emit('send-translation', {
+                    to: partnerEmail,
+                    text: translatedText,
+                    lang: targetLang
+                });
+            }
+        } catch (error) {
+            console.error("AI Translation Error:", error);
+        }
+    };
+
+    // Auto-restart recognition if user takes a pause but AI is still ON
+    recognition.onend = () => { 
+        if (isAIOn) {
+            try { recognition.start(); } catch(e) { console.log(e); } 
+        }
+    };
+
+    try { recognition.start(); } catch(e) { console.log("Mic start error"); }
+}
+
+// 3. Receiver Logic (Samne wala jab bolega, tab ye speak karega)
+socket.on('receive-translation', (data) => {
+    // Sirf tabhi awaaz aayegi jab aap is page par honge aur call chalu hogi
+    const utterance = new SpeechSynthesisUtterance(data.text);
+    utterance.lang = data.lang;
+    utterance.rate = 1.0; 
+    
+    // Play translated voice
+    synth.speak(utterance);
+    
+    // Optional: Agar subtitle dikhana ho to dashboard me id 'callStatusText' par text change karein
+    const statusText = document.getElementById('callStatusText');
+    if(statusText) {
+        statusText.innerText = `💬 Translation: ${data.text}`;
+    }
+});
