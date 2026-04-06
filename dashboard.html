@@ -253,6 +253,32 @@
             <video id="remoteVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
             <video id="localVideo" autoplay playsinline muted style="position: absolute; bottom: 20px; right: 20px; width: 150px; height: 200px; object-fit: cover; border-radius: 12px; border: 3px solid var(--primary-color); background: #222; transform: scaleX(-1); box-shadow: 0 5px 15px rgba(0,0,0,0.5);"></video>
         </div>
+        <div style="position: relative; width: 80%; max-width: 900px; display: flex; gap: 20px; justify-content: center;">
+            </div>
+        
+        <div id="aiTranslatorControls" style="background: rgba(15, 23, 42, 0.85); padding: 10px 20px; border-radius: 12px; display: flex; gap: 15px; align-items: center; justify-content: center; margin-top: 20px; border: 1px solid rgba(255,255,255,0.2);">
+            <div>
+                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 3px;">I Speak:</label>
+                <select id="myLanguage" style="background: #1e293b; color: white; border: 1px solid #475569; border-radius: 5px; padding: 5px; font-size: 12px; outline: none;">
+                    <option value="hi-IN">Hindi</option>
+                    <option value="en-US">English</option>
+                    <option value="gu-IN">Gujarati</option>
+                </select>
+            </div>
+            
+            <div>
+                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 3px;">Translate To:</label>
+                <select id="targetLanguage" style="background: #1e293b; color: white; border: 1px solid #475569; border-radius: 5px; padding: 5px; font-size: 12px; outline: none;">
+                    <option value="en-US">English</option>
+                    <option value="hi-IN">Hindi</option>
+                    <option value="gu-IN">Gujarati</option>
+                </select>
+            </div>
+
+            <button id="toggleAIBtn" onclick="toggleAITranslator()" style="background: var(--primary-color); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s; margin-top: 10px;">
+                <i class="fas fa-robot"></i> AI OFF
+            </button>
+        </div>
         
         <div style="display: flex; gap: 30px; margin-top: 30px;">
             <button id="toggleMicBtn" onclick="toggleMic()" style="width: 65px; height: 65px; border-radius: 50%; border: none; background: var(--bg-card); color: var(--primary-color); font-size: 24px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: 0.3s; display: flex; align-items: center; justify-content: center;"><i class="fas fa-microphone"></i></button>
