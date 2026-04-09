@@ -101,8 +101,12 @@ function handleRegister(e) {
     const email = document.getElementById('regEmail').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
     const pass = document.getElementById('regPass').value;
+    
+    // NEW GENDER LOGIC
+    const genderElement = document.querySelector('input[name="regGender"]:checked');
+    const gender = genderElement ? genderElement.value : "Not Specified";
 
-    currentTempUser = { name: name, email: email, phone: phone, pass: pass, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5 };
+    currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5 };
     userSkillsArray = []; 
     currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
     
@@ -216,6 +220,7 @@ async function handleProfileSave(e) {
                 email: currentTempUser.email,
                 password: currentTempUser.pass, 
                 phone: currentTempUser.phone,
+                gender: currentTempUser.gender, // NEW GENDER FIELD TO DB
                 address: userAddress, 
                 role: selectedRole, 
                 skill: finalSkill,
