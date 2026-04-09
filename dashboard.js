@@ -220,6 +220,7 @@ function refreshDynamicData(isLiveUpdate = false) {
     if(!me) { logout(); return; }
 
     if(me.credits === undefined) me.credits = 5;
+    if(me.acquiredSkills === undefined) me.acquiredSkills = []; // 🟢 Added acquiredSkills safety check
 
     if(me.notifications) {
         if(isFirstDataLoad) {
@@ -249,6 +250,9 @@ function refreshDynamicData(isLiveUpdate = false) {
         document.getElementById('statUsers').innerText = usersDB.length;
         document.getElementById('statSwaps').innerText = me.swaps ? me.swaps.length : 0;
         document.getElementById('statCredits').innerText = me.credits; 
+        
+        const statAcquired = document.getElementById('statAcquired');
+        if(statAcquired) statAcquired.innerText = me.acquiredSkills.length; // 🟢 Display Acquired Skills count
     }
 
     let unreadNotis = me.notifications ? me.notifications.filter(n => !n.isRead) : [];
@@ -422,7 +426,6 @@ function applySearchFilter() {
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
 
-// 🟢 BUG 2 FIX: Added safety check `if (modal)` to ensure HTML element exists
 function openTopicSelection(targetEmail, skill) {
     const targetUser = usersDB.find(u => u.email === targetEmail);
     if(!targetUser) return;
@@ -546,10 +549,14 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
         
         if (mySwap.status === 'Active') {
             let providerIndex = -1;
+            let requesterIndex = -1;
+            
             if (mySwap.role === 'Provider') {
                 providerIndex = meIndex;
+                requesterIndex = targetIndex;
             } else if (mySwap.role === 'Requester') {
                 providerIndex = targetIndex;
+                requesterIndex = meIndex;
             } else {
                 providerIndex = targetIndex; 
             }
@@ -563,6 +570,20 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
                     isRead: false, 
                     id: Date.now() + Math.random() 
                 });
+            }
+
+            // 🟢 NEW: Add to Acquired Skills logic for Learner
+            if (requesterIndex !== -1) {
+                if (usersDB[requesterIndex].acquiredSkills === undefined) usersDB[requesterIndex].acquiredSkills = [];
+                if (!usersDB[requesterIndex].acquiredSkills.includes(skill)) {
+                    usersDB[requesterIndex].acquiredSkills.push(skill);
+                    usersDB[requesterIndex].notifications = usersDB[requesterIndex].notifications || [];
+                    usersDB[requesterIndex].notifications.push({
+                        text: `🎓 You successfully learned '${skill}'! Check your Acquired Skills box.`,
+                        isRead: false,
+                        id: Date.now() + Math.random()
+                    });
+                }
             }
         }
 
@@ -587,6 +608,76 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     }
     
     refreshDynamicData();
+}
+
+// 🟢 NEW: Modal Logic to show Acquired Skills
+function openAcquiredSkillsModal() {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const me = usersDB.find(u => u.email === myEmail);
+    if(!me) return;
+
+    let acquired = me.acquiredSkills || [];
+    let myCurrentSkills = me.skills || [];
+
+    const container = document.getElementById('acquiredListContainer');
+    container.innerHTML = "";
+
+    if (acquired.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px;">You haven't learned any new skills yet. Complete a swap as a learner to add skills here!</p>`;
+    } else {
+        acquired.forEach(sk => {
+            let isAlreadyAdded = myCurrentSkills.includes(sk);
+            let btnHTML = isAlreadyAdded 
+                ? `<button class="btn-outline" style="padding:5px 10px; font-size:12px; cursor:not-allowed; opacity:0.5;">Added</button>`
+                : `<button class="btn-solid" style="padding:5px 10px; font-size:12px; margin:0;" onclick="addAcquiredToProfile('${sk}')">Add to Profile</button>`;
+
+            container.innerHTML += `
+                <div class="list-item" style="margin-bottom:0;">
+                    <div><h4 style="margin:0; font-size:15px; color:var(--text-main);">${sk}</h4></div>
+                    ${btnHTML}
+                </div>`;
+        });
+    }
+
+    const modal = document.getElementById('acquiredSkillsModal');
+    if(modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = "flex";
+    }
+}
+
+function closeAcquiredSkillsModal() {
+    const modal = document.getElementById('acquiredSkillsModal');
+    if(modal) {
+        modal.classList.add('hidden');
+        modal.style.display = "none";
+    }
+}
+
+// 🟢 NEW: Add learned skill directly to Teaching Profile!
+function addAcquiredToProfile(skill) {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const meIndex = usersDB.findIndex(u => u.email === myEmail);
+    if(meIndex === -1) return;
+
+    if(!usersDB[meIndex].skills) usersDB[meIndex].skills = [];
+    if(!usersDB[meIndex].topics) usersDB[meIndex].topics = {};
+
+    if(!usersDB[meIndex].skills.includes(skill)) {
+        usersDB[meIndex].skills.push(skill);
+        usersDB[meIndex].topics[skill] = []; // Initialize empty topics for them
+        
+        if (usersDB[meIndex].role === 'learn') {
+            usersDB[meIndex].role = 'teach'; // Upgrade to mentor so they show in discover
+        }
+
+        localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
+        updateCloudUser(usersDB[meIndex]);
+        
+        showToast(`🎉 Congratulations! You are now ready to teach '${skill}'!`);
+        openAcquiredSkillsModal(); // Refresh modal view
+        refreshDynamicData();
+    }
 }
 
 function openChatFromDiscover(targetEmail) {
