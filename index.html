@@ -292,7 +292,7 @@
                 
                 <div style="margin-top: 20px; text-align: center; background: var(--bg-input); padding: 25px; border-radius: 12px; border: 1px dashed var(--primary-color);">
                     <h3 style="color: var(--primary-color); margin-bottom: 15px; font-size: 16px;"><i class="fas fa-rocket"></i> Ready to start your journey?</h3>
-                    <button class="btn-solid" style="width: auto; padding: 12px 30px; margin-top: 0; display: inline-block;" onclick="switchAuthView('homeView', document.querySelectorAll('.nav-links a')[0]); showSubForm('registerForm')">Join Skill Hub Now</button>
+                    <button class="btn-solid" style="width: auto; padding: 12px 30px; margin-top: 0; display: inline-block;" onclick="switchAuthView('homeView', document.querySelectorAll('.nav-links a')[0]); setTimeout(function(){ showSubForm('registerForm'); }, 50);">Join Skill Hub Now</button>
                 </div>
             </div>
             
@@ -308,7 +308,7 @@
         </div>
     </div>
 
-    <script src="config.js?v=6"></script>
-    <script src="auth.js?v=6"></script>
+    <script src="config.js?v=7"></script>
+    <script src="auth.js?v=7"></script>
 </body>
 </html>
