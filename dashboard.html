@@ -66,12 +66,22 @@
                 
                 <div id="view-dashboard" class="view-section active">
                     <div class="dashboard-title-row"><h2>Platform Overview</h2></div>
-                    <div class="metrics-grid">
+                    
+                    <div class="metrics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        
                         <div class="metric-card purple"><div class="metric-top"><span class="metric-title">Available Credits</span><div class="metric-icon"><i class="fas fa-coins"></i></div></div><div class="metric-value" id="statCredits">5</div></div>
                         <div class="metric-card blue"><div class="metric-top"><span class="metric-title">Active Swaps</span><div class="metric-icon"><i class="fas fa-sync-alt"></i></div></div><div class="metric-value" id="statSwaps">0</div></div>
                         
-                        <div class="metric-card green"><div class="metric-top"><span class="metric-title">Total Visitors</span><div class="metric-icon"><i class="fas fa-eye"></i></div></div><div class="metric-value" id="statVisitors">0</div></div>
+                        <div class="metric-card" style="cursor:pointer; border: 1px solid #ec4899; box-shadow: 0 4px 15px rgba(236,72,153,0.15);" onclick="openAcquiredSkillsModal()">
+                            <div class="metric-top">
+                                <span class="metric-title">Skills Acquired</span>
+                                <div class="metric-icon" style="background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(219, 39, 119, 0.2)); color: #ec4899;"><i class="fas fa-graduation-cap"></i></div>
+                            </div>
+                            <div class="metric-value" id="statAcquired">0</div>
+                            <p style="font-size: 11px; color: #ec4899; margin-top: 5px; font-weight: 700;">Click to add to profile</p>
+                        </div>
                         
+                        <div class="metric-card green"><div class="metric-top"><span class="metric-title">Total Visitors</span><div class="metric-icon"><i class="fas fa-eye"></i></div></div><div class="metric-value" id="statVisitors">0</div></div>
                         <div class="metric-card orange"><div class="metric-top"><span class="metric-title">Total Users</span><div class="metric-icon"><i class="fas fa-users"></i></div></div><div class="metric-value" id="statUsers">0</div></div>
                     </div>
                     
@@ -226,13 +236,26 @@
         </div>
     </div>
 
+    <div id="acquiredSkillsModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display:none; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="crisp-card" style="width: 90%; max-width: 500px; padding: 30px; position: relative; animation: popIn 0.3s ease;">
+            <i class="fas fa-times" style="position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-muted);" onclick="closeAcquiredSkillsModal()"></i>
+            <h2 style="margin-bottom: 10px; color: #ec4899;"><i class="fas fa-graduation-cap"></i> Skills Acquired</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Skills you have learned. Click 'Add' to start teaching them!</p>
+            <div id="acquiredListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 10px;">
+                </div>
+            <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: flex-end;">
+                <button class="btn-outline" style="width: auto; margin-top: 0; border-color: #ec4899; color: #ec4899;" onclick="closeAcquiredSkillsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div id="topicSelectionModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display:none; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
         <div class="crisp-card" style="width: 90%; max-width: 500px; padding: 30px; position: relative; animation: popIn 0.3s ease;">
             <i class="fas fa-times" style="position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-muted);" onclick="closeTopicModal()"></i>
             <h2 style="margin-bottom: 10px; color: var(--primary-color);">Select a Topic</h2>
             <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">What part of <strong id="modalSkillName">Skill</strong> would you like to learn?</p>
             <div id="topicListContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 10px;">
-                </div>
+            </div>
             <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: flex-end;">
                 <button class="btn-outline" style="width: auto; margin-top: 0;" onclick="closeTopicModal()">Cancel</button>
             </div>
@@ -305,7 +328,7 @@
     </div>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="config.js?v=8"></script>
-    <script src="dashboard.js?v=8"></script>
+    <script src="config.js?v=9"></script>
+    <script src="dashboard.js?v=9"></script>
 </body>
 </html>
