@@ -78,7 +78,7 @@ async function handleLogin(e) {
         }
     } catch (err) {
         console.error(err);
-        messageBox.innerHTML = "<span class='error-msg'>Server connect nahi ho raha.</span>";
+        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server.</span>";
         btn.innerText = "Login"; 
         btn.disabled = false;
     }
@@ -245,7 +245,7 @@ async function handleProfileSave(e) {
         }, 1500);
 
     } catch (err) {
-        console.log("⚠️ Database error: Server chalu nahi hai.", err);
+        console.log("⚠️ Database error: Server is offline.", err);
         messageBox.innerHTML = "<span class='error-msg'>Server Error. Try again.</span>";
         btn.innerText = originalText; btn.disabled = false;
     }
