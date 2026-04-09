@@ -78,7 +78,7 @@ async function handleLogin(e) {
         }
     } catch (err) {
         console.error(err);
-        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server.</span>";
+        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server. Please try again.</span>";
         btn.innerText = "Login"; 
         btn.disabled = false;
     }
@@ -87,7 +87,7 @@ async function handleLogin(e) {
 function handleVerifyOTP(e) {
     e.preventDefault();
     if (document.getElementById('otpInput').value.trim() === generatedOTP) { finalizeLogin(pendingLoginUser); } 
-    else { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP!</span>"; }
+    else { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP! Please try again.</span>"; }
 }
 
 function finalizeLogin(userFound) {
@@ -101,6 +101,13 @@ function handleRegister(e) {
     const email = document.getElementById('regEmail').value.trim();
     const phone = document.getElementById('regPhone').value.trim();
     const pass = document.getElementById('regPass').value;
+    const confirmPass = document.getElementById('regConfirmPass').value;
+    
+    // NEW: Check if passwords match
+    if (pass !== confirmPass) {
+        messageBox.innerHTML = "<span class='error-msg'>Passwords do not match. Please try again.</span>";
+        return; 
+    }
     
     // NEW GENDER LOGIC
     const genderElement = document.querySelector('input[name="regGender"]:checked');
@@ -246,7 +253,7 @@ async function handleProfileSave(e) {
 
     } catch (err) {
         console.log("⚠️ Database error: Server is offline.", err);
-        messageBox.innerHTML = "<span class='error-msg'>Server Error. Try again.</span>";
+        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server. Please try again.</span>";
         btn.innerText = originalText; btn.disabled = false;
     }
 }
@@ -277,7 +284,7 @@ async function handleSendForgotOTP(e) {
             btn.innerText = "Send OTP"; btn.disabled = false;
         }
     } catch(err) {
-        messageBox.innerHTML = "<span class='error-msg'>Server Error</span>";
+        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server. Please try again.</span>";
         btn.innerText = "Send OTP"; btn.disabled = false;
     }
 }
@@ -286,8 +293,8 @@ async function handleResetPassword(e) {
     e.preventDefault();
     const enteredOTP = document.getElementById('forgotOTPInput').value.trim();
     const newPass = document.getElementById('forgotNewPassInput').value;
-    if(enteredOTP !== resetGeneratedOTP) { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP!</span>"; return; }
-    if(newPass.length < 4) { messageBox.innerHTML = "<span class='error-msg'>Password too short!</span>"; return; }
+    if(enteredOTP !== resetGeneratedOTP) { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP! Please try again.</span>"; return; }
+    if(newPass.length < 4) { messageBox.innerHTML = "<span class='error-msg'>Password too short! Please try again.</span>"; return; }
 
     const btn = e.target.querySelector('button[type="submit"]');
     btn.innerText = "Updating..."; btn.disabled = true;
@@ -308,7 +315,7 @@ async function handleResetPassword(e) {
             btn.innerText = "Reset Password"; btn.disabled = false;
         }
     } catch(err) {
-        messageBox.innerHTML = "<span class='error-msg'>Server Error</span>";
+        messageBox.innerHTML = "<span class='error-msg'>Unable to connect to the server. Please try again.</span>";
         btn.innerText = "Reset Password"; btn.disabled = false;
     }
 }
