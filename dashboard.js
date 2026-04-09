@@ -330,8 +330,10 @@ function refreshDynamicData(isLiveUpdate = false) {
         me.swaps.forEach((swap, idx) => {
             let bClass = swap.status === 'Pending' ? 'badge-yellow' : (swap.status === 'Active' ? 'badge-green' : 'badge-purple');
             let actionBtns = '';
+            
+            // 🟢 MODIFIED: Accept button triggers openScheduleModal
             if(swap.status === 'Requested') { 
-                actionBtns = `<button class="btn-solid" style="padding: 6px 12px; font-size: 12px; margin: 0;" onclick="acceptSwap(${idx}, '${swap.partner}', '${swap.skill}')">Accept</button>
+                actionBtns = `<button class="btn-solid" style="padding: 6px 12px; font-size: 12px; margin: 0;" onclick="openScheduleModal(${idx}, '${swap.partner}', '${swap.skill}')">Accept & Schedule</button>
                               <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Decline</button>`;
             } else if(swap.status === 'Pending') { 
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel Request</button>`;
@@ -343,8 +345,13 @@ function refreshDynamicData(isLiveUpdate = false) {
                 ? `<br><small style="color:var(--primary-color); font-weight:600;"><i class="fas fa-bullseye"></i> Topic: ${swap.topic}</small>` 
                 : "";
 
+            // 🟢 NEW: Display the scheduled time directly on the Swap card
+            let scheduleDisplay = swap.scheduledTime 
+                ? `<br><small style="color:#10b981; font-weight:600; margin-top:4px; display:inline-block;"><i class="far fa-calendar-alt"></i> ${new Date(swap.scheduledTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</small>` 
+                : "";
+
             newSwapsHTML += `<div class="list-item">
-                                <div><h4>${swap.skill} ${topicDisplay}</h4><p>Partner: ${swap.partner}</p></div>
+                                <div><h4>${swap.skill} ${topicDisplay}</h4><p>Partner: ${swap.partner}</p>${scheduleDisplay}</div>
                                 <div style="display:flex; align-items:center; gap:15px;">
                                     <span class="${bClass}">${swap.status}</span>
                                     <div style="display:flex; gap:10px;">${actionBtns}</div>
@@ -425,6 +432,92 @@ function applySearchFilter() {
         }
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
+
+// ==========================================
+// 🟢 NEW: SCHEDULE MODAL LOGIC
+// ==========================================
+let pendingScheduleSwapIndex = -1;
+let pendingSchedulePartner = "";
+let pendingScheduleSkill = "";
+
+function openScheduleModal(mySwapIndex, partnerName, skill) {
+    pendingScheduleSwapIndex = mySwapIndex;
+    pendingSchedulePartner = partnerName;
+    pendingScheduleSkill = skill;
+
+    let today = new Date().toISOString().split('T')[0];
+    document.getElementById('scheduleDate').setAttribute('min', today);
+
+    const modal = document.getElementById('scheduleModal');
+    if(modal) {
+        modal.classList.remove('hidden');
+        modal.style.display = "flex";
+    }
+}
+
+function closeScheduleModal() {
+    const modal = document.getElementById('scheduleModal');
+    if(modal) {
+        modal.classList.add('hidden');
+        modal.style.display = "none";
+    }
+}
+
+function confirmSchedule() {
+    let dateVal = document.getElementById('scheduleDate').value;
+    let timeVal = document.getElementById('scheduleTime').value;
+
+    if(!dateVal || !timeVal) { alert("❌ Please select both Date and Time!"); return; }
+
+    let scheduledTimestamp = new Date(`${dateVal}T${timeVal}`).getTime();
+    if(scheduledTimestamp < Date.now()) { alert("❌ Please select a future time!"); return; }
+
+    closeScheduleModal();
+    acceptSwapWithSchedule(pendingScheduleSwapIndex, pendingSchedulePartner, pendingScheduleSkill, scheduledTimestamp);
+}
+
+function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimestamp) {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const meIndex = usersDB.findIndex(u => u.email === myEmail);
+    
+    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
+    let targetIndex = usersDB.findIndex(u => u.email === mySwap.partnerEmail);
+    if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
+
+    if(targetIndex !== -1) {
+        if(usersDB[targetIndex].credits === undefined) usersDB[targetIndex].credits = 5;
+        if(usersDB[targetIndex].credits < 1) { alert("The requester doesn't have enough credits anymore."); return; }
+
+        usersDB[targetIndex].credits -= 1;
+        let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
+        if(partnerSwapIndex !== -1) { 
+            usersDB[targetIndex].swaps[partnerSwapIndex].status = 'Active'; 
+            usersDB[targetIndex].swaps[partnerSwapIndex].scheduledTime = scheduledTimestamp;
+        }
+        
+        usersDB[meIndex].swaps[mySwapIndex].status = 'Active';
+        usersDB[meIndex].swaps[mySwapIndex].scheduledTime = scheduledTimestamp;
+
+        let dateObj = new Date(scheduledTimestamp);
+        let formattedDate = dateObj.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
+        usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
+        usersDB[targetIndex].notifications.push({ 
+            text: `🎉 ${usersDB[meIndex].name} accepted your request for '${skill}'! Scheduled on: ${formattedDate}. (1 Credit deducted)`, 
+            isRead: false, 
+            id: Date.now() + Math.random() 
+        });
+        
+        localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
+        updateCloudUser(usersDB[meIndex]); 
+        updateCloudUser(usersDB[targetIndex]); 
+
+        refreshDynamicData();
+        alert("✅ Swap Accepted & Scheduled! They will be notified.");
+    }
+}
+// ==========================================
+
 
 function openTopicSelection(targetEmail, skill) {
     const targetUser = usersDB.find(u => u.email === targetEmail);
@@ -572,13 +665,11 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
                 });
             }
 
-            // 🟢 UPDATED: Acquired Skills ab Object (skill + topic) dono save karega
             if (requesterIndex !== -1) {
                 if (usersDB[requesterIndex].acquiredSkills === undefined) usersDB[requesterIndex].acquiredSkills = [];
                 
                 let learnedTopic = mySwap.topic || "General (Full Skill)";
                 
-                // Pata karo agar ye topic pehle hi seekh chuka hai
                 let alreadyLearned = usersDB[requesterIndex].acquiredSkills.some(item => 
                     (typeof item === 'object' && item.skill === skill && item.topic === learnedTopic) || 
                     (typeof item === 'string' && item === skill && learnedTopic === "General (Full Skill)")
@@ -619,7 +710,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     refreshDynamicData();
 }
 
-// 🟢 UPDATED: Modal Design with Thick Box, Gap and Auto Width Button
 function openAcquiredSkillsModal() {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const me = usersDB.find(u => u.email === myEmail);
@@ -636,20 +726,16 @@ function openAcquiredSkillsModal() {
         container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px;">You haven't learned any new skills yet. Complete a swap as a learner to add skills here!</p>`;
     } else {
         acquired.forEach(item => {
-            // Handle backwards compatibility (old string format vs new object format)
             let skName = typeof item === 'string' ? item : item.skill;
             let tpName = typeof item === 'string' ? "General (Full Skill)" : item.topic;
 
-            // Check if this specific topic is already added
             let isAlreadyAdded = myCurrentSkills.includes(skName) && 
                                  (myCurrentTopics[skName] && myCurrentTopics[skName].includes(tpName));
 
-            // Fixed Button Width (auto) and padding
             let btnHTML = isAlreadyAdded 
                 ? `<button class="btn-outline" style="padding:8px 15px; font-size:12px; cursor:not-allowed; opacity:0.5; width:auto; margin:0; border-radius:8px;">Added</button>`
                 : `<button class="btn-solid" style="padding:8px 15px; font-size:12px; margin:0; width:auto; border-radius:8px;" onclick="addAcquiredToProfile('${skName}', '${tpName}')">Add to Profile</button>`;
 
-            // Thick list item box with gap (margin-right: 15px)
             container.innerHTML += `
                 <div class="list-item" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:15px 20px; border-radius:12px; border:2px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
                     <div style="flex:1; margin-right:15px;">
@@ -676,7 +762,6 @@ function closeAcquiredSkillsModal() {
     }
 }
 
-// 🟢 UPDATED: Add learned skill AND TOPIC directly to Teaching Profile!
 function addAcquiredToProfile(skill, topic) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -782,6 +867,7 @@ function openLiveChat(partnerEmail) {
     }, 50);
 }
 
+// 🟢 MODIFIED: Video Call Button Lock Logic
 function renderChatWindow() {
     const partnerUser = usersDB.find(u => u.email === currentChatPartnerEmail);
     if(!partnerUser) return;
@@ -793,11 +879,53 @@ function renderChatWindow() {
     document.getElementById('chatPartnerStatus').style.color = partnerUser.isOnline ? "#10b981" : "var(--text-muted)";
     document.getElementById('chatInputArea').style.display = "flex";
     
-    document.getElementById('videoCallBtn').style.display = "block";
-
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const me = usersDB.find(u => u.email === myEmail);
     const history = (me.chatHistory && me.chatHistory[currentChatPartnerEmail]) ? me.chatHistory[currentChatPartnerEmail] : [];
+
+    // --- VIDEO CALL SCHEDULE LOGIC ---
+    const videoBtn = document.getElementById('videoCallBtn');
+    let activeSwap = me.swaps.find(s => s.partnerEmail === currentChatPartnerEmail && s.status === 'Active');
+    
+    if (activeSwap) {
+        videoBtn.style.display = "block";
+        let scheduledTime = activeSwap.scheduledTime;
+        
+        if (scheduledTime) {
+            let currentTime = Date.now();
+            if (currentTime >= scheduledTime) {
+                // Time has passed, check role
+                if (activeSwap.role === 'Provider') {
+                    videoBtn.innerHTML = `<i class="fas fa-video"></i> Video Call`;
+                    videoBtn.style.background = "var(--primary-gradient)";
+                    videoBtn.style.color = "white";
+                    videoBtn.onclick = startVideoCall;
+                } else {
+                    videoBtn.innerHTML = `<i class="fas fa-lock"></i> Locked`;
+                    videoBtn.style.background = "var(--bg-input)";
+                    videoBtn.style.color = "var(--text-muted)";
+                    videoBtn.onclick = () => showToast('🔒 Only the Mentor (Provider) can start the call.');
+                }
+            } else {
+                // Time has not come yet
+                let dateObj = new Date(scheduledTime);
+                let formattedDate = dateObj.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+                videoBtn.innerHTML = `<i class="far fa-clock"></i> Scheduled`;
+                videoBtn.style.background = "var(--bg-input)";
+                videoBtn.style.color = "var(--text-muted)";
+                videoBtn.onclick = () => showToast(`⏳ Call unlocks on: ${formattedDate}`);
+            }
+        } else {
+            // Fallback if old swap has no schedule
+            videoBtn.innerHTML = `<i class="fas fa-video"></i> Video Call`;
+            videoBtn.style.background = "var(--primary-gradient)";
+            videoBtn.style.color = "white";
+            videoBtn.onclick = startVideoCall;
+        }
+    } else {
+        videoBtn.style.display = "none";
+    }
+    // ---------------------------------
 
     const chatMessages = document.getElementById('chatMessages');
     
