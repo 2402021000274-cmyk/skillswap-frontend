@@ -92,6 +92,18 @@
                         <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" required></div>
                         <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" required></div>
                         <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" required></div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: var(--bg-input); border-radius: 12px; color: var(--text-muted);">
+                            <span style="font-size: 14px; font-weight: 500;"><i class="fas fa-venus-mars" style="margin-right: 10px;"></i>Gender:</span>
+                            <div style="display: flex; gap: 15px;">
+                                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
+                                    <input type="radio" name="regGender" value="Male" required style="accent-color: var(--primary-color);"> Male
+                                </label>
+                                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
+                                    <input type="radio" name="regGender" value="Female" style="accent-color: var(--primary-color);"> Female
+                                </label>
+                            </div>
+                        </div>
                         <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regPass" placeholder="Password" required><i class="fas fa-eye eye-icon" onclick="togglePass('regPass', this)"></i></div>
                         <button type="submit" class="btn-submit">Verify Email</button>
                     </form>
