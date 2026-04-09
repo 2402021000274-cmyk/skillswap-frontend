@@ -1,4 +1,5 @@
 let editSkillsArray = [];
+let editTopicsObj = {}; // 🟢 NEW: To manage topics in Profile Edit
 let editProfilePic = "";
 let currentChatPartnerEmail = null;
 let currentSearchQuery = ""; 
@@ -21,9 +22,8 @@ let localStream;
 let remoteStream;
 let incomingCallPartner = null;
 let isCalling = false;
-let pendingIceCandidates = []; // 🟢 FIXED: ICE Queue add kiya for Black Screen Issue
+let pendingIceCandidates = []; 
 
-// 🟢 FIXED: Multiple STUN servers for better connectivity
 const rtcConfig = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -32,20 +32,10 @@ const rtcConfig = {
     ]
 };
 
-// 🟢 FIXED: Video constraints to prevent Lag
 const mediaConstraints = {
-    video: {
-        width: { ideal: 640 }, 
-        height: { ideal: 480 },
-        frameRate: { ideal: 24, max: 30 }
-    },
-    audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true
-    }
+    video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24, max: 30 } },
+    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
 };
-// ==========================================
 
 const socket = typeof io !== 'undefined' ? io(API_BASE_URL) : null;
 if(socket) {
@@ -54,7 +44,6 @@ if(socket) {
         if(myEmail) { socket.emit('register-user', myEmail); }
     });
 
-    // 🟢 NEW: Live Visitor Counter Listener
     socket.on('visitor-update', (count) => {
         const visitorEl = document.getElementById('statVisitors');
         if(visitorEl) visitorEl.innerText = count;
@@ -78,17 +67,13 @@ if(socket) {
         document.getElementById('callerNameText').innerText = (callerUser ? callerUser.name : "User") + " is calling...";
         document.getElementById('incomingCallModal').style.display = "flex";
         window.incomingOffer = data.offer;
-        try {
-            let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-            audio.play();
-        } catch(e){}
+        try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){}
     });
 
     socket.on('answer-made', async (data) => {
         document.getElementById('callStatusText').innerText = "Connected";
         await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
         
-        // 🟢 FIXED: Process delayed network info
         for (let candidate of pendingIceCandidates) {
             try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
         }
@@ -100,16 +85,11 @@ if(socket) {
         setTimeout(() => endCall(false), 2000);
     });
 
-    socket.on('call-ended', () => {
-        endCall(false); 
-    });
+    socket.on('call-ended', () => { endCall(false); });
 
     socket.on('ice-candidate', async (data) => {
-        // 🟢 FIXED: Check connection state before adding candidate
         if(peerConnection && peerConnection.remoteDescription && peerConnection.remoteDescription.type) {
-            try {
-                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-            } catch(e) { console.error("Error adding ice candidate", e); }
+            try { await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate)); } catch(e) { console.error("Error adding ice candidate", e); }
         } else {
             pendingIceCandidates.push(data.candidate);
         }
@@ -133,23 +113,10 @@ function showToast(message) {
     }
     let toast = document.createElement('div');
     toast.style.cssText = "background: var(--bg-card); color: var(--text-main); border-left: 4px solid var(--primary-color); padding: 15px 20px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.15); animation: slideInRight 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) forwards; display:flex; align-items:center; gap:12px; font-size: 14px; font-weight: 600;";
-    toast.innerHTML = `
-        <div style="background:var(--primary-light); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--primary-color);">
-            <i class="fas fa-bell"></i>
-        </div>
-        <span style="flex:1;">${message}</span>
-    `;
+    toast.innerHTML = `<div style="background:var(--primary-light); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--primary-color);"><i class="fas fa-bell"></i></div><span style="flex:1;">${message}</span>`;
     toastBox.appendChild(toast);
-    
-    try {
-        let audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play();
-    } catch(e){}
-
-    setTimeout(() => {
-        toast.style.animation = "slideOutRight 0.3s forwards";
-        setTimeout(() => toast.remove(), 300);
-    }, 4500);
+    try { new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play(); } catch(e){}
+    setTimeout(() => { toast.style.animation = "slideOutRight 0.3s forwards"; setTimeout(() => toast.remove(), 300); }, 4500);
 }
 
 async function updateCloudUser(userObj) {
@@ -169,7 +136,6 @@ async function updateCloudUser(userObj) {
 
 async function syncWithDatabase() {
     if(isSyncPaused) return; 
-
     try {
         const response = await fetch(API_BASE_URL + '/users', { headers: { "ngrok-skip-browser-warning": "69420" } });
         if (response.ok) {
@@ -181,15 +147,8 @@ async function syncWithDatabase() {
     } catch (error) { console.log("Backend offline. Using LocalStorage.", error); }
 }
 
-if (document.getElementById('dashboardWrapper')) {
-    syncWithDatabase();
-}
-
-setInterval(() => {
-    if(document.getElementById('dashboardWrapper') && sessionStorage.getItem('loggedInUserEmail')) {
-        syncWithDatabase(); 
-    }
-}, 2500); 
+if (document.getElementById('dashboardWrapper')) syncWithDatabase();
+setInterval(() => { if(document.getElementById('dashboardWrapper') && sessionStorage.getItem('loggedInUserEmail')) syncWithDatabase(); }, 2500); 
 
 function setOnlineStatus(status) {
     let email = sessionStorage.getItem('loggedInUserEmail');
@@ -317,8 +276,9 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let messageBtnHTML = isSwapAccepted 
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
-                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages after the swap request is accepted.')"><i class="fas fa-lock"></i> Message</button>`;
+                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages if the swap is Active!')"><i class="fas fa-lock"></i> Message</button>`;
 
+                // 🟢 NEW: Swap button now opens the specific topic selection modal
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
                         <div class="top-badge">Available</div>
@@ -326,7 +286,7 @@ function refreshDynamicData(isLiveUpdate = false) {
                         <h3>${skill}</h3>
                         <p style="margin-bottom: 20px;">User: <strong>${otherUser.name}</strong></p>
                         <div class="card-buttons">
-                            <button class="btn-solid" onclick="requestSwap('${otherUser.email}', '${skill}')">Swap</button>
+                            <button class="btn-solid" onclick="openTopicSelection('${otherUser.email}', '${skill}')">Swap Topic</button>
                             ${messageBtnHTML}
                         </div>
                     </div>`;
@@ -370,8 +330,14 @@ function refreshDynamicData(isLiveUpdate = false) {
             } else { 
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">End Swap</button>`;
             }
+            
+            // 🟢 NEW: Highlight the specific topic requested in "My Swaps"
+            let topicDisplay = swap.topic && swap.topic !== "General (Full Skill)" 
+                ? `<br><small style="color:var(--primary-color); font-weight:600;"><i class="fas fa-bullseye"></i> Topic: ${swap.topic}</small>` 
+                : "";
+
             newSwapsHTML += `<div class="list-item">
-                                <div><h4>${swap.skill}</h4><p>Partner: ${swap.partner}</p></div>
+                                <div><h4>${swap.skill} ${topicDisplay}</h4><p>Partner: ${swap.partner}</p></div>
                                 <div style="display:flex; align-items:center; gap:15px;">
                                     <span class="${bClass}">${swap.status}</span>
                                     <div style="display:flex; gap:10px;">${actionBtns}</div>
@@ -453,8 +419,43 @@ function applySearchFilter() {
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
 
-// 🟢 BUG FIX: Added 'role' to track who requested and who will teach (Provider)
-function requestSwap(targetEmail, skill) {
+// 🟢 NEW: Read topics created by target user and open Modal
+function openTopicSelection(targetEmail, skill) {
+    const targetUser = usersDB.find(u => u.email === targetEmail);
+    if(!targetUser) return;
+
+    let topics = (targetUser.topics && targetUser.topics[skill]) ? targetUser.topics[skill] : [];
+    
+    // If the user hasn't added specific topics, provide a general option
+    if (topics.length === 0) {
+        topics = ["General (Full Skill)"];
+    }
+
+    document.getElementById('modalSkillName').innerText = skill;
+    const container = document.getElementById('topicListContainer');
+    container.innerHTML = "";
+
+    topics.forEach(t => {
+        container.innerHTML += `
+            <div class="list-item" style="cursor:pointer; border:1px solid var(--border-color); transition:0.2s;" onmouseover="this.style.borderColor='var(--primary-color)'" onmouseout="this.style.borderColor='var(--border-color)'" onclick="requestSwap('${targetEmail}', '${skill}', '${t}')">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fas fa-book-open" style="color:var(--primary-color)"></i>
+                    <span style="font-weight:600;">${t}</span>
+                </div>
+                <i class="fas fa-chevron-right" style="font-size:12px; color:var(--text-muted)"></i>
+            </div>`;
+    });
+
+    document.getElementById('topicSelectionModal').style.display = "flex";
+}
+
+function closeTopicModal() {
+    document.getElementById('topicSelectionModal').style.display = "none";
+}
+
+// 🟢 MODIFIED: Added specific 'topic' to the Swap Request
+function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
+    closeTopicModal(); // Hide modal first
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
     const targetIndex = usersDB.findIndex(u => u.email === targetEmail);
@@ -469,12 +470,14 @@ function requestSwap(targetEmail, skill) {
     
     if(usersDB[meIndex].swaps.find(s => s.skill === skill && s.partnerEmail === usersDB[targetIndex].email)) { alert("You have already requested this swap!"); return; }
 
-    // Role added here: 'Requester' is the one who asks, 'Provider' is the one who will teach and get the credit back later.
-    usersDB[meIndex].swaps.push({ skill: skill, partner: usersDB[targetIndex].name, partnerEmail: usersDB[targetIndex].email, status: 'Pending', role: 'Requester' });
-    usersDB[targetIndex].swaps.push({ skill: skill, partner: usersDB[meIndex].name, partnerEmail: usersDB[meIndex].email, status: 'Requested', role: 'Provider' });
+    // Save topic string in DB
+    usersDB[meIndex].swaps.push({ skill: skill, topic: topic, partner: usersDB[targetIndex].name, partnerEmail: usersDB[targetIndex].email, status: 'Pending', role: 'Requester' });
+    usersDB[targetIndex].swaps.push({ skill: skill, topic: topic, partner: usersDB[meIndex].name, partnerEmail: usersDB[meIndex].email, status: 'Requested', role: 'Provider' });
     
+    // 🟢 Detailed Notification
+    let detailText = topic === "General (Full Skill)" ? "" : ` ('${topic}')`;
     usersDB[targetIndex].notifications.push({ 
-        text: `🤝 ${usersDB[meIndex].name} requested to swap '${skill}' with you.`, 
+        text: `🤝 ${usersDB[meIndex].name} requested to learn ${skill}${detailText} from you.`, 
         isRead: false, 
         id: Date.now() + Math.random() 
     });
@@ -483,7 +486,7 @@ function requestSwap(targetEmail, skill) {
     updateCloudUser(usersDB[meIndex]); 
     updateCloudUser(usersDB[targetIndex]); 
 
-    alert("✅ Swap Request sent! They will get a notification instantly.");
+    alert(`✅ Swap Request sent for ${skill} - ${topic}!`);
     switchDashView('view-active-swaps', document.querySelectorAll('.sidebar-menu a')[2]);
 }
 
@@ -521,7 +524,6 @@ function acceptSwap(mySwapIndex, partnerName, skill) {
     }
 }
 
-// 🟢 BUG FIX: Added logic to give 1 credit to Provider when swap ends
 function cancelSwap(mySwapIndex, partnerName, skill) {
     if(!confirm("Are you sure you want to cancel/decline/end this swap?")) return;
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -533,16 +535,13 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
 
     if(targetIndex !== -1) {
         
-        // --- NEW LOGIC FOR CREDITS ---
         if (mySwap.status === 'Active') {
-            // End active swap -> Provider gets 1 credit
             let providerIndex = -1;
             if (mySwap.role === 'Provider') {
                 providerIndex = meIndex;
             } else if (mySwap.role === 'Requester') {
                 providerIndex = targetIndex;
             } else {
-                // Fallback for older swaps that don't have role saved
                 providerIndex = targetIndex; 
             }
 
@@ -557,7 +556,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
                 });
             }
         }
-        // -----------------------------
 
         usersDB[targetIndex].swaps = usersDB[targetIndex].swaps.filter(s => !(s.partnerEmail === usersDB[meIndex].email && s.skill === skill));
         usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
@@ -593,7 +591,7 @@ function openChatFromDiscover(targetEmail) {
     }
     
     if (!isSwapAccepted) {
-        showToast('🔒 You can only send messages after the swap request is accepted.');
+        showToast('🔒 You can only send messages if the swap is Active!');
         return;
     }
 
@@ -791,6 +789,7 @@ function deleteNotification(idx) {
     refreshDynamicData();
 }
 
+// 🟢 NEW: Edit profile topics load
 function openMyProfile(element) {
     switchDashView('view-profile', element);
     const currentEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -810,6 +809,15 @@ function openMyProfile(element) {
         } else {
             editSkillsArray = [];
         }
+        
+        // Deep copy topics to edit safely
+        if(user.topics) {
+            editTopicsObj = JSON.parse(JSON.stringify(user.topics));
+        } else {
+            editTopicsObj = {};
+        }
+        
+        editSkillsArray.forEach(sk => { if(!editTopicsObj[sk]) editTopicsObj[sk] = []; });
         
         renderEditSkills();
     }
@@ -847,20 +855,56 @@ if(document.getElementById('editSkillInput')){
             e.preventDefault(); 
             const skillValue = this.value.trim();
             if (skillValue !== '' && !editSkillsArray.includes(skillValue)) {
-                editSkillsArray.push(skillValue); renderEditSkills();
+                editSkillsArray.push(skillValue); 
+                editTopicsObj[skillValue] = []; // Initialize
+                renderEditSkills();
             }
             this.value = ''; 
         }
     });
 }
 
+// 🟢 NEW: Render Topics in Edit Profile
 function renderEditSkills() {
     const list = document.getElementById('editSkillsList');
     list.innerHTML = '';
-    editSkillsArray.forEach((skill, index) => { list.innerHTML += `<div class="skill-tag">${skill} <i class="fas fa-times" onclick="removeEditSkill(${index})"></i></div>`; });
+    
+    editSkillsArray.forEach((skill, index) => {
+        let tHTML = (editTopicsObj[skill] || []).map((t, tIdx) =>
+            `<span style="font-size:11px; background:var(--primary-light); color:var(--primary-color); padding:4px 8px; border-radius:12px; margin-right:5px; margin-bottom:5px; display:inline-block; font-weight:600;">${t} <i class="fas fa-times" onclick="removeEditTopic('${skill}', ${tIdx})" style="cursor:pointer; margin-left:5px;"></i></span>`
+        ).join('');
+
+        list.innerHTML += `
+        <div style="background:var(--bg-input); border:1px solid var(--border-color); padding:15px; border-radius:10px; margin-bottom:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div class="skill-tag" style="margin-bottom:10px; display:inline-block; font-size:14px;">${skill} <i class="fas fa-times" onclick="removeEditSkill(${index})"></i></div>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap;">${tHTML}</div>
+            <input type="text" placeholder="Add topic for ${skill} & Press Enter" onkeydown="handleEditTopicInput(event, '${skill}')" style="width:100%; padding:10px 12px; font-size:13px; border:1px solid var(--border-color); border-radius:8px; background:var(--bg-card); color:var(--text-main); outline:none;">
+        </div>`;
+    });
 }
 
-function removeEditSkill(index) { editSkillsArray.splice(index, 1); renderEditSkills(); }
+function handleEditTopicInput(e, skill) {
+    if(e.key === 'Enter') {
+        e.preventDefault();
+        let val = e.target.value.trim();
+        if(val !== '' && !editTopicsObj[skill].includes(val)) {
+            editTopicsObj[skill].push(val);
+            renderEditSkills();
+        }
+    }
+}
+
+function removeEditTopic(skill, tIdx) {
+    editTopicsObj[skill].splice(tIdx, 1);
+    renderEditSkills();
+}
+
+function removeEditSkill(index) { 
+    let sk = editSkillsArray[index];
+    delete editTopicsObj[sk];
+    editSkillsArray.splice(index, 1); 
+    renderEditSkills(); 
+}
 
 function handleProfileUpdate(e) {
     e.preventDefault();
@@ -875,6 +919,7 @@ function handleProfileUpdate(e) {
         usersDB[userIndex].phone = document.getElementById('editPhone').value;
         usersDB[userIndex].address = document.getElementById('editAddress').value;
         usersDB[userIndex].skills = [...editSkillsArray];
+        usersDB[userIndex].topics = editTopicsObj; // 🟢 Save topics to DB
         usersDB[userIndex].profilePic = editProfilePic;
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
         updateCloudUser(usersDB[userIndex]); 
@@ -1030,7 +1075,7 @@ function hideLogoutConfirm() {
 
 
 // ==========================================
-// 🟢 WEBRTC VIDEO CALL ENGINE (OPTIMIZED)
+// 🟢 WEBRTC VIDEO CALL ENGINE
 // ==========================================
 async function startVideoCall() {
     if(!currentChatPartnerEmail) return;
@@ -1076,7 +1121,6 @@ async function acceptCall() {
         setupPeerConnection();
         await peerConnection.setRemoteDescription(new RTCSessionDescription(window.incomingOffer));
 
-        // 🟢 FIXED: Process delayed network info for the receiver
         for (let candidate of pendingIceCandidates) {
             try { await peerConnection.addIceCandidate(new RTCIceCandidate(candidate)); } catch(e) {}
         }
@@ -1098,7 +1142,7 @@ async function acceptCall() {
 
 function rejectCall() {
     document.getElementById('incomingCallModal').style.display = "none";
-    document.getElementById('videoCallModal').style.display = "none"; // 🟢 FIXED: Ensure modal closes
+    document.getElementById('videoCallModal').style.display = "none"; 
     if(incomingCallPartner) {
         socket.emit('reject-call', { to: incomingCallPartner });
     }
@@ -1159,7 +1203,6 @@ function endCall(isLocalAction = true) {
         remoteStream = null;
     }
     
-    // 🟢 FIXED: Clear video source to remove frozen frames on call cut
     const localVid = document.getElementById('localVideo');
     if (localVid) localVid.srcObject = null;
     
@@ -1169,7 +1212,7 @@ function endCall(isLocalAction = true) {
     isCalling = false;
     incomingCallPartner = null;
     pendingIceCandidates = []; 
-    document.getElementById('callStatusText').innerText = "Calling..."; // Reset text
+    document.getElementById('callStatusText').innerText = "Calling..."; 
 }
 
 function toggleMic() {
@@ -1205,6 +1248,7 @@ function toggleCamera() {
         }
     }
 }
+
 // ==========================================
 // 🟢 AI TRANSLATOR (VOICE-TO-VOICE) LOGIC
 // ==========================================
@@ -1212,14 +1256,13 @@ let isAIOn = false;
 let recognition;
 const synth = window.speechSynthesis;
 
-// 1. Button Logic (ON/OFF)
 function toggleAITranslator() {
     isAIOn = !isAIOn;
     const btn = document.getElementById('toggleAIBtn');
     
     if (isAIOn) {
         btn.innerHTML = '<i class="fas fa-robot"></i> AI ON';
-        btn.style.background = "#10b981"; // Green color
+        btn.style.background = "#10b981"; 
         startAITranslationProcess();
     } else {
         btn.innerHTML = '<i class="fas fa-robot"></i> AI OFF';
@@ -1228,13 +1271,12 @@ function toggleAITranslator() {
     }
 }
 
-// 2. Listening & Translating Logic
 function startAITranslationProcess() {
     window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     
     if (!window.SpeechRecognition) {
         alert("Your browser doesn't support AI Translation. Please use Google Chrome.");
-        toggleAITranslator(); // Turn off if not supported
+        toggleAITranslator(); 
         return;
     }
 
@@ -1242,7 +1284,6 @@ function startAITranslationProcess() {
     recognition.continuous = true;
     recognition.interimResults = false;
     
-    // Set language from Dropdown (Default Hindi)
     recognition.lang = document.getElementById('myLanguage').value || 'hi-IN'; 
 
     recognition.onresult = async (event) => {
@@ -1250,55 +1291,33 @@ function startAITranslationProcess() {
         const spokenText = event.results[lastIndex][0].transcript;
         const targetLang = document.getElementById('targetLanguage').value || 'en-US';
 
-        console.log("Original Voice:", spokenText);
-
         try {
-            // Google Translate (Free Public API API for testing)
             const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang.split('-')[0]}&dt=t&q=${encodeURI(spokenText)}`);
             const data = await response.json();
             const translatedText = data[0][0][0];
 
-            console.log("Translated Text:", translatedText);
-
-            // Determine partner's email (Handles both caller and receiver scenarios)
             let partnerEmail = incomingCallPartner || currentChatPartnerEmail; 
             
             if (partnerEmail) {
-                // Send to backend
                 socket.emit('send-translation', {
                     to: partnerEmail,
                     text: translatedText,
                     lang: targetLang
                 });
             }
-        } catch (error) {
-            console.error("AI Translation Error:", error);
-        }
+        } catch (error) { console.error("AI Translation Error:", error); }
     };
 
-    // Auto-restart recognition if user takes a pause but AI is still ON
-    recognition.onend = () => { 
-        if (isAIOn) {
-            try { recognition.start(); } catch(e) { console.log(e); } 
-        }
-    };
-
-    try { recognition.start(); } catch(e) { console.log("Mic start error"); }
+    recognition.onend = () => { if (isAIOn) { try { recognition.start(); } catch(e) {} } };
+    try { recognition.start(); } catch(e) {}
 }
 
-// 3. Receiver Logic (Plays audio when the partner speaks)
 socket.on('receive-translation', (data) => {
-    // Voice will only play if you are on this page and the call is active
     const utterance = new SpeechSynthesisUtterance(data.text);
     utterance.lang = data.lang;
     utterance.rate = 1.0; 
-    
-    // Play translated voice
     synth.speak(utterance);
     
-    // Optional: If you want to show subtitles, change the text on the dashboard element with id 'callStatusText'
     const statusText = document.getElementById('callStatusText');
-    if(statusText) {
-        statusText.innerText = `💬 Translation: ${data.text}`;
-    }
+    if(statusText) { statusText.innerText = `💬 Translation: ${data.text}`; }
 });
