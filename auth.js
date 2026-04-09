@@ -1,6 +1,6 @@
 let currentTempUser = {}; 
 let userSkillsArray = []; 
-let userTopicsObj = {}; // 🟢 NEW: To store sub-topics for each skill
+let userTopicsObj = {}; 
 let currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 let pendingLoginUser = null;
 let generatedOTP = null;
@@ -93,6 +93,7 @@ function handleVerifyOTP(e) {
 
 function finalizeLogin(userFound) {
     sessionStorage.setItem('loggedInUserEmail', userFound.email);
+    sessionStorage.setItem('justLoggedIn', 'true'); // 🟢 BUG 3 FIX: System ko batana ki ye NAYA login hai
     window.location.href = "dashboard.html"; 
 }
 
@@ -114,7 +115,7 @@ function handleRegister(e) {
 
     currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5 };
     userSkillsArray = []; 
-    userTopicsObj = {}; // Reset topics
+    userTopicsObj = {}; 
     currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
     
     regGeneratedOTP = Math.floor(100000 + Math.random() * 900000).toString();
@@ -184,7 +185,7 @@ if(document.getElementById('skillInput')){
             const skillValue = this.value.trim();
             if (skillValue !== '' && !userSkillsArray.includes(skillValue)) {
                 userSkillsArray.push(skillValue); 
-                userTopicsObj[skillValue] = []; // Initialize empty array for topics
+                userTopicsObj[skillValue] = []; 
                 renderSkills();
             }
             this.value = ''; 
@@ -192,7 +193,6 @@ if(document.getElementById('skillInput')){
     });
 }
 
-// 🟢 NEW: Logic to render Skills AND their specific Topics input field dynamically
 function renderSkills() {
     const skillsList = document.getElementById('skillsList');
     skillsList.innerHTML = '';
@@ -211,7 +211,6 @@ function renderSkills() {
     });
 }
 
-// 🟢 NEW: Add specific topic to a skill
 function handleTopicInput(e, skill) {
     if(e.key === 'Enter') {
         e.preventDefault();
@@ -223,7 +222,6 @@ function handleTopicInput(e, skill) {
     }
 }
 
-// 🟢 NEW: Remove a specific topic
 function removeTopic(skill, tIdx) {
     userTopicsObj[skill].splice(tIdx, 1);
     renderSkills();
@@ -269,7 +267,7 @@ async function handleProfileSave(e) {
                 role: selectedRole, 
                 skill: finalSkill,
                 skills: userSkillsArray, 
-                topics: userTopicsObj, // 🟢 NEW: Saving topics to Database
+                topics: userTopicsObj, 
                 profilePic: currentProfilePic
             })
         });
