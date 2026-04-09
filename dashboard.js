@@ -220,7 +220,7 @@ function refreshDynamicData(isLiveUpdate = false) {
     if(!me) { logout(); return; }
 
     if(me.credits === undefined) me.credits = 5;
-    if(me.acquiredSkills === undefined) me.acquiredSkills = []; // 🟢 Added acquiredSkills safety check
+    if(me.acquiredSkills === undefined) me.acquiredSkills = []; 
 
     if(me.notifications) {
         if(isFirstDataLoad) {
@@ -252,7 +252,7 @@ function refreshDynamicData(isLiveUpdate = false) {
         document.getElementById('statCredits').innerText = me.credits; 
         
         const statAcquired = document.getElementById('statAcquired');
-        if(statAcquired) statAcquired.innerText = me.acquiredSkills.length; // 🟢 Display Acquired Skills count
+        if(statAcquired) statAcquired.innerText = me.acquiredSkills.length; 
     }
 
     let unreadNotis = me.notifications ? me.notifications.filter(n => !n.isRead) : [];
@@ -572,14 +572,23 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
                 });
             }
 
-            // 🟢 NEW: Add to Acquired Skills logic for Learner
+            // 🟢 UPDATED: Acquired Skills ab Object (skill + topic) dono save karega
             if (requesterIndex !== -1) {
                 if (usersDB[requesterIndex].acquiredSkills === undefined) usersDB[requesterIndex].acquiredSkills = [];
-                if (!usersDB[requesterIndex].acquiredSkills.includes(skill)) {
-                    usersDB[requesterIndex].acquiredSkills.push(skill);
+                
+                let learnedTopic = mySwap.topic || "General (Full Skill)";
+                
+                // Pata karo agar ye topic pehle hi seekh chuka hai
+                let alreadyLearned = usersDB[requesterIndex].acquiredSkills.some(item => 
+                    (typeof item === 'object' && item.skill === skill && item.topic === learnedTopic) || 
+                    (typeof item === 'string' && item === skill && learnedTopic === "General (Full Skill)")
+                );
+
+                if (!alreadyLearned) {
+                    usersDB[requesterIndex].acquiredSkills.push({ skill: skill, topic: learnedTopic });
                     usersDB[requesterIndex].notifications = usersDB[requesterIndex].notifications || [];
                     usersDB[requesterIndex].notifications.push({
-                        text: `🎓 You successfully learned '${skill}'! Check your Acquired Skills box.`,
+                        text: `🎓 You successfully learned '${learnedTopic}' in ${skill}! Check your Acquired Skills box.`,
                         isRead: false,
                         id: Date.now() + Math.random()
                     });
@@ -610,7 +619,7 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     refreshDynamicData();
 }
 
-// 🟢 NEW: Modal Logic to show Acquired Skills
+// 🟢 UPDATED: Modal Design with Thick Box, Gap and Auto Width Button
 function openAcquiredSkillsModal() {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const me = usersDB.find(u => u.email === myEmail);
@@ -618,6 +627,7 @@ function openAcquiredSkillsModal() {
 
     let acquired = me.acquiredSkills || [];
     let myCurrentSkills = me.skills || [];
+    let myCurrentTopics = me.topics || {};
 
     const container = document.getElementById('acquiredListContainer');
     container.innerHTML = "";
@@ -625,16 +635,28 @@ function openAcquiredSkillsModal() {
     if (acquired.length === 0) {
         container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px;">You haven't learned any new skills yet. Complete a swap as a learner to add skills here!</p>`;
     } else {
-        acquired.forEach(sk => {
-            let isAlreadyAdded = myCurrentSkills.includes(sk);
-            let btnHTML = isAlreadyAdded 
-                ? `<button class="btn-outline" style="padding:5px 10px; font-size:12px; cursor:not-allowed; opacity:0.5;">Added</button>`
-                : `<button class="btn-solid" style="padding:5px 10px; font-size:12px; margin:0;" onclick="addAcquiredToProfile('${sk}')">Add to Profile</button>`;
+        acquired.forEach(item => {
+            // Handle backwards compatibility (old string format vs new object format)
+            let skName = typeof item === 'string' ? item : item.skill;
+            let tpName = typeof item === 'string' ? "General (Full Skill)" : item.topic;
 
+            // Check if this specific topic is already added
+            let isAlreadyAdded = myCurrentSkills.includes(skName) && 
+                                 (myCurrentTopics[skName] && myCurrentTopics[skName].includes(tpName));
+
+            // Fixed Button Width (auto) and padding
+            let btnHTML = isAlreadyAdded 
+                ? `<button class="btn-outline" style="padding:8px 15px; font-size:12px; cursor:not-allowed; opacity:0.5; width:auto; margin:0; border-radius:8px;">Added</button>`
+                : `<button class="btn-solid" style="padding:8px 15px; font-size:12px; margin:0; width:auto; border-radius:8px;" onclick="addAcquiredToProfile('${skName}', '${tpName}')">Add to Profile</button>`;
+
+            // Thick list item box with gap (margin-right: 15px)
             container.innerHTML += `
-                <div class="list-item" style="margin-bottom:0;">
-                    <div><h4 style="margin:0; font-size:15px; color:var(--text-main);">${sk}</h4></div>
-                    ${btnHTML}
+                <div class="list-item" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:15px 20px; border-radius:12px; border:2px solid var(--border-color); box-shadow:0 4px 6px rgba(0,0,0,0.05);">
+                    <div style="flex:1; margin-right:15px;">
+                        <h4 style="margin:0; font-size:16px; color:var(--text-main); font-weight:800;">${skName}</h4>
+                        <p style="margin:4px 0 0 0; font-size:13px; color:var(--primary-color); font-weight:600;"><i class="fas fa-bullseye"></i> ${tpName}</p>
+                    </div>
+                    <div>${btnHTML}</div>
                 </div>`;
         });
     }
@@ -654,8 +676,8 @@ function closeAcquiredSkillsModal() {
     }
 }
 
-// 🟢 NEW: Add learned skill directly to Teaching Profile!
-function addAcquiredToProfile(skill) {
+// 🟢 UPDATED: Add learned skill AND TOPIC directly to Teaching Profile!
+function addAcquiredToProfile(skill, topic) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
     if(meIndex === -1) return;
@@ -665,19 +687,26 @@ function addAcquiredToProfile(skill) {
 
     if(!usersDB[meIndex].skills.includes(skill)) {
         usersDB[meIndex].skills.push(skill);
-        usersDB[meIndex].topics[skill] = []; // Initialize empty topics for them
-        
-        if (usersDB[meIndex].role === 'learn') {
-            usersDB[meIndex].role = 'teach'; // Upgrade to mentor so they show in discover
-        }
-
-        localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
-        updateCloudUser(usersDB[meIndex]);
-        
-        showToast(`🎉 Congratulations! You are now ready to teach '${skill}'!`);
-        openAcquiredSkillsModal(); // Refresh modal view
-        refreshDynamicData();
     }
+    
+    if(!usersDB[meIndex].topics[skill]) {
+        usersDB[meIndex].topics[skill] = [];
+    }
+    
+    if(!usersDB[meIndex].topics[skill].includes(topic)) {
+        usersDB[meIndex].topics[skill].push(topic);
+    }
+    
+    if (usersDB[meIndex].role === 'learn') {
+        usersDB[meIndex].role = 'teach'; 
+    }
+
+    localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
+    updateCloudUser(usersDB[meIndex]);
+    
+    showToast(`🎉 Congratulations! You are now ready to teach '${topic}' in ${skill}!`);
+    openAcquiredSkillsModal(); 
+    refreshDynamicData();
 }
 
 function openChatFromDiscover(targetEmail) {
