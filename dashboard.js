@@ -58,7 +58,7 @@ if(socket) {
         syncWithDatabase(); 
         if (currentChatPartnerEmail !== data.from) {
             let senderName = usersDB.find(u => u.email === data.from)?.name || "User";
-            showToast(`💬 Naya message: ${senderName} ne bheja`);
+            showToast(`💬 New message from ${senderName}`);
         }
     });
 
@@ -311,7 +311,7 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let messageBtnHTML = isSwapAccepted 
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
-                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 Swap accept hone ke baad hi message kar sakte ho!')"><i class="fas fa-lock"></i> Message</button>`;
+                    : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages after the swap request is accepted.')"><i class="fas fa-lock"></i> Message</button>`;
 
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
@@ -587,7 +587,7 @@ function openChatFromDiscover(targetEmail) {
     }
     
     if (!isSwapAccepted) {
-        showToast('🔒 Swap accept hone ke baad hi message kar sakte ho!');
+        showToast('🔒 You can only send messages after the swap request is accepted.');
         return;
     }
 
@@ -918,12 +918,12 @@ async function deleteAccount() {
                 usersDB = usersDB.filter(u => u.email !== userEmail);
                 localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
                 
-                alert("🎉 Account MongoDB aur Local se permanently delete ho gaya!");
+                alert("🎉 Your account has been permanently deleted!");
                 logout();
-            } else { alert("❌ Database se delete nahi ho paya."); }
+            } else { alert("❌ Failed to delete account from the database."); }
         } catch (error) {
             console.error("Delete Error:", error);
-            alert("Server connect nahi ho raha.");
+            alert("Unable to connect to the server.");
         }
     }
 }
@@ -1050,7 +1050,7 @@ async function startVideoCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili! Make sure no other app (like screen recorder) is using the mic.");
+        alert("Camera or Microphone permission denied! Please ensure no other app is using them.");
         endCall(true);
     }
 }
@@ -1085,7 +1085,7 @@ async function acceptCall() {
         });
 
     } catch (err) {
-        alert("Camera ya Mic ki permission nahi mili! Make sure no other app (like screen recorder) is using the mic.");
+        alert("Camera or Microphone permission denied! Please ensure no other app is using them.");
         rejectCall();
     }
 }
@@ -1280,9 +1280,9 @@ function startAITranslationProcess() {
     try { recognition.start(); } catch(e) { console.log("Mic start error"); }
 }
 
-// 3. Receiver Logic (Samne wala jab bolega, tab ye speak karega)
+// 3. Receiver Logic (Plays audio when the partner speaks)
 socket.on('receive-translation', (data) => {
-    // Sirf tabhi awaaz aayegi jab aap is page par honge aur call chalu hogi
+    // Voice will only play if you are on this page and the call is active
     const utterance = new SpeechSynthesisUtterance(data.text);
     utterance.lang = data.lang;
     utterance.rate = 1.0; 
@@ -1290,7 +1290,7 @@ socket.on('receive-translation', (data) => {
     // Play translated voice
     synth.speak(utterance);
     
-    // Optional: Agar subtitle dikhana ho to dashboard me id 'callStatusText' par text change karein
+    // Optional: If you want to show subtitles, change the text on the dashboard element with id 'callStatusText'
     const statusText = document.getElementById('callStatusText');
     if(statusText) {
         statusText.innerText = `💬 Translation: ${data.text}`;
