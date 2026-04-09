@@ -93,7 +93,7 @@ function handleVerifyOTP(e) {
 
 function finalizeLogin(userFound) {
     sessionStorage.setItem('loggedInUserEmail', userFound.email);
-    sessionStorage.setItem('justLoggedIn', 'true'); // 🟢 BUG 3 FIX: System ko batana ki ye NAYA login hai
+    sessionStorage.setItem('justLoggedIn', 'true'); 
     window.location.href = "dashboard.html"; 
 }
 
@@ -113,7 +113,8 @@ function handleRegister(e) {
     const genderElement = document.querySelector('input[name="regGender"]:checked');
     const gender = genderElement ? genderElement.value : "Not Specified";
 
-    currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5 };
+    // 🟢 ADDED: acquiredSkills: [] taaki naye user me array ban jaye
+    currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5, acquiredSkills: [] };
     userSkillsArray = []; 
     userTopicsObj = {}; 
     currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
@@ -268,6 +269,7 @@ async function handleProfileSave(e) {
                 skill: finalSkill,
                 skills: userSkillsArray, 
                 topics: userTopicsObj, 
+                acquiredSkills: [], // 🟢 ADDED: DB me bhi initialize hoga
                 profilePic: currentProfilePic
             })
         });
