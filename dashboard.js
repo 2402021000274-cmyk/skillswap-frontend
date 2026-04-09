@@ -41,11 +41,11 @@ const socket = typeof io !== 'undefined' ? io(API_BASE_URL) : null;
 if(socket) {
     socket.on('connect', () => {
         let myEmail = sessionStorage.getItem('loggedInUserEmail');
-        let isNewLogin = sessionStorage.getItem('justLoggedIn') === 'true'; // 🟢 BUG 3 FIX: Checking if fresh login
+        let isNewLogin = sessionStorage.getItem('justLoggedIn') === 'true'; 
         
         if(myEmail) { 
             socket.emit('register-user', { email: myEmail, isNewLogin: isNewLogin }); 
-            sessionStorage.removeItem('justLoggedIn'); // Reset flag
+            sessionStorage.removeItem('justLoggedIn'); 
         }
     });
 
@@ -283,7 +283,6 @@ function refreshDynamicData(isLiveUpdate = false) {
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
                     : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages if the swap is Active!')"><i class="fas fa-lock"></i> Message</button>`;
 
-                // 🟢 BUG 2 FIX: Name changed to 'Swap', functionality intact
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
                         <div class="top-badge">Available</div>
@@ -423,7 +422,7 @@ function applySearchFilter() {
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
 
-// 🟢 BUG 2 FIX: Modal ab properly open hoga
+// 🟢 BUG 2 FIX: Added safety check `if (modal)` to ensure HTML element exists
 function openTopicSelection(targetEmail, skill) {
     const targetUser = usersDB.find(u => u.email === targetEmail);
     if(!targetUser) return;
@@ -450,14 +449,20 @@ function openTopicSelection(targetEmail, skill) {
     });
 
     const modal = document.getElementById('topicSelectionModal');
-    modal.classList.remove('hidden'); // Fix to remove CSS hiding
-    modal.style.display = "flex";
+    if(modal) {
+        modal.classList.remove('hidden'); 
+        modal.style.display = "flex";
+    } else {
+        console.error("Modal block missing from HTML!");
+    }
 }
 
 function closeTopicModal() {
     const modal = document.getElementById('topicSelectionModal');
-    modal.classList.add('hidden');
-    modal.style.display = "none";
+    if(modal) {
+        modal.classList.add('hidden');
+        modal.style.display = "none";
+    }
 }
 
 function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
