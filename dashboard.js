@@ -54,6 +54,12 @@ if(socket) {
         if(myEmail) { socket.emit('register-user', myEmail); }
     });
 
+    // 🟢 NEW: Live Visitor Counter Listener
+    socket.on('visitor-update', (count) => {
+        const visitorEl = document.getElementById('statVisitors');
+        if(visitorEl) visitorEl.innerText = count;
+    });
+
     socket.on('receive-msg', (data) => {
         syncWithDatabase(); 
         if (currentChatPartnerEmail !== data.from) {
