@@ -1,5 +1,6 @@
 let currentTempUser = {}; 
 let userSkillsArray = []; 
+let userTopicsObj = {}; // 🟢 NEW: To store sub-topics for each skill
 let currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 let pendingLoginUser = null;
 let generatedOTP = null;
@@ -103,18 +104,17 @@ function handleRegister(e) {
     const pass = document.getElementById('regPass').value;
     const confirmPass = document.getElementById('regConfirmPass').value;
     
-    // NEW: Check if passwords match
     if (pass !== confirmPass) {
         messageBox.innerHTML = "<span class='error-msg'>Passwords do not match. Please try again.</span>";
         return; 
     }
     
-    // NEW GENDER LOGIC
     const genderElement = document.querySelector('input[name="regGender"]:checked');
     const gender = genderElement ? genderElement.value : "Not Specified";
 
     currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5 };
     userSkillsArray = []; 
+    userTopicsObj = {}; // Reset topics
     currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
     
     regGeneratedOTP = Math.floor(100000 + Math.random() * 900000).toString();
@@ -183,21 +183,58 @@ if(document.getElementById('skillInput')){
             e.preventDefault(); 
             const skillValue = this.value.trim();
             if (skillValue !== '' && !userSkillsArray.includes(skillValue)) {
-                userSkillsArray.push(skillValue); renderSkills();
+                userSkillsArray.push(skillValue); 
+                userTopicsObj[skillValue] = []; // Initialize empty array for topics
+                renderSkills();
             }
             this.value = ''; 
         }
     });
 }
 
+// 🟢 NEW: Logic to render Skills AND their specific Topics input field dynamically
 function renderSkills() {
     const skillsList = document.getElementById('skillsList');
     skillsList.innerHTML = '';
+    
     userSkillsArray.forEach((skill, index) => {
-        skillsList.innerHTML += `<div class="skill-tag">${skill} <i class="fas fa-times" onclick="removeSkill(${index})"></i></div>`;
+        let tHTML = (userTopicsObj[skill] || []).map((t, tIdx) =>
+            `<span style="font-size:11px; background:var(--primary-light); color:var(--primary-color); padding:4px 8px; border-radius:12px; margin-right:5px; margin-bottom:5px; display:inline-block; font-weight:600;">${t} <i class="fas fa-times" onclick="removeTopic('${skill}', ${tIdx})" style="cursor:pointer; margin-left:5px;"></i></span>`
+        ).join('');
+
+        skillsList.innerHTML += `
+        <div style="background:var(--bg-input); border:1px solid var(--border-color); padding:15px; border-radius:10px; margin-bottom:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div class="skill-tag" style="margin-bottom:10px; display:inline-block; font-size:14px;">${skill} <i class="fas fa-times" onclick="removeSkill(${index})"></i></div>
+            <div style="margin-bottom:10px; display:flex; flex-wrap:wrap;">${tHTML}</div>
+            <input type="text" placeholder="Add topic for ${skill} & Press Enter (e.g. OOPs)" onkeydown="handleTopicInput(event, '${skill}')" style="width:100%; padding:10px 12px; font-size:13px; border:1px solid var(--border-color); border-radius:8px; background:var(--bg-card); color:var(--text-main); outline:none;">
+        </div>`;
     });
 }
-function removeSkill(index) { userSkillsArray.splice(index, 1); renderSkills(); }
+
+// 🟢 NEW: Add specific topic to a skill
+function handleTopicInput(e, skill) {
+    if(e.key === 'Enter') {
+        e.preventDefault();
+        let val = e.target.value.trim();
+        if(val !== '' && !userTopicsObj[skill].includes(val)) {
+            userTopicsObj[skill].push(val);
+            renderSkills();
+        }
+    }
+}
+
+// 🟢 NEW: Remove a specific topic
+function removeTopic(skill, tIdx) {
+    userTopicsObj[skill].splice(tIdx, 1);
+    renderSkills();
+}
+
+function removeSkill(index) { 
+    let sk = userSkillsArray[index];
+    delete userTopicsObj[sk];
+    userSkillsArray.splice(index, 1); 
+    renderSkills(); 
+}
 
 async function handleProfileSave(e) {
     e.preventDefault();
@@ -227,11 +264,12 @@ async function handleProfileSave(e) {
                 email: currentTempUser.email,
                 password: currentTempUser.pass, 
                 phone: currentTempUser.phone,
-                gender: currentTempUser.gender, // NEW GENDER FIELD TO DB
+                gender: currentTempUser.gender,
                 address: userAddress, 
                 role: selectedRole, 
                 skill: finalSkill,
                 skills: userSkillsArray, 
+                topics: userTopicsObj, // 🟢 NEW: Saving topics to Database
                 profilePic: currentProfilePic
             })
         });
@@ -320,9 +358,6 @@ async function handleResetPassword(e) {
     }
 }
 
-// ==========================================
-// 🟢 LIVE CAMERA FOR REGISTRATION (NAYA CODE)
-// ==========================================
 let regCameraStream = null;
 
 async function startRegCamera() {
@@ -335,7 +370,7 @@ async function startRegCamera() {
         regCameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
         video.srcObject = regCameraStream;
     } catch (err) {
-        alert("❌ Camera access denied! Please allow camera permissions in your browser.");
+        alert("Camera access denied! Please allow camera permissions in your browser.");
         stopRegCamera();
     }
 }
@@ -370,7 +405,7 @@ function takeRegSnapshot() {
     
     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
     document.getElementById('profilePreview').src = compressedBase64;
-    currentProfilePic = compressedBase64; // Registration wali pic variable
+    currentProfilePic = compressedBase64; 
     
     stopRegCamera();
 }
