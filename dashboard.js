@@ -447,6 +447,7 @@ function applySearchFilter() {
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
 
+// 🟢 BUG FIX: Added 'role' to track who requested and who will teach (Provider)
 function requestSwap(targetEmail, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -462,8 +463,9 @@ function requestSwap(targetEmail, skill) {
     
     if(usersDB[meIndex].swaps.find(s => s.skill === skill && s.partnerEmail === usersDB[targetIndex].email)) { alert("You have already requested this swap!"); return; }
 
-    usersDB[meIndex].swaps.push({ skill: skill, partner: usersDB[targetIndex].name, partnerEmail: usersDB[targetIndex].email, status: 'Pending' });
-    usersDB[targetIndex].swaps.push({ skill: skill, partner: usersDB[meIndex].name, partnerEmail: usersDB[meIndex].email, status: 'Requested' });
+    // Role added here: 'Requester' is the one who asks, 'Provider' is the one who will teach and get the credit back later.
+    usersDB[meIndex].swaps.push({ skill: skill, partner: usersDB[targetIndex].name, partnerEmail: usersDB[targetIndex].email, status: 'Pending', role: 'Requester' });
+    usersDB[targetIndex].swaps.push({ skill: skill, partner: usersDB[meIndex].name, partnerEmail: usersDB[meIndex].email, status: 'Requested', role: 'Provider' });
     
     usersDB[targetIndex].notifications.push({ 
         text: `🤝 ${usersDB[meIndex].name} requested to swap '${skill}' with you.`, 
@@ -513,8 +515,9 @@ function acceptSwap(mySwapIndex, partnerName, skill) {
     }
 }
 
+// 🟢 BUG FIX: Added logic to give 1 credit to Provider when swap ends
 function cancelSwap(mySwapIndex, partnerName, skill) {
-    if(!confirm("Are you sure you want to cancel/decline this swap?")) return;
+    if(!confirm("Are you sure you want to cancel/decline/end this swap?")) return;
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
     
@@ -523,6 +526,33 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
 
     if(targetIndex !== -1) {
+        
+        // --- NEW LOGIC FOR CREDITS ---
+        if (mySwap.status === 'Active') {
+            // End active swap -> Provider gets 1 credit
+            let providerIndex = -1;
+            if (mySwap.role === 'Provider') {
+                providerIndex = meIndex;
+            } else if (mySwap.role === 'Requester') {
+                providerIndex = targetIndex;
+            } else {
+                // Fallback for older swaps that don't have role saved
+                providerIndex = targetIndex; 
+            }
+
+            if (providerIndex !== -1) {
+                if (usersDB[providerIndex].credits === undefined) usersDB[providerIndex].credits = 5;
+                usersDB[providerIndex].credits += 1;
+                usersDB[providerIndex].notifications = usersDB[providerIndex].notifications || [];
+                usersDB[providerIndex].notifications.push({ 
+                    text: `🎉 Swap completed! You received 1 Credit for teaching '${skill}'.`, 
+                    isRead: false, 
+                    id: Date.now() + Math.random() 
+                });
+            }
+        }
+        // -----------------------------
+
         usersDB[targetIndex].swaps = usersDB[targetIndex].swaps.filter(s => !(s.partnerEmail === usersDB[meIndex].email && s.skill === skill));
         usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
         
@@ -1099,7 +1129,7 @@ function setupPeerConnection() {
                 from: myEmail
             });
         }
-    };
+    }
 }
 
 function endCall(isLocalAction = true) {
