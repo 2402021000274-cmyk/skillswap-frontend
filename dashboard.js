@@ -1,5 +1,5 @@
 let editSkillsArray = [];
-let editTopicsObj = {}; // 🟢 NEW: To manage topics in Profile Edit
+let editTopicsObj = {}; 
 let editProfilePic = "";
 let currentChatPartnerEmail = null;
 let currentSearchQuery = ""; 
@@ -41,7 +41,12 @@ const socket = typeof io !== 'undefined' ? io(API_BASE_URL) : null;
 if(socket) {
     socket.on('connect', () => {
         let myEmail = sessionStorage.getItem('loggedInUserEmail');
-        if(myEmail) { socket.emit('register-user', myEmail); }
+        let isNewLogin = sessionStorage.getItem('justLoggedIn') === 'true'; // 🟢 BUG 3 FIX: Checking if fresh login
+        
+        if(myEmail) { 
+            socket.emit('register-user', { email: myEmail, isNewLogin: isNewLogin }); 
+            sessionStorage.removeItem('justLoggedIn'); // Reset flag
+        }
     });
 
     socket.on('visitor-update', (count) => {
@@ -278,7 +283,7 @@ function refreshDynamicData(isLiveUpdate = false) {
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
                     : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages if the swap is Active!')"><i class="fas fa-lock"></i> Message</button>`;
 
-                // 🟢 NEW: Swap button now opens the specific topic selection modal
+                // 🟢 BUG 2 FIX: Name changed to 'Swap', functionality intact
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
                         <div class="top-badge">Available</div>
@@ -286,7 +291,7 @@ function refreshDynamicData(isLiveUpdate = false) {
                         <h3>${skill}</h3>
                         <p style="margin-bottom: 20px;">User: <strong>${otherUser.name}</strong></p>
                         <div class="card-buttons">
-                            <button class="btn-solid" onclick="openTopicSelection('${otherUser.email}', '${skill}')">Swap Topic</button>
+                            <button class="btn-solid" onclick="openTopicSelection('${otherUser.email}', '${skill}')">Swap</button>
                             ${messageBtnHTML}
                         </div>
                     </div>`;
@@ -331,7 +336,6 @@ function refreshDynamicData(isLiveUpdate = false) {
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">End Swap</button>`;
             }
             
-            // 🟢 NEW: Highlight the specific topic requested in "My Swaps"
             let topicDisplay = swap.topic && swap.topic !== "General (Full Skill)" 
                 ? `<br><small style="color:var(--primary-color); font-weight:600;"><i class="fas fa-bullseye"></i> Topic: ${swap.topic}</small>` 
                 : "";
@@ -419,14 +423,13 @@ function applySearchFilter() {
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
 
-// 🟢 NEW: Read topics created by target user and open Modal
+// 🟢 BUG 2 FIX: Modal ab properly open hoga
 function openTopicSelection(targetEmail, skill) {
     const targetUser = usersDB.find(u => u.email === targetEmail);
     if(!targetUser) return;
 
     let topics = (targetUser.topics && targetUser.topics[skill]) ? targetUser.topics[skill] : [];
     
-    // If the user hasn't added specific topics, provide a general option
     if (topics.length === 0) {
         topics = ["General (Full Skill)"];
     }
@@ -446,16 +449,19 @@ function openTopicSelection(targetEmail, skill) {
             </div>`;
     });
 
-    document.getElementById('topicSelectionModal').style.display = "flex";
+    const modal = document.getElementById('topicSelectionModal');
+    modal.classList.remove('hidden'); // Fix to remove CSS hiding
+    modal.style.display = "flex";
 }
 
 function closeTopicModal() {
-    document.getElementById('topicSelectionModal').style.display = "none";
+    const modal = document.getElementById('topicSelectionModal');
+    modal.classList.add('hidden');
+    modal.style.display = "none";
 }
 
-// 🟢 MODIFIED: Added specific 'topic' to the Swap Request
 function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
-    closeTopicModal(); // Hide modal first
+    closeTopicModal(); 
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
     const targetIndex = usersDB.findIndex(u => u.email === targetEmail);
@@ -470,11 +476,9 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     
     if(usersDB[meIndex].swaps.find(s => s.skill === skill && s.partnerEmail === usersDB[targetIndex].email)) { alert("You have already requested this swap!"); return; }
 
-    // Save topic string in DB
     usersDB[meIndex].swaps.push({ skill: skill, topic: topic, partner: usersDB[targetIndex].name, partnerEmail: usersDB[targetIndex].email, status: 'Pending', role: 'Requester' });
     usersDB[targetIndex].swaps.push({ skill: skill, topic: topic, partner: usersDB[meIndex].name, partnerEmail: usersDB[meIndex].email, status: 'Requested', role: 'Provider' });
     
-    // 🟢 Detailed Notification
     let detailText = topic === "General (Full Skill)" ? "" : ` ('${topic}')`;
     usersDB[targetIndex].notifications.push({ 
         text: `🤝 ${usersDB[meIndex].name} requested to learn ${skill}${detailText} from you.`, 
@@ -789,7 +793,6 @@ function deleteNotification(idx) {
     refreshDynamicData();
 }
 
-// 🟢 NEW: Edit profile topics load
 function openMyProfile(element) {
     switchDashView('view-profile', element);
     const currentEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -810,7 +813,6 @@ function openMyProfile(element) {
             editSkillsArray = [];
         }
         
-        // Deep copy topics to edit safely
         if(user.topics) {
             editTopicsObj = JSON.parse(JSON.stringify(user.topics));
         } else {
@@ -856,7 +858,7 @@ if(document.getElementById('editSkillInput')){
             const skillValue = this.value.trim();
             if (skillValue !== '' && !editSkillsArray.includes(skillValue)) {
                 editSkillsArray.push(skillValue); 
-                editTopicsObj[skillValue] = []; // Initialize
+                editTopicsObj[skillValue] = []; 
                 renderEditSkills();
             }
             this.value = ''; 
@@ -864,7 +866,6 @@ if(document.getElementById('editSkillInput')){
     });
 }
 
-// 🟢 NEW: Render Topics in Edit Profile
 function renderEditSkills() {
     const list = document.getElementById('editSkillsList');
     list.innerHTML = '';
@@ -919,7 +920,7 @@ function handleProfileUpdate(e) {
         usersDB[userIndex].phone = document.getElementById('editPhone').value;
         usersDB[userIndex].address = document.getElementById('editAddress').value;
         usersDB[userIndex].skills = [...editSkillsArray];
-        usersDB[userIndex].topics = editTopicsObj; // 🟢 Save topics to DB
+        usersDB[userIndex].topics = editTopicsObj; 
         usersDB[userIndex].profilePic = editProfilePic;
         localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
         updateCloudUser(usersDB[userIndex]); 
@@ -1072,7 +1073,6 @@ function showLogoutConfirm(e) {
 function hideLogoutConfirm() {
     document.getElementById('logoutConfirmBox').style.display = 'none';
 }
-
 
 // ==========================================
 // 🟢 WEBRTC VIDEO CALL ENGINE
