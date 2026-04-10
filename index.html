@@ -116,15 +116,17 @@
                             <i class="fas fa-eye eye-icon" onclick="togglePass('regConfirmPass', this)"></i>
                         </div>
 
-                        <button type="submit" class="btn-submit">Verify Email</button>
+                        <div id="recaptcha-container" style="margin-bottom: 15px; display: flex; justify-content: center;"></div>
+
+                        <button type="submit" class="btn-submit">Verify Phone</button>
                     </form>
                     <div class="toggle-text">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
                 </div>
 
                 <div id="regOtpForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Verify Email</h2>
+                    <h2 class="form-title">Verify Phone</h2>
                     <form onsubmit="handleVerifyRegOTP(event)">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" required></div>
+                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit SMS OTP" required></div>
                         <button type="submit" class="btn-submit">Verify OTP</button>
                     </form>
                     <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
@@ -308,7 +310,10 @@
         </div>
     </div>
 
-    <script src="config.js?v=7"></script>
-    <script src="auth.js?v=7"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <script src="config.js?v=8"></script>
+    <script src="auth.js?v=8"></script>
 </body>
 </html>
