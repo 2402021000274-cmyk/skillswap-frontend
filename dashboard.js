@@ -105,10 +105,11 @@ if(socket) {
         }
     });
 
-    // 🟢 NEW: SOCKET LISTENER FOR RECEIVING NOTES
+    // 🟢 SOCKET: RECEIVING NOTES
     socket.on('receive-notes', (data) => {
         sessionNotes = data.notes;
         showToast(`📚 Mentor shared ${sessionNotes.length} pages of Notes!`);
+        document.getElementById('viewNotesBtn').style.display = 'flex';
         document.getElementById('viewNotesBtn').style.opacity = '1';
         let badge = document.getElementById('notesBadge');
         if(badge) badge.style.display = 'flex';
@@ -116,12 +117,14 @@ if(socket) {
         renderNotePage();
     });
 
-    // 🟢 NEW: SOCKET LISTENER FOR AUTO-SYNCING PAGE
+    // 🟢 SOCKET: AUTO/MANUAL SYNC PAGE (UPDATED FOR BOTH WAYS)
     socket.on('sync-note-page', (data) => {
-        currentNotePage = data.pageIndex;
-        document.getElementById('smartNotesPanel').style.display = 'flex';
-        renderNotePage();
-        showToast(`🤖 AI Auto-Sync: Switched to Page ${currentNotePage + 1}`);
+        if(currentNotePage !== data.pageIndex) { // Check to stop infinite loop
+            currentNotePage = data.pageIndex;
+            document.getElementById('smartNotesPanel').style.display = 'flex';
+            renderNotePage();
+            showToast(`🔄 Screen Synced: Switched to Page ${currentNotePage + 1}`);
+        }
     });
 }
 
@@ -1351,7 +1354,7 @@ function hideLogoutConfirm() {
     document.getElementById('logoutConfirmBox').style.display = 'none';
 }
 
-// 🟢 NEW: SMART NOTES SETUP LOGIC
+// 🟢 NEW: SMART NOTES SETUP LOGIC (UPDATED FOR BOTH WAYS)
 function setupNotesUI() {
     if (currentCallRole === 'Provider') {
         document.getElementById('uploadNotesBtn').style.display = 'flex';
@@ -1376,14 +1379,16 @@ async function handleNotesUpload(event) {
         sessionNotes.push({ image: base64, keyword: keyword.toLowerCase() });
     }
     
-    showToast(`✅ ${files.length} Notes uploaded! AI Auto-Sync is ready.`);
+    showToast(`✅ ${files.length} Notes uploaded! Ready to Sync.`);
     
     let partnerEmail = currentChatPartnerEmail || incomingCallPartner;
     socket.emit('share-notes', { to: partnerEmail, notes: sessionNotes });
     
+    // 🟢 Provider ko bhi turant panel dikhega
     document.getElementById('viewNotesBtn').style.display = 'flex';
     document.getElementById('viewNotesBtn').style.opacity = '1';
     currentNotePage = 0;
+    document.getElementById('smartNotesPanel').style.display = 'flex';
     renderNotePage();
 }
 
@@ -1416,12 +1421,28 @@ function renderNotePage() {
     document.getElementById('notePageIndicator').innerText = `${currentNotePage + 1} / ${sessionNotes.length}`;
 }
 
+// 🟢 NEW: MANUAL TWO-WAY SYNC FUNCTION
+function syncPageWithPartner() {
+    let partnerEmail = currentChatPartnerEmail || incomingCallPartner;
+    if(partnerEmail) {
+        socket.emit('sync-note-page', { to: partnerEmail, pageIndex: currentNotePage });
+    }
+}
+
 function prevNote() {
-    if(currentNotePage > 0) { currentNotePage--; renderNotePage(); }
+    if(currentNotePage > 0) { 
+        currentNotePage--; 
+        renderNotePage(); 
+        syncPageWithPartner(); // 🟢 Partner ko bhi notify karega
+    }
 }
 
 function nextNote() {
-    if(currentNotePage < sessionNotes.length - 1) { currentNotePage++; renderNotePage(); }
+    if(currentNotePage < sessionNotes.length - 1) { 
+        currentNotePage++; 
+        renderNotePage(); 
+        syncPageWithPartner(); // 🟢 Partner ko bhi notify karega
+    }
 }
 
 function downloadCurrentNote() {
@@ -1664,7 +1685,7 @@ function startAITranslationProcess() {
         const spokenText = event.results[lastIndex][0].transcript;
         const targetLang = document.getElementById('targetLanguage').value || 'en-US';
 
-        // 🟢 NEW: AI SMART NOTES AUTO-SYNC (THE MAGIC)
+        // 🟢 AI SMART NOTES AUTO-SYNC (THE MAGIC)
         if (currentCallRole === 'Provider' && sessionNotes.length > 0) {
             let lowerSpoken = spokenText.toLowerCase();
             for(let i = 0; i < sessionNotes.length; i++) {
