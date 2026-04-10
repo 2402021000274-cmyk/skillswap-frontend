@@ -97,12 +97,11 @@ function finalizeLogin(userFound) {
     window.location.href = "dashboard.html"; 
 }
 
-// 🟢 NEW PHONE OTP REGISTRATION LOGIC
 function handleRegister(e) {
     e.preventDefault();
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
-    let phone = document.getElementById('regPhone').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
     const pass = document.getElementById('regPass').value;
     const confirmPass = document.getElementById('regConfirmPass').value;
     
@@ -110,73 +109,34 @@ function handleRegister(e) {
         messageBox.innerHTML = "<span class='error-msg'>Passwords do not match. Please try again.</span>";
         return; 
     }
-
-    // Firebase requires country code. Defaulting to India (+91) if not provided.
-    if (!phone.startsWith('+')) {
-        phone = '+91' + phone;
-    }
     
     const genderElement = document.querySelector('input[name="regGender"]:checked');
     const gender = genderElement ? genderElement.value : "Not Specified";
 
+    // 🟢 ADDED: acquiredSkills: [] taaki naye user me array ban jaye
     currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5, acquiredSkills: [] };
     userSkillsArray = []; 
     userTopicsObj = {}; 
     currentProfilePic = "https://cdn-icons-png.flaticon.com/512/149/149071.png"; 
     
+    regGeneratedOTP = Math.floor(100000 + Math.random() * 900000).toString();
     const btn = e.target.querySelector('button[type="submit"]');
     const originalText = btn.innerText;
-    btn.innerText = "Sending SMS..."; btn.disabled = true;
-
-    // Initialize reCAPTCHA
-    if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-            'size': 'invisible'
-        });
-    }
-
-    // Send Phone OTP via Firebase
-    auth.signInWithPhoneNumber(phone, window.recaptchaVerifier)
-        .then((confirmationResult) => {
-            window.confirmationResult = confirmationResult;
-            showSubForm('regOtpForm'); 
-            btn.innerText = originalText; 
-            btn.disabled = false;
-        })
-        .catch((error) => {
-            console.error("SMS Sending Error:", error);
-            messageBox.innerHTML = `<span class='error-msg'>Could not send SMS: ${error.message}</span>`;
-            btn.innerText = originalText; 
-            btn.disabled = false;
-            if(window.recaptchaVerifier) {
-                window.recaptchaVerifier.render().then(function(widgetId) {
-                    grecaptcha.reset(widgetId);
-                });
-            }
-        });
+    btn.innerText = "Sending OTP..."; btn.disabled = true;
+    sendRealEmailOTP(email, regGeneratedOTP, () => {
+        showSubForm('regOtpForm'); btn.innerText = originalText; btn.disabled = false;
+    });
 }
 
-// 🟢 VERIFY PHONE OTP LOGIC
 function handleVerifyRegOTP(e) {
     e.preventDefault();
     const enteredOTP = document.getElementById('regOtpInput').value.trim();
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalText = btn.innerText;
-    btn.innerText = "Verifying..."; btn.disabled = true;
-
-    window.confirmationResult.confirm(enteredOTP)
-        .then((result) => {
-            // Phone Verified Successfully
-            renderSkills(); 
-            showSubForm('profileSetupForm');
-            document.getElementById('profName').value = currentTempUser.name;
-            document.getElementById('profEmail').value = currentTempUser.email;
-            document.getElementById('regOtpInput').value = '';
-            btn.innerText = originalText; btn.disabled = false;
-        }).catch((error) => {
-            messageBox.innerHTML = "<span class='error-msg'>Invalid SMS OTP! Please try again.</span>";
-            btn.innerText = originalText; btn.disabled = false;
-        });
+    if (enteredOTP === regGeneratedOTP) {
+        renderSkills(); showSubForm('profileSetupForm');
+        document.getElementById('profName').value = currentTempUser.name;
+        document.getElementById('profEmail').value = currentTempUser.email;
+        document.getElementById('regOtpInput').value = '';
+    } else { messageBox.innerHTML = "<span class='error-msg'>Invalid OTP! Please try again.</span>"; }
 }
 
 function previewImage(event, targetId) {
@@ -309,7 +269,7 @@ async function handleProfileSave(e) {
                 skill: finalSkill,
                 skills: userSkillsArray, 
                 topics: userTopicsObj, 
-                acquiredSkills: [], 
+                acquiredSkills: [], // 🟢 ADDED: DB me bhi initialize hoga
                 profilePic: currentProfilePic
             })
         });
