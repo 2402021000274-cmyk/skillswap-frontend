@@ -329,15 +329,13 @@ function refreshDynamicData(isLiveUpdate = false) {
     if(me.swaps && me.swaps.length > 0) {
         me.swaps.forEach((swap, idx) => {
             
-            // 🟢 MODIFIED: Status colors including new "Pending Confirmation" state
             let bClass = 'badge-purple';
             if (swap.status === 'Pending') bClass = 'badge-yellow';
             else if (swap.status === 'Active') bClass = 'badge-green';
-            else if (swap.status === 'Pending Confirmation') bClass = 'badge-orange'; // Or yellow, let's keep yellow
+            else if (swap.status === 'Pending Confirmation') bClass = 'badge-orange'; 
 
             let actionBtns = '';
             
-            // 🟢 UPDATED: Full Two-Way confirmation button logic
             if(swap.status === 'Requested') { 
                 actionBtns = `<button class="btn-solid" style="padding: 6px 12px; font-size: 12px; margin: 0;" onclick="openScheduleModal(${idx}, '${swap.partner}', '${swap.skill}')">Accept & Schedule</button>
                               <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Decline</button>`;
@@ -346,15 +344,15 @@ function refreshDynamicData(isLiveUpdate = false) {
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel Request</button>`;
             } 
             else if (swap.status === 'Pending Confirmation') {
-                if (swap.role === 'Requester') { // Learner has to say OK
+                if (swap.role === 'Requester') { 
                     actionBtns = `<button class="btn-solid" style="background:#10b981; padding: 6px 12px; font-size: 12px; margin: 0; box-shadow: 0 4px 10px rgba(16,185,129,0.3);" onclick="confirmSwapSchedule(${idx}, '${swap.partner}', '${swap.skill}')"><i class="fas fa-check-circle"></i> Confirm Time (OK)</button>
                                   <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel</button>`;
-                } else { // Provider waiting
+                } else { 
                     actionBtns = `<button class="btn-outline" style="padding: 6px 12px; font-size: 12px; margin: 0; cursor:not-allowed; opacity:0.6; border-color:var(--text-muted); color:var(--text-muted);"><i class="fas fa-hourglass-half"></i> Waiting for OK...</button>
                                   <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel</button>`;
                 }
             }
-            else { // Active
+            else { 
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">End Swap</button>`;
             }
             
@@ -449,9 +447,7 @@ function applySearchFilter() {
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
 
-// ==========================================
-// 🟢 NEW: TWO-WAY SCHEDULE LOGIC
-// ==========================================
+
 let pendingScheduleSwapIndex = -1;
 let pendingSchedulePartner = "";
 let pendingScheduleSkill = "";
@@ -492,7 +488,6 @@ function confirmSchedule() {
     acceptSwapWithSchedule(pendingScheduleSwapIndex, pendingSchedulePartner, pendingScheduleSkill, scheduledTimestamp);
 }
 
-// 🟢 Modified to put Swap into 'Pending Confirmation' state
 function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimestamp) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -505,7 +500,7 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
         if(usersDB[targetIndex].credits === undefined) usersDB[targetIndex].credits = 5;
         if(usersDB[targetIndex].credits < 1) { alert("The requester doesn't have enough credits anymore."); return; }
 
-        usersDB[targetIndex].credits -= 1; // Credit deducted as commitment
+        usersDB[targetIndex].credits -= 1; 
         let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
         
         if(partnerSwapIndex !== -1) { 
@@ -535,7 +530,6 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
     }
 }
 
-// 🟢 NEW: Learner confirms the schedule to make it 'Active'
 function confirmSwapSchedule(mySwapIndex, partnerName, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -569,7 +563,6 @@ function confirmSwapSchedule(mySwapIndex, partnerName, skill) {
         alert("✅ Schedule Confirmed! Swap is now Active. You can message them.");
     }
 }
-// ==========================================
 
 
 function openTopicSelection(targetEmail, skill) {
@@ -648,7 +641,6 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     switchDashView('view-active-swaps', document.querySelectorAll('.sidebar-menu a')[2]);
 }
 
-// 🟢 MODIFIED: cancelSwap to handle safe cancellation during "Pending Confirmation"
 function cancelSwap(mySwapIndex, partnerName, skill) {
     if(!confirm("Are you sure you want to cancel/decline/end this swap?")) return;
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -695,7 +687,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
             }
         } 
         else if (mySwap.status === 'Pending Confirmation') {
-            // 🟢 SAFE REFUND: If cancelled before learner hits OK, return the 1 credit back to Learner!
             let reqIdx = mySwap.role === 'Requester' ? meIndex : targetIndex;
             usersDB[reqIdx].credits += 1;
             usersDB[reqIdx].notifications = usersDB[reqIdx].notifications || [];
@@ -882,7 +873,6 @@ function openLiveChat(partnerEmail) {
     }, 50);
 }
 
-// 🟢 MODIFIED: Video Call Button Lock Logic
 function renderChatWindow() {
     const partnerUser = usersDB.find(u => u.email === currentChatPartnerEmail);
     if(!partnerUser) return;
@@ -898,7 +888,6 @@ function renderChatWindow() {
     const me = usersDB.find(u => u.email === myEmail);
     const history = (me.chatHistory && me.chatHistory[currentChatPartnerEmail]) ? me.chatHistory[currentChatPartnerEmail] : [];
 
-    // --- VIDEO CALL SCHEDULE LOGIC ---
     const videoBtn = document.getElementById('videoCallBtn');
     let activeSwap = me.swaps.find(s => s.partnerEmail === currentChatPartnerEmail && s.status === 'Active');
     
@@ -909,7 +898,6 @@ function renderChatWindow() {
         if (scheduledTime) {
             let currentTime = Date.now();
             if (currentTime >= scheduledTime) {
-                // Time has passed, check role
                 if (activeSwap.role === 'Provider') {
                     videoBtn.innerHTML = `<i class="fas fa-video"></i> Video Call`;
                     videoBtn.style.background = "var(--primary-gradient)";
@@ -922,7 +910,6 @@ function renderChatWindow() {
                     videoBtn.onclick = () => showToast('🔒 Only the Mentor (Provider) can start the call.');
                 }
             } else {
-                // Time has not come yet
                 let dateObj = new Date(scheduledTime);
                 let formattedDate = dateObj.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
                 videoBtn.innerHTML = `<i class="far fa-clock"></i> Scheduled`;
@@ -931,7 +918,6 @@ function renderChatWindow() {
                 videoBtn.onclick = () => showToast(`⏳ Call unlocks on: ${formattedDate}`);
             }
         } else {
-            // Fallback if old swap has no schedule
             videoBtn.innerHTML = `<i class="fas fa-video"></i> Video Call`;
             videoBtn.style.background = "var(--primary-gradient)";
             videoBtn.style.color = "white";
@@ -940,7 +926,6 @@ function renderChatWindow() {
     } else {
         videoBtn.style.display = "none";
     }
-    // ---------------------------------
 
     const chatMessages = document.getElementById('chatMessages');
     
@@ -1342,9 +1327,6 @@ function hideLogoutConfirm() {
     document.getElementById('logoutConfirmBox').style.display = 'none';
 }
 
-// ==========================================
-// 🟢 WEBRTC VIDEO CALL ENGINE
-// ==========================================
 async function startVideoCall() {
     if(!currentChatPartnerEmail) return;
     
@@ -1517,9 +1499,6 @@ function toggleCamera() {
     }
 }
 
-// ==========================================
-// 🟢 AI TRANSLATOR (VOICE-TO-VOICE) LOGIC
-// ==========================================
 let isAIOn = false;
 let recognition;
 const synth = window.speechSynthesis;
@@ -1589,3 +1568,71 @@ socket.on('receive-translation', (data) => {
     const statusText = document.getElementById('callStatusText');
     if(statusText) { statusText.innerText = `💬 Translation: ${data.text}`; }
 });
+
+// ==========================================
+// 🟢 AI TROUBLESHOOTER LOGIC (NEW)
+// ==========================================
+function addAIMessage(text, type) {
+    let chat = document.getElementById("aiChatBox");
+    let div = document.createElement("div");
+    div.className = "chat-bubble " + (type === 'user' ? 'sent' : 'received');
+    
+    if (type === 'user') {
+        div.style.cssText = "align-self: flex-end; background: var(--primary-gradient); color: #fff; padding: 10px 15px; border-radius: 14px; font-size: 14px; max-width: 80%; word-wrap: break-word;";
+    } else {
+        div.style.cssText = "align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 15px; border-radius: 14px; font-size: 14px; max-width: 80%; word-wrap: break-word;";
+    }
+    
+    div.innerText = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+}
+
+function quickAIMsg(text) {
+    document.getElementById("aiUserInput").value = text;
+    sendAIMessage();
+}
+
+function fallbackAI(msg) {
+    msg = msg.toLowerCase();
+    if (msg.includes("login")) return "Check your email and password. If you forgot it, use the 'Forgot Password' option on the login page.";
+    if (msg.includes("video") || msg.includes("camera")) return "Make sure you have granted camera and microphone permissions in your browser. Also check if the other user is online.";
+    if (msg.includes("code") || msg.includes("error")) return "Code errors usually happen due to missing semicolons, typos, or wrong logic. Try checking the browser console (F12) for exact error lines.";
+    if (msg.includes("credit") || msg.includes("earn")) return "You earn 1 credit when you teach someone, and spend 1 credit when you learn. If you are out of credits, try accepting a swap request to teach!";
+    return null;
+}
+
+async function sendAIMessage() {
+    let input = document.getElementById("aiUserInput");
+    let message = input.value.trim();
+    if (!message) return;
+
+    addAIMessage(message, "user");
+    input.value = "";
+
+    let fb = fallbackAI(message);
+    if (fb) {
+        setTimeout(() => addAIMessage(fb, "bot"), 600);
+        return;
+    }
+
+    addAIMessage("Thinking...", "bot");
+    let chatBox = document.getElementById("aiChatBox");
+
+    try {
+        let res = await fetch(`${API_BASE_URL}/api/ai`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
+            body: JSON.stringify({ message })
+        });
+        
+        let data = await res.json();
+        chatBox.removeChild(chatBox.lastChild); 
+        addAIMessage(data.reply, "bot");
+        
+    } catch (err) {
+        console.error(err);
+        chatBox.removeChild(chatBox.lastChild);
+        addAIMessage("Sorry, my AI servers are currently resting. Please try again later!", "bot");
+    }
+}
