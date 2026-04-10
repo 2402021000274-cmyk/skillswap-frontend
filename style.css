@@ -123,11 +123,6 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .skill-tag i { cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
 .skill-tag i:hover { color: #fff; transform: scale(1.2); }
 
-/* 🟢 NEW: Calendar Input Styling */
-.schedule-inputs { display: flex; gap: 15px; margin-bottom: 20px; }
-.schedule-inputs input { flex: 1; padding: 14px 15px; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-input); color: var(--text-main); font-weight: 600; outline: none; font-size: 15px; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
-.schedule-inputs input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02); }
-
 /* ================= Dashboard Layout ================= */
 #dashboardWrapper { display: flex; width: 100vw; height: 100vh; background: var(--bg-main); color: var(--text-main); }
 
@@ -400,3 +395,33 @@ input:checked + .slider:before { transform: translateX(20px); }
 .schedule-inputs { display: flex; gap: 15px; margin-bottom: 20px; }
 .schedule-inputs input { flex: 1; padding: 14px 15px; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-input); color: var(--text-main); font-weight: 600; outline: none; font-size: 15px; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
 .schedule-inputs input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02); }
+
+/* 🟢 NEW: Mobile App Style Slide-Up Modal Animation */
+@keyframes slideUpApp { 
+    from { transform: translateY(100%); } 
+    to { transform: translateY(0); } 
+}
+
+.app-modal-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    background: var(--bg-card);
+    border-radius: 30px 30px 0 0; 
+    animation: slideUpApp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    backdrop-filter: var(--glass-blur);
+}
+
+@media screen and (min-width: 600px) {
+    /* Desktop pe wapas normal pop-up design */
+    .app-modal-card {
+        position: relative;
+        bottom: auto;
+        border-radius: 20px;
+        border-bottom: 1px solid var(--border-color);
+        animation: popIn 0.3s ease;
+    }
+}
