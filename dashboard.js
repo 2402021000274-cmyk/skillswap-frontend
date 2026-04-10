@@ -248,7 +248,7 @@ function refreshDynamicData(isLiveUpdate = false) {
         if(publicToggle) publicToggle.checked = me.isPublic !== false;
 
         document.getElementById('statUsers').innerText = usersDB.length;
-        document.getElementById('statSwaps').innerText = me.swaps ? me.swaps.length : 0;
+        document.getElementById('statSwaps').innerText = me.swaps ? me.swaps.filter(s => s.status === 'Active' || s.status === 'Pending Confirmation').length : 0;
         document.getElementById('statCredits').innerText = me.credits; 
         
         const statAcquired = document.getElementById('statAcquired');
@@ -328,16 +328,33 @@ function refreshDynamicData(isLiveUpdate = false) {
     let newSwapsHTML = "";
     if(me.swaps && me.swaps.length > 0) {
         me.swaps.forEach((swap, idx) => {
-            let bClass = swap.status === 'Pending' ? 'badge-yellow' : (swap.status === 'Active' ? 'badge-green' : 'badge-purple');
+            
+            // 🟢 MODIFIED: Status colors including new "Pending Confirmation" state
+            let bClass = 'badge-purple';
+            if (swap.status === 'Pending') bClass = 'badge-yellow';
+            else if (swap.status === 'Active') bClass = 'badge-green';
+            else if (swap.status === 'Pending Confirmation') bClass = 'badge-orange'; // Or yellow, let's keep yellow
+
             let actionBtns = '';
             
-            // 🟢 MODIFIED: Accept button triggers openScheduleModal
+            // 🟢 UPDATED: Full Two-Way confirmation button logic
             if(swap.status === 'Requested') { 
                 actionBtns = `<button class="btn-solid" style="padding: 6px 12px; font-size: 12px; margin: 0;" onclick="openScheduleModal(${idx}, '${swap.partner}', '${swap.skill}')">Accept & Schedule</button>
                               <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Decline</button>`;
-            } else if(swap.status === 'Pending') { 
+            } 
+            else if(swap.status === 'Pending') { 
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel Request</button>`;
-            } else { 
+            } 
+            else if (swap.status === 'Pending Confirmation') {
+                if (swap.role === 'Requester') { // Learner has to say OK
+                    actionBtns = `<button class="btn-solid" style="background:#10b981; padding: 6px 12px; font-size: 12px; margin: 0; box-shadow: 0 4px 10px rgba(16,185,129,0.3);" onclick="confirmSwapSchedule(${idx}, '${swap.partner}', '${swap.skill}')"><i class="fas fa-check-circle"></i> Confirm Time (OK)</button>
+                                  <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel</button>`;
+                } else { // Provider waiting
+                    actionBtns = `<button class="btn-outline" style="padding: 6px 12px; font-size: 12px; margin: 0; cursor:not-allowed; opacity:0.6; border-color:var(--text-muted); color:var(--text-muted);"><i class="fas fa-hourglass-half"></i> Waiting for OK...</button>
+                                  <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel</button>`;
+                }
+            }
+            else { // Active
                 actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">End Swap</button>`;
             }
             
@@ -345,7 +362,6 @@ function refreshDynamicData(isLiveUpdate = false) {
                 ? `<br><small style="color:var(--primary-color); font-weight:600;"><i class="fas fa-bullseye"></i> Topic: ${swap.topic}</small>` 
                 : "";
 
-            // 🟢 NEW: Display the scheduled time directly on the Swap card
             let scheduleDisplay = swap.scheduledTime 
                 ? `<br><small style="color:#10b981; font-weight:600; margin-top:4px; display:inline-block;"><i class="far fa-calendar-alt"></i> ${new Date(swap.scheduledTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}</small>` 
                 : "";
@@ -434,7 +450,7 @@ function applySearchFilter() {
 }
 
 // ==========================================
-// 🟢 NEW: SCHEDULE MODAL LOGIC
+// 🟢 NEW: TWO-WAY SCHEDULE LOGIC
 // ==========================================
 let pendingScheduleSwapIndex = -1;
 let pendingSchedulePartner = "";
@@ -476,6 +492,7 @@ function confirmSchedule() {
     acceptSwapWithSchedule(pendingScheduleSwapIndex, pendingSchedulePartner, pendingScheduleSkill, scheduledTimestamp);
 }
 
+// 🟢 Modified to put Swap into 'Pending Confirmation' state
 function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimestamp) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -488,14 +505,15 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
         if(usersDB[targetIndex].credits === undefined) usersDB[targetIndex].credits = 5;
         if(usersDB[targetIndex].credits < 1) { alert("The requester doesn't have enough credits anymore."); return; }
 
-        usersDB[targetIndex].credits -= 1;
+        usersDB[targetIndex].credits -= 1; // Credit deducted as commitment
         let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
+        
         if(partnerSwapIndex !== -1) { 
-            usersDB[targetIndex].swaps[partnerSwapIndex].status = 'Active'; 
+            usersDB[targetIndex].swaps[partnerSwapIndex].status = 'Pending Confirmation'; 
             usersDB[targetIndex].swaps[partnerSwapIndex].scheduledTime = scheduledTimestamp;
         }
         
-        usersDB[meIndex].swaps[mySwapIndex].status = 'Active';
+        usersDB[meIndex].swaps[mySwapIndex].status = 'Pending Confirmation';
         usersDB[meIndex].swaps[mySwapIndex].scheduledTime = scheduledTimestamp;
 
         let dateObj = new Date(scheduledTimestamp);
@@ -503,7 +521,7 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
 
         usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
         usersDB[targetIndex].notifications.push({ 
-            text: `🎉 ${usersDB[meIndex].name} accepted your request for '${skill}'! Scheduled on: ${formattedDate}. (1 Credit deducted)`, 
+            text: `📅 ${usersDB[meIndex].name} proposed a time for '${skill}' (${formattedDate}). Please confirm to make it Active!`, 
             isRead: false, 
             id: Date.now() + Math.random() 
         });
@@ -513,7 +531,42 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
         updateCloudUser(usersDB[targetIndex]); 
 
         refreshDynamicData();
-        alert("✅ Swap Accepted & Scheduled! They will be notified.");
+        alert("✅ Time proposed! Waiting for Learner to confirm.");
+    }
+}
+
+// 🟢 NEW: Learner confirms the schedule to make it 'Active'
+function confirmSwapSchedule(mySwapIndex, partnerName, skill) {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const meIndex = usersDB.findIndex(u => u.email === myEmail);
+    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
+    
+    let targetIndex = usersDB.findIndex(u => u.email === mySwap.partnerEmail);
+    if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
+
+    if(targetIndex !== -1) {
+        let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
+        
+        if(partnerSwapIndex !== -1) { 
+            usersDB[targetIndex].swaps[partnerSwapIndex].status = 'Active'; 
+        }
+        usersDB[meIndex].swaps[mySwapIndex].status = 'Active';
+
+        let formattedDate = new Date(mySwap.scheduledTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+
+        usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
+        usersDB[targetIndex].notifications.push({ 
+            text: `✅ ${usersDB[meIndex].name} confirmed the schedule for '${skill}' at ${formattedDate}! Swap is now Active.`, 
+            isRead: false, 
+            id: Date.now() + Math.random() 
+        });
+        
+        localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
+        updateCloudUser(usersDB[meIndex]); 
+        updateCloudUser(usersDB[targetIndex]); 
+
+        refreshDynamicData();
+        alert("✅ Schedule Confirmed! Swap is now Active. You can message them.");
     }
 }
 // ==========================================
@@ -595,40 +648,7 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     switchDashView('view-active-swaps', document.querySelectorAll('.sidebar-menu a')[2]);
 }
 
-function acceptSwap(mySwapIndex, partnerName, skill) {
-    const myEmail = sessionStorage.getItem('loggedInUserEmail');
-    const meIndex = usersDB.findIndex(u => u.email === myEmail);
-    
-    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
-    let targetIndex = usersDB.findIndex(u => u.email === mySwap.partnerEmail);
-    if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
-
-    if(targetIndex !== -1) {
-        if(usersDB[targetIndex].credits === undefined) usersDB[targetIndex].credits = 5;
-        if(usersDB[targetIndex].credits < 1) { alert("The requester doesn't have enough credits anymore."); return; }
-
-        usersDB[targetIndex].credits -= 1;
-        let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
-        if(partnerSwapIndex !== -1) { usersDB[targetIndex].swaps[partnerSwapIndex].status = 'Active'; }
-        usersDB[meIndex].swaps[mySwapIndex].status = 'Active';
-
-        usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
-        
-        usersDB[targetIndex].notifications.push({ 
-            text: `🎉 ${usersDB[meIndex].name} accepted your request for '${skill}'! (1 Credit deducted)`, 
-            isRead: false, 
-            id: Date.now() + Math.random() 
-        });
-        
-        localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
-        updateCloudUser(usersDB[meIndex]); 
-        updateCloudUser(usersDB[targetIndex]); 
-
-        refreshDynamicData();
-        alert("✅ Swap Accepted! You can now message them in Live Chat.");
-    }
-}
-
+// 🟢 MODIFIED: cancelSwap to handle safe cancellation during "Pending Confirmation"
 function cancelSwap(mySwapIndex, partnerName, skill) {
     if(!confirm("Are you sure you want to cancel/decline/end this swap?")) return;
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
@@ -641,18 +661,8 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     if(targetIndex !== -1) {
         
         if (mySwap.status === 'Active') {
-            let providerIndex = -1;
-            let requesterIndex = -1;
-            
-            if (mySwap.role === 'Provider') {
-                providerIndex = meIndex;
-                requesterIndex = targetIndex;
-            } else if (mySwap.role === 'Requester') {
-                providerIndex = targetIndex;
-                requesterIndex = meIndex;
-            } else {
-                providerIndex = targetIndex; 
-            }
+            let providerIndex = mySwap.role === 'Provider' ? meIndex : targetIndex;
+            let requesterIndex = mySwap.role === 'Requester' ? meIndex : targetIndex;
 
             if (providerIndex !== -1) {
                 if (usersDB[providerIndex].credits === undefined) usersDB[providerIndex].credits = 5;
@@ -667,9 +677,7 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
 
             if (requesterIndex !== -1) {
                 if (usersDB[requesterIndex].acquiredSkills === undefined) usersDB[requesterIndex].acquiredSkills = [];
-                
                 let learnedTopic = mySwap.topic || "General (Full Skill)";
-                
                 let alreadyLearned = usersDB[requesterIndex].acquiredSkills.some(item => 
                     (typeof item === 'object' && item.skill === skill && item.topic === learnedTopic) || 
                     (typeof item === 'string' && item === skill && learnedTopic === "General (Full Skill)")
@@ -685,6 +693,13 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
                     });
                 }
             }
+        } 
+        else if (mySwap.status === 'Pending Confirmation') {
+            // 🟢 SAFE REFUND: If cancelled before learner hits OK, return the 1 credit back to Learner!
+            let reqIdx = mySwap.role === 'Requester' ? meIndex : targetIndex;
+            usersDB[reqIdx].credits += 1;
+            usersDB[reqIdx].notifications = usersDB[reqIdx].notifications || [];
+            usersDB[reqIdx].notifications.push({ text: `💰 Swap was not confirmed. 1 Credit refunded!`, isRead: false, id: Date.now() + Math.random() });
         }
 
         usersDB[targetIndex].swaps = usersDB[targetIndex].swaps.filter(s => !(s.partnerEmail === usersDB[meIndex].email && s.skill === skill));
