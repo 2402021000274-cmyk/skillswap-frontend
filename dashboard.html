@@ -98,7 +98,27 @@
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="chart-section" style="margin-top: 25px; margin-bottom: 0;">
+                        <div class="chart-header"><h3>🤖 AI Troubleshooter</h3></div>
+                        <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Ask me anything about the platform, bugs, or how to use features!</p>
+                        
+                        <div id="aiChatBox" class="chat-box" style="height: 250px; overflow-y: auto; background: var(--bg-input); border-radius: 12px; padding: 15px; border: 1px solid var(--border-color); margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px;">
+                            <div class="chat-bubble received" style="align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 15px; border-radius: 14px; font-size: 14px;">Hi! I'm your Smart Assistant. How can I help you today?</div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="aiUserInput" placeholder="Type your problem here..." style="flex: 1; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); outline: none; font-size: 14px;" onkeydown="if(event.key === 'Enter') sendAIMessage()">
+                            <button onclick="sendAIMessage()" class="btn-solid" style="width: auto; padding: 0 20px; margin: 0; border-radius: 10px;"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+
+                        <div class="suggestions" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button onclick="quickAIMsg('Login issue')" class="skill-tag" style="border: none; cursor: pointer; padding: 6px 12px; font-size: 12px; height: auto;">Login issue</button>
+                            <button onclick="quickAIMsg('Video not working')" class="skill-tag" style="border: none; cursor: pointer; padding: 6px 12px; font-size: 12px; height: auto;">Video not working</button>
+                            <button onclick="quickAIMsg('How to earn credits?')" class="skill-tag" style="border: none; cursor: pointer; padding: 6px 12px; font-size: 12px; height: auto;">How to earn credits?</button>
+                        </div>
+                    </div>
+                    </div>
 
                 <div id="view-find-skills" class="view-section">
                     <div class="dashboard-title-row"><h2>Discover Skills</h2></div>
@@ -345,7 +365,7 @@
     </div>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="config.js?v=14"></script>
-    <script src="dashboard.js?v=14"></script>
+    <script src="config.js?v=15"></script>
+    <script src="dashboard.js?v=15"></script>
 </body>
 </html>
