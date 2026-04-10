@@ -262,11 +262,12 @@
         </div>
     </div>
 
-    <div id="scheduleModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display:none; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-        <div class="crisp-card" style="width: 90%; max-width: 450px; padding: 30px; position: relative; animation: popIn 0.3s ease;">
+    <div id="scheduleModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display:none; align-items: flex-end; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="app-modal-card">
+            <i class="fas fa-minus" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: 24px; color: var(--text-muted); opacity: 0.5;"></i>
             <i class="fas fa-times" style="position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-muted);" onclick="closeScheduleModal()"></i>
-            <h2 style="margin-bottom: 10px; color: var(--primary-color);"><i class="fas fa-calendar-check"></i> Schedule Session</h2>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Select a convenient date and time to teach this skill. The video call will be locked until this exact time.</p>
+            <h2 style="margin-bottom: 10px; color: var(--primary-color); margin-top: 15px;"><i class="fas fa-calendar-check"></i> Schedule Session</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">Select a convenient date and time to teach this skill. The learner will have to confirm this time.</p>
 
             <div class="schedule-inputs">
                 <input type="date" id="scheduleDate" required>
@@ -275,7 +276,7 @@
 
             <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <button class="btn-outline" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="closeScheduleModal()">Cancel</button>
-                <button class="btn-solid" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="confirmSchedule()">Confirm & Accept</button>
+                <button class="btn-solid" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="confirmSchedule()">Send Request</button>
             </div>
         </div>
     </div>
@@ -344,7 +345,7 @@
     </div>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-    <script src="config.js?v=13"></script>
-    <script src="dashboard.js?v=13"></script>
+    <script src="config.js?v=14"></script>
+    <script src="dashboard.js?v=14"></script>
 </body>
 </html>
