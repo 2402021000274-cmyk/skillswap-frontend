@@ -24,6 +24,11 @@ let incomingCallPartner = null;
 let isCalling = false;
 let pendingIceCandidates = []; 
 
+// 🟢 AI SMART NOTES VARIABLES
+let sessionNotes = [];
+let currentNotePage = 0;
+let currentCallRole = null;
+
 const rtcConfig = {
     iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -98,6 +103,25 @@ if(socket) {
         } else {
             pendingIceCandidates.push(data.candidate);
         }
+    });
+
+    // 🟢 NEW: SOCKET LISTENER FOR RECEIVING NOTES
+    socket.on('receive-notes', (data) => {
+        sessionNotes = data.notes;
+        showToast(`📚 Mentor shared ${sessionNotes.length} pages of Notes!`);
+        document.getElementById('viewNotesBtn').style.opacity = '1';
+        let badge = document.getElementById('notesBadge');
+        if(badge) badge.style.display = 'flex';
+        currentNotePage = 0;
+        renderNotePage();
+    });
+
+    // 🟢 NEW: SOCKET LISTENER FOR AUTO-SYNCING PAGE
+    socket.on('sync-note-page', (data) => {
+        currentNotePage = data.pageIndex;
+        document.getElementById('smartNotesPanel').style.display = 'flex';
+        renderNotePage();
+        showToast(`🤖 AI Auto-Sync: Switched to Page ${currentNotePage + 1}`);
     });
 }
 
@@ -1327,9 +1351,99 @@ function hideLogoutConfirm() {
     document.getElementById('logoutConfirmBox').style.display = 'none';
 }
 
+// 🟢 NEW: SMART NOTES SETUP LOGIC
+function setupNotesUI() {
+    if (currentCallRole === 'Provider') {
+        document.getElementById('uploadNotesBtn').style.display = 'flex';
+        document.getElementById('viewNotesBtn').style.display = 'none';
+    } else {
+        document.getElementById('uploadNotesBtn').style.display = 'none';
+        document.getElementById('viewNotesBtn').style.display = 'flex';
+        document.getElementById('viewNotesBtn').style.opacity = '0.5'; 
+    }
+}
+
+async function handleNotesUpload(event) {
+    const files = event.target.files;
+    if(!files || files.length === 0) return;
+    
+    sessionNotes = [];
+    for(let i=0; i<files.length; i++) {
+        let keyword = prompt(`Page ${i+1}: What topic is this? (e.g., 'String', 'Loop')\nAI will listen for this word to auto-sync!`);
+        if(!keyword) keyword = `Page ${i+1}`;
+        
+        let base64 = await toBase64(files[i]);
+        sessionNotes.push({ image: base64, keyword: keyword.toLowerCase() });
+    }
+    
+    showToast(`✅ ${files.length} Notes uploaded! AI Auto-Sync is ready.`);
+    
+    let partnerEmail = currentChatPartnerEmail || incomingCallPartner;
+    socket.emit('share-notes', { to: partnerEmail, notes: sessionNotes });
+    
+    document.getElementById('viewNotesBtn').style.display = 'flex';
+    document.getElementById('viewNotesBtn').style.opacity = '1';
+    currentNotePage = 0;
+    renderNotePage();
+}
+
+function toBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
+
+function toggleNotesPanel() {
+    if(sessionNotes.length === 0) {
+        showToast("No notes available yet!"); return;
+    }
+    let panel = document.getElementById('smartNotesPanel');
+    if(panel.style.display === 'none' || panel.style.display === '') {
+        panel.style.display = 'flex';
+        let badge = document.getElementById('notesBadge');
+        if(badge) badge.style.display = 'none';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+function renderNotePage() {
+    if(sessionNotes.length === 0) return;
+    document.getElementById('currentNoteImg').src = sessionNotes[currentNotePage].image;
+    document.getElementById('notePageIndicator').innerText = `${currentNotePage + 1} / ${sessionNotes.length}`;
+}
+
+function prevNote() {
+    if(currentNotePage > 0) { currentNotePage--; renderNotePage(); }
+}
+
+function nextNote() {
+    if(currentNotePage < sessionNotes.length - 1) { currentNotePage++; renderNotePage(); }
+}
+
+function downloadCurrentNote() {
+    if(sessionNotes.length === 0) return;
+    const link = document.createElement('a');
+    link.href = sessionNotes[currentNotePage].image;
+    link.download = `SkillHub_Note_Page_${currentNotePage+1}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+
 async function startVideoCall() {
     if(!currentChatPartnerEmail) return;
     
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const me = usersDB.find(u => u.email === myEmail);
+    let activeSwap = me.swaps.find(s => s.partnerEmail === currentChatPartnerEmail && s.status === 'Active');
+    currentCallRole = activeSwap ? activeSwap.role : 'Provider'; 
+    setupNotesUI();
+
     document.getElementById('videoCallModal').style.display = "flex";
     document.getElementById('callStatusText').innerText = "Calling " + usersDB.find(u => u.email === currentChatPartnerEmail).name + "...";
     isCalling = true;
@@ -1343,7 +1457,6 @@ async function startVideoCall() {
         const offer = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offer);
 
-        const myEmail = sessionStorage.getItem('loggedInUserEmail');
         socket.emit('call-user', {
             to: currentChatPartnerEmail,
             from: myEmail,
@@ -1357,6 +1470,12 @@ async function startVideoCall() {
 }
 
 async function acceptCall() {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const me = usersDB.find(u => u.email === myEmail);
+    let activeSwap = me.swaps.find(s => s.partnerEmail === incomingCallPartner && s.status === 'Active');
+    currentCallRole = activeSwap ? activeSwap.role : 'Requester';
+    setupNotesUI();
+
     document.getElementById('incomingCallModal').style.display = "none";
     document.getElementById('videoCallModal').style.display = "flex";
     document.getElementById('callStatusText').innerText = "Connecting...";
@@ -1436,6 +1555,13 @@ function endCall(isLocalAction = true) {
     document.getElementById('videoCallModal').style.display = "none";
     document.getElementById('incomingCallModal').style.display = "none";
     
+    // Reset Notes Data
+    sessionNotes = [];
+    currentNotePage = 0;
+    document.getElementById('smartNotesPanel').style.display = 'none';
+    document.getElementById('uploadNotesBtn').style.display = 'none';
+    document.getElementById('viewNotesBtn').style.display = 'none';
+
     if(isLocalAction && (currentChatPartnerEmail || incomingCallPartner)) {
         socket.emit('end-call', { to: currentChatPartnerEmail || incomingCallPartner });
     }
@@ -1538,6 +1664,24 @@ function startAITranslationProcess() {
         const spokenText = event.results[lastIndex][0].transcript;
         const targetLang = document.getElementById('targetLanguage').value || 'en-US';
 
+        // 🟢 NEW: AI SMART NOTES AUTO-SYNC (THE MAGIC)
+        if (currentCallRole === 'Provider' && sessionNotes.length > 0) {
+            let lowerSpoken = spokenText.toLowerCase();
+            for(let i = 0; i < sessionNotes.length; i++) {
+                let keyword = sessionNotes[i].keyword.toLowerCase();
+                if(keyword && lowerSpoken.includes(keyword)) {
+                    if (currentNotePage !== i) { 
+                        currentNotePage = i;
+                        renderNotePage();
+                        showToast(`🤖 AI detected '${keyword}'. Auto-syncing Page ${i+1}`);
+                        let partnerEmail = currentChatPartnerEmail || incomingCallPartner;
+                        socket.emit('sync-note-page', { to: partnerEmail, pageIndex: i });
+                    }
+                    break;
+                }
+            }
+        }
+
         try {
             const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang.split('-')[0]}&dt=t&q=${encodeURI(spokenText)}`);
             const data = await response.json();
@@ -1570,7 +1714,7 @@ socket.on('receive-translation', (data) => {
 });
 
 // ==========================================
-// 🟢 AI TROUBLESHOOTER LOGIC (NEW)
+// 🟢 AI TROUBLESHOOTER LOGIC 
 // ==========================================
 function addAIMessage(text, type) {
     let chat = document.getElementById("aiChatBox");
