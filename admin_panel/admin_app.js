@@ -1,4 +1,4 @@
-// 🟢 Security Check (Koi direct link kholne ki koshish kare toh rok dega)
+// 🟢 Security Check
 if(sessionStorage.getItem('isAdminLoggedIn') !== 'true') {
     window.location.href = "admin_login.html";
 }
@@ -17,23 +17,30 @@ let allUsers = [];
 async function fetchAllUsers() {
     try {
         const response = await fetch(API_BASE_URL + '/users', {
-            headers: { 'ngrok-skip-browser-warning': '69420' } // Render/Ngrok ke liye bypass
+            headers: { 'ngrok-skip-browser-warning': '69420' } 
         });
         allUsers = await response.json();
         
-        // Stats update karna
+        // 1. Update Main Stats
         document.getElementById('totalUsersCount').innerText = allUsers.length;
         
         let activeSwaps = 0;
-        allUsers.forEach(u => {
-            if(u.swaps) {
-                activeSwaps += u.swaps.filter(s => s.status === 'Active').length;
-            }
-        });
-        // Har swap 2 users me dikhta hai (requester aur provider), isliye 2 se divide kiya
-        document.getElementById('totalSwapsCount').innerText = Math.floor(activeSwaps / 2); 
+        let totalSystemCredits = 0;
         
+        allUsers.forEach(u => {
+            if(u.swaps) activeSwaps += u.swaps.filter(s => s.status === 'Active').length;
+            totalSystemCredits += (u.credits !== undefined ? u.credits : 5);
+        });
+        
+        document.getElementById('totalSwapsCount').innerText = Math.floor(activeSwaps / 2); 
+        document.getElementById('totalCreditsCount').innerText = totalSystemCredits;
+        
+        // 2. Render Main Table
         renderUserTable();
+        
+        // 3. Render Newest Users (Sidebar Widget)
+        renderNewestUsers();
+
     } catch (err) {
         console.error("Error fetching users:", err);
         document.getElementById('userTableBody').innerHTML = "<tr><td colspan='5' style='color:#ef4444; text-align:center;'><i class='fas fa-exclamation-triangle'></i> Failed to connect to Backend Server. Make sure server is running.</td></tr>";
@@ -46,26 +53,76 @@ function renderUserTable() {
     tbody.innerHTML = "";
     
     if(allUsers.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align: center; color: #94a3b8;'>No registered users found in the database.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align: center; color: var(--text-muted);'>No registered users found in the database.</td></tr>";
         return;
     }
 
     allUsers.forEach((user) => {
         let creds = user.credits !== undefined ? user.credits : 5;
+        let roleClass = user.role === 'teach' ? 'badge-role' : 'badge-role learner';
         let roleName = user.role === 'teach' ? 'Teacher & Learner' : 'Only Learner';
+        let pic = user.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
         
         tbody.innerHTML += `
-            <tr>
-                <td style="font-weight: 800; color: #fff;">${user.name}</td>
-                <td style="color: #cbd5e1;">${user.email}</td>
-                <td><span class="badge-role">${roleName}</span></td>
+            <tr class="user-row">
+                <td>
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <img src="${pic}" style="width:40px; height:40px; border-radius:8px; object-fit:cover; border:1px solid var(--border-color);">
+                        <span style="font-weight: 800; color: #fff;">${user.name}</span>
+                    </div>
+                </td>
+                <td style="color: #cbd5e1;" class="user-email">${user.email}</td>
+                <td><span class="${roleClass}">${roleName}</span></td>
                 <td><span class="badge-credits">${creds}</span></td>
                 <td>
-                    <button class="action-btn edit-btn" onclick="editCredits('${user.email}', ${creds})"><i class="fas fa-coins"></i> Manage Credits</button>
-                    <button class="action-btn del-btn" onclick="deleteUser('${user.email}', '${user.name}')"><i class="fas fa-trash-alt"></i> Delete Account</button>
+                    <button class="action-btn edit-btn" onclick="editCredits('${user.email}', ${creds})"><i class="fas fa-coins"></i> Edit Credits</button>
+                    <button class="action-btn del-btn" onclick="deleteUser('${user.email}', '${user.name}')"><i class="fas fa-trash-alt"></i> Delete</button>
                 </td>
             </tr>
         `;
+    });
+}
+
+// 🟢 DISPLAY: Newest Users Sidebar Widget
+function renderNewestUsers() {
+    const list = document.getElementById('newUsersList');
+    list.innerHTML = "";
+    
+    // Reverse array to get newest first, then take top 4
+    const newest = [...allUsers].reverse().slice(0, 4);
+    
+    if(newest.length === 0) {
+        list.innerHTML = "<p style='color:var(--text-muted); font-size:13px; text-align:center;'>No users yet.</p>";
+        return;
+    }
+
+    newest.forEach(user => {
+        let pic = user.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        list.innerHTML += `
+            <div class="user-item-sm">
+                <img src="${pic}" alt="User">
+                <div class="details">
+                    <h4>${user.name}</h4>
+                    <p>${user.email.split('@')[0]}...</p>
+                </div>
+                <div class="joined-date">New</div>
+            </div>
+        `;
+    });
+}
+
+// 🟢 SEARCH FUNCTION (Local filtering for table)
+function filterAdminTable() {
+    let input = document.getElementById("adminSearch").value.toLowerCase();
+    let rows = document.querySelectorAll(".user-row");
+    
+    rows.forEach(row => {
+        let text = row.innerText.toLowerCase();
+        if(text.includes(input)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
     });
 }
 
@@ -82,7 +139,7 @@ async function editCredits(email, currentCredits) {
             });
             if(response.ok) {
                 alert("✅ System Update: User credits modified successfully!");
-                fetchAllUsers(); // Table ko turant refresh karega naye credits dikhane ke liye
+                fetchAllUsers(); 
             } else {
                 alert("❌ Database Error: Failed to update credits.");
             }
@@ -102,13 +159,23 @@ async function deleteUser(email, name) {
             });
             if(response.ok) {
                 alert("✅ Target Eliminated: User account deleted successfully!");
-                fetchAllUsers(); // Table refresh karega
+                fetchAllUsers(); 
             } else {
                 alert("❌ Database Error: Failed to delete user.");
             }
         } catch(err) {
             alert("❌ Connection Error: Unable to reach the server.");
         }
+    }
+}
+
+// 🟢 MAINTENANCE MODE TOGGLE (UI Visual Only for now)
+function toggleMaintenance() {
+    let isChecked = document.getElementById('maintenanceToggle').checked;
+    if(isChecked) {
+        alert("⚠️ WARNING: This will be connected to the Backend 'SURPRISE_MODE' API soon to lock the entire platform for users.");
+    } else {
+        alert("✅ Platform unlocked and available for users.");
     }
 }
 
