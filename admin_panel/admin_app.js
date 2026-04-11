@@ -13,6 +13,15 @@ function adminLogout() {
 
 let allUsers = [];
 
+// 🟢 Fetch initial status of the toggle
+async function fetchMaintenanceStatus() {
+    try {
+        const res = await fetch(API_BASE_URL + '/admin/maintenance-status', { headers: { 'ngrok-skip-browser-warning': '69420' }});
+        const data = await res.json();
+        document.getElementById('maintenanceToggle').checked = data.isMaintenance;
+    } catch(e) { console.error("Error fetching maintenance status"); }
+}
+
 // 🟢 GET: Saare users ka data backend se lana
 async function fetchAllUsers() {
     try {
@@ -40,6 +49,9 @@ async function fetchAllUsers() {
         
         // 3. Render Newest Users (Sidebar Widget)
         renderNewestUsers();
+        
+        // 4. Fetch Maintenance Switch Status
+        fetchMaintenanceStatus();
 
     } catch (err) {
         console.error("Error fetching users:", err);
@@ -169,13 +181,25 @@ async function deleteUser(email, name) {
     }
 }
 
-// 🟢 MAINTENANCE MODE TOGGLE (UI Visual Only for now)
-function toggleMaintenance() {
+// 🟢 NEW: REAL MAINTENANCE MODE LOGIC
+async function toggleMaintenance() {
     let isChecked = document.getElementById('maintenanceToggle').checked;
-    if(isChecked) {
-        alert("⚠️ WARNING: This will be connected to the Backend 'SURPRISE_MODE' API soon to lock the entire platform for users.");
-    } else {
-        alert("✅ Platform unlocked and available for users.");
+    try {
+        const res = await fetch(API_BASE_URL + '/admin/toggle-maintenance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '69420' },
+            body: JSON.stringify({ isMaintenance: isChecked })
+        });
+        const data = await res.json();
+        
+        if(data.isMaintenance) {
+            alert("🚧 MAINTENANCE MODE ON: The platform is now locked. All active users are being safely logged out.");
+        } else {
+            alert("✅ MAINTENANCE MODE OFF: The platform is live again for all users.");
+        }
+    } catch(err) {
+        alert("❌ Error connecting to server. The switch will be reverted.");
+        document.getElementById('maintenanceToggle').checked = !isChecked; 
     }
 }
 
