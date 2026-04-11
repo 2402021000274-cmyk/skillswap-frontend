@@ -7,25 +7,32 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="admin_style.css">
 </head>
-<body>
+<body id="adminLoginWrapper">
 
     <div class="login-container">
-        <i class="fas fa-user-shield" style="font-size: 40px; color: #38bdf8; margin-bottom: 15px;"></i>
+        <i class="fas fa-user-shield" style="font-size: 50px; color: var(--primary-color); margin-bottom: 20px; filter: drop-shadow(var(--shadow-glow));"></i>
+        
         <h2>Admin Command Center</h2>
         <p>Authorized Personnel Only</p>
 
         <form id="adminLoginForm">
             <div class="input-group">
-                <i class="fas fa-envelope"></i>
+                <i class="fas fa-envelope left-icon"></i>
                 <input type="text" id="adminEmail" placeholder="Admin ID / Email" required>
             </div>
             <div class="input-group">
-                <i class="fas fa-lock"></i>
+                <i class="fas fa-lock left-icon"></i>
                 <input type="password" id="adminPass" placeholder="Master Password" required>
             </div>
+            
             <button type="submit" class="btn-admin">Access System</button>
+            
             <span id="loginError" class="error-msg"></span>
         </form>
+        
+        <div style="margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+            <p style="font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Secure Infrastructure v1.0</p>
+        </div>
     </div>
 
     <script src="../config.js"></script> 
