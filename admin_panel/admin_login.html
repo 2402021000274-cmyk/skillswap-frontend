@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Hub - Admin Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="admin_style.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <i class="fas fa-user-shield" style="font-size: 40px; color: #38bdf8; margin-bottom: 15px;"></i>
+        <h2>Admin Command Center</h2>
+        <p>Authorized Personnel Only</p>
+
+        <form id="adminLoginForm">
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="text" id="adminEmail" placeholder="Admin ID / Email" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="adminPass" placeholder="Master Password" required>
+            </div>
+            <button type="submit" class="btn-admin">Access System</button>
+            <span id="loginError" class="error-msg"></span>
+        </form>
+    </div>
+
+    <script src="../config.js"></script> 
+    <script src="admin_auth.js"></script>
+</body>
+</html>
