@@ -5,27 +5,32 @@ document.getElementById('adminLoginForm').addEventListener('submit', function(e)
     const pass = document.getElementById('adminPass').value.trim();
     const errorBox = document.getElementById('loginError');
 
-    // 🟢 ADMIN CREDENTIALS (Aap isse apne hisaab se change kar sakte hain)
+    // 🟢 ADMIN MASTER CREDENTIALS
     const ADMIN_ID = "admin@skillhub.com";
     const ADMIN_PASS = "Admin@123";
 
     if (email === ADMIN_ID && pass === ADMIN_PASS) {
-        errorBox.style.color = "#10b981"; // Green color
-        errorBox.innerText = "Access Granted! Redirecting...";
+        // Success State
+        errorBox.style.color = "#10b981"; // Vibrant Green
+        errorBox.innerText = "Access Granted! Initializing Dashboard...";
         
-        // Session save karke dashboard pe bhejenge
+        // Session storage for security check
         sessionStorage.setItem('isAdminLoggedIn', 'true');
         
+        // Short delay for the success message to show
         setTimeout(() => {
             window.location.href = "admin_dashboard.html";
-        }, 1000);
+        }, 1200);
     } else {
-        errorBox.style.color = "#ef4444"; // Red color
-        errorBox.innerText = "Invalid Admin Credentials!";
+        // Failure State
+        errorBox.style.color = "#ef4444"; // Error Red
+        errorBox.innerText = "Access Denied: Invalid Master Credentials!";
+        
+        // Shake animation effect for input fields could be added here
     }
 });
 
-// Agar pehle se login hai toh seedha dashboard pe bhej do
+// 🟢 Auto-redirect if already logged in during current session
 window.onload = function() {
     if(sessionStorage.getItem('isAdminLoggedIn') === 'true') {
         window.location.href = "admin_dashboard.html";
