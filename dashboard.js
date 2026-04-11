@@ -71,6 +71,14 @@ if(socket) {
         syncWithDatabase(); 
     });
 
+    // 🟢 NEW: MAINTENANCE MODE LISTENER
+    socket.on('maintenance-mode', (isActive) => {
+        if(isActive) {
+            alert("🚧 Emergency: The Admin has put the system under Maintenance Mode. You will be logged out safely.");
+            logout();
+        }
+    });
+
     socket.on('call-made', async (data) => {
         incomingCallPartner = data.from;
         let callerUser = usersDB.find(u => u.email === data.from);
