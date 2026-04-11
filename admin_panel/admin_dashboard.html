@@ -5,101 +5,153 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skill Hub - Admin Control Center</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: #0f172a; color: #f8fafc; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 260px; background: rgba(30, 41, 59, 0.8); padding: 25px; display: flex; flex-direction: column; border-right: 1px solid #334155; backdrop-filter: blur(10px); }
-        .sidebar h2 { color: #38bdf8; margin-bottom: 40px; text-align: center; font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .nav-btn { background: transparent; color: #94a3b8; border: none; padding: 15px; text-align: left; font-size: 16px; cursor: pointer; border-radius: 12px; margin-bottom: 10px; transition: 0.3s; display: flex; align-items: center; gap: 12px; font-weight: 600;}
-        .nav-btn:hover, .nav-btn.active { background: #38bdf8; color: #0f172a; font-weight: 800; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); transform: translateX(5px);}
-        
-        /* Main Content */
-        .main-content { flex: 1; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, #1e293b, #0f172a); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .header h1 { font-size: 32px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .logout-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 12px 25px; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 8px;}
-        .logout-btn:hover { background: #ef4444; color: #fff; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
-        
-        /* Stats Grid */
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 40px; }
-        .stat-card { background: rgba(30, 41, 59, 0.6); padding: 30px; border-radius: 20px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: 0.3s; position: relative; overflow: hidden;}
-        .stat-card:hover { transform: translateY(-5px); border-color: #38bdf8; }
-        .stat-card h3 { color: #94a3b8; font-size: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;}
-        .stat-card p { font-size: 40px; font-weight: 800; color: #f8fafc; }
-        
-        /* Table Area */
-        .table-container { background: rgba(30, 41, 59, 0.8); padding: 30px; border-radius: 20px; border: 1px solid #334155; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 18px; text-align: left; border-bottom: 1px solid rgba(51, 65, 85, 0.5); font-size: 15px;}
-        th { color: #94a3b8; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
-        
-        /* Action Buttons */
-        .action-btn { padding: 8px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-right: 8px; font-size: 13px; transition: 0.2s;}
-        .edit-btn { background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3); }
-        .edit-btn:hover { background: #eab308; color: #fff; }
-        .del-btn { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .del-btn:hover { background: #ef4444; color: #fff; }
-        
-        /* Badges */
-        .badge-credits { background: #38bdf8; color: #0f172a; padding: 4px 12px; border-radius: 20px; font-weight: 800; }
-        .badge-role { background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 8px; font-weight: 700; font-size: 12px;}
-    </style>
+    <link rel="stylesheet" href="admin_style.css">
 </head>
 <body>
-    
-    <div class="sidebar">
-        <h2><i class="fas fa-shield-alt"></i> Admin Panel</h2>
-        <button class="nav-btn active"><i class="fas fa-users-cog"></i> User Management</button>
-        <button class="nav-btn" onclick="alert('System Settings API coming soon!')"><i class="fas fa-server"></i> System Status</button>
-        <div style="margin-top: auto; text-align: center;">
-            <p style="color: #64748b; font-size: 12px; font-weight: bold;">Skill Hub Supervisor v1.0</p>
-        </div>
-    </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h1><i class="fas fa-satellite-dish" style="color: #38bdf8; margin-right: 10px;"></i> Master Dashboard</h1>
-            <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-power-off"></i> Secure Logout</button>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3><i class="fas fa-users" style="color: #38bdf8;"></i> Total Registered Users</h3>
-                <p id="totalUsersCount">0</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-sync-alt" style="color: #10b981;"></i> Total Active Swaps</h3>
-                <p id="totalSwapsCount">0</p>
-            </div>
-            <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.5);">
-                <h3><i class="fas fa-check-circle" style="color: #10b981;"></i> System Status</h3>
-                <p style="color: #10b981; font-size: 28px; margin-top: 10px;">All Systems Operational</p>
+    <div id="adminWrapper">
+        <div class="sidebar">
+            <a href="#" class="sidebar-logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>SkillHub</span>
+            </a>
+            
+            <div class="menu-label">Main Menu</div>
+            <ul class="sidebar-menu">
+                <li><a class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a onclick="alert('User Analytics coming soon!')"><i class="fas fa-chart-line"></i> Analytics</a></li>
+                <li><a onclick="alert('Platform Settings coming soon!')"><i class="fas fa-cog"></i> Settings</a></li>
+            </ul>
+
+            <div class="logout-btn-container">
+                <button class="logout-btn" onclick="adminLogout()">
+                    <i class="fas fa-power-off"></i> Secure Logout
+                </button>
             </div>
         </div>
 
-        <div class="table-container">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="font-size: 20px; font-weight: 800;">User Database Directory</h2>
-                <button onclick="fetchAllUsers()" style="background: transparent; color: #38bdf8; border: 1px solid #38bdf8; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;"><i class="fas fa-redo-alt"></i> Refresh Data</button>
+        <div class="main-content">
+            
+            <div class="dashboard-header">
+                <h1>Command Center</h1>
+                <div class="header-actions">
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="adminSearch" placeholder="Search users by name or email..." oninput="filterAdminTable()">
+                    </div>
+                    <div class="icon-btn"><i class="fas fa-bell"></i></div>
+                    <div class="user-profile-mini">
+                        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Admin">
+                        <div class="details">
+                            <span class="name">Super Admin</span>
+                            <span class="role">System Owner</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>User Name</th>
-                        <th>Email Address</th>
-                        <th>Account Type</th>
-                        <th>Available Credits</th>
-                        <th>Admin Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <tr><td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching Live Data from Server...</td></tr>
-                </tbody>
-            </table>
+
+            <div class="welcome-banner">
+                <div>
+                    <h2>Welcome back, Admin! 👋</h2>
+                    <p>Here is what's happening on your platform today.</p>
+                </div>
+                <div class="maintenance-control" style="background: rgba(0,0,0,0.2); border: none; margin: 0; padding: 10px 20px;">
+                    <div style="margin-right: 15px;">
+                        <h4 style="color: #fff; font-size: 14px;">Maintenance Mode</h4>
+                        <p style="color: rgba(255,255,255,0.6); font-size: 11px;">Lock site for updates</p>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="maintenanceToggle" onchange="toggleMaintenance()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3><i class="fas fa-users"></i> Total Users</h3>
+                    <div class="value" id="totalUsersCount">0</div>
+                    <div class="change up"><i class="fas fa-arrow-up"></i> Live Count</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-sync-alt"></i> Active Swaps</h3>
+                    <div class="value" id="totalSwapsCount">0</div>
+                    <div class="change up"><i class="fas fa-arrow-up"></i> Live Count</div>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-coins"></i> Total Credits Issued</h3>
+                    <div class="value" id="totalCreditsCount">0</div>
+                    <div class="change up"><i class="fas fa-arrow-up"></i> Economy</div>
+                </div>
+                <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.4);">
+                    <h3><i class="fas fa-server" style="color: #10b981;"></i> Server Status</h3>
+                    <div class="value" style="color: #10b981; font-size: 28px; margin-top: 10px;">Online</div>
+                    <div class="change" style="color: var(--text-muted);">Latency: 24ms</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-bolt" style="color: #eab308;"></i> Recent Activity (System Logs)</h2>
+                    </div>
+                    <div class="activity-feed">
+                        <div class="activity-item admin-act">
+                            <div class="activity-icon"><i class="fas fa-user-shield"></i></div>
+                            <div class="activity-details">
+                                <p>Admin logged into the system</p>
+                                <span>Just now</span>
+                            </div>
+                        </div>
+                        <div class="activity-item swap-act">
+                            <div class="activity-icon"><i class="fas fa-handshake"></i></div>
+                            <div class="activity-details">
+                                <p>Database sync completed successfully</p>
+                                <span>2 mins ago</span>
+                            </div>
+                        </div>
+                        <div class="activity-item user-reg">
+                            <div class="activity-icon"><i class="fas fa-user-check"></i></div>
+                            <div class="activity-details">
+                                <p>Real-time socket connection established</p>
+                                <span>5 mins ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-user-plus" style="color: var(--primary-color);"></i> Newest Users</h2>
+                    </div>
+                    <div class="new-users-list" id="newUsersList">
+                        <div style="text-align: center; color: var(--text-muted); padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-database-section">
+                <div class="table-controls">
+                    <h2 style="font-size: 20px; font-weight: 800; color: #fff;">User Database Directory</h2>
+                    <button onclick="fetchAllUsers()" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;"><i class="fas fa-redo-alt"></i> Refresh Data</button>
+                </div>
+                
+                <table id="adminUserTable">
+                    <thead>
+                        <tr>
+                            <th>User Profile</th>
+                            <th>Email Address</th>
+                            <th>Account Type</th>
+                            <th>Credits</th>
+                            <th>Admin Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching Live Data from Server...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     </div>
 
