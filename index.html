@@ -4,336 +4,339 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skill Hub - Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="authWrapper">
-        <nav class="navbar">
+    <div id="authWrapper" class="d-flex w-100 vh-100">
+        <nav class="navbar w-100 d-flex justify-content-between align-items-start px-4 pt-3 position-absolute top-0 start-0 z-3">
             <a href="#" class="logo" style="background: transparent; padding: 0; box-shadow: none;">
-                <img src="logo.jpeg" alt="Skill Hub" style="height: 115px; width: auto; object-fit: contain; background: rgba(255, 255, 255, 0.95); padding: 5px 15px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: block;">
+                <img src="logo.jpeg" alt="Skill Hub" class="img-fluid" style="height: 80px; width: auto; object-fit: contain; background: rgba(255, 255, 255, 0.95); padding: 5px 15px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: block;">
             </a>
-            <ul class="nav-links">
+            <ul class="nav-links d-flex gap-3 align-items-center m-0 p-0 list-unstyled">
                 <li><a onclick="switchAuthView('homeView', this)" class="auth-nav-link active">Home</a></li>
                 <li><a onclick="switchAuthView('aboutView', this)" class="auth-nav-link">About Us</a></li>
                 <li><a onclick="switchAuthView('howItWorksView', this)" class="auth-nav-link">How it Works</a></li>
             </ul>
         </nav>
 
-        <div class="left-section">
-            <div class="overlay"></div>
-            <div class="content-box">
-                <h1>Learn New Skills.<br>Share Your Passion.</h1>
-                <p>Join the world's best community for skill exchange. Connect, collaborate, and grow together.</p>
+        <div class="left-section d-none d-lg-flex col-lg-6 position-relative align-items-center justify-content-center text-white" style="flex: 1.2; background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop') no-repeat center center/cover;">
+            <div class="overlay position-absolute w-100 h-100 top-0 start-0" style="background: linear-gradient(135deg, rgba(11, 15, 25, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%); z-index: 1;"></div>
+            <div class="content-box position-relative z-2 text-center p-5">
+                <h1 class="display-3 fw-bolder mb-4 text-white">Learn New Skills.<br>Share Your Passion.</h1>
+                <p class="lead opacity-75">Join the world's best community for skill exchange. Connect, collaborate, and grow together.</p>
             </div>
         </div>
 
-        <div class="right-section">
+        <div class="right-section col-12 col-lg-6 d-flex flex-column" style="flex: 0.8; background: var(--bg-card); overflow-y: auto; position: relative; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);">
             <div class="top-scroll-mask"></div>
-            <div id="messageBox" class="message-box" style="padding: 10px; margin: 0 auto 10px; max-width: 480px;"></div>
+            <div id="messageBox" class="message-box w-100 px-3" style="padding: 10px; margin: 0 auto 10px; max-width: 480px;"></div>
 
-            <div id="homeView" class="auth-view active">
+            <div id="homeView" class="auth-view active w-100 px-3 px-md-5">
                 <div id="loginForm">
                     <h2 class="form-title">Welcome Back</h2>
                     <p class="form-subtitle">Enter your details to access your account.</p>
-                    <form onsubmit="handleLogin(event)" autocomplete="off">
-                        <div class="input-group">
-                            <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" autocomplete="off" required>
+                    <form onsubmit="handleLogin(event)" autocomplete="off" class="w-100">
+                        <div class="input-group mb-4 position-relative">
+                            <i class="fas fa-envelope left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i>
+                            <input type="email" id="loginEmail" class="form-control rounded-4 ps-5 py-3" placeholder="Email Address" autocomplete="off" required>
                         </div>
-                        <div class="input-group" style="margin-bottom: 5px;">
-                            <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('loginPass', this)"></i>
+                        <div class="input-group mb-2 position-relative">
+                            <i class="fas fa-lock left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i>
+                            <input type="password" id="loginPass" class="form-control rounded-4 ps-5 py-3" placeholder="Password" autocomplete="new-password" required>
+                            <i class="fas fa-eye eye-icon position-absolute top-50 end-0 translate-middle-y me-3 z-3" style="cursor: pointer;" onclick="togglePass('loginPass', this)"></i>
                         </div>
-                        <div style="text-align: right; margin-bottom: 20px;">
+                        <div class="text-end mb-4">
                             <span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span>
                         </div>
-                        <button type="submit" class="btn-submit" style="margin-top: 0;">Login</button>
+                        <button type="submit" class="btn-submit w-100 py-3 shadow-sm">Login</button>
                     </form>
-                    <div class="toggle-text">Don't have an account? <span onclick="showSubForm('registerForm')">Register Now</span></div>
+                    <div class="toggle-text mt-4">Don't have an account? <span onclick="showSubForm('registerForm')" class="text-primary fw-bold" style="cursor: pointer;">Register Now</span></div>
                 </div>
 
                 <div id="forgotPasswordForm" class="hidden" style="width: 100%;">
                     <h2 class="form-title">Reset Password</h2>
                     <p class="form-subtitle">Enter your registered email to receive an OTP.</p>
                     <form onsubmit="handleSendForgotOTP(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" autocomplete="off" required></div>
-                        <button type="submit" class="btn-submit">Send OTP</button>
+                        <div class="input-group mb-4 position-relative"><i class="fas fa-envelope left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="email" id="forgotIdentifier" class="form-control rounded-4 ps-5 py-3" placeholder="Email Address" autocomplete="off" required></div>
+                        <button type="submit" class="btn-submit w-100 py-3">Send OTP</button>
                     </form>
-                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
+                    <div class="toggle-text mt-4"><span onclick="showSubForm('loginForm')" style="cursor: pointer;">Back to Login</span></div>
                 </div>
 
                 <div id="verifyForgotOTPForm" class="hidden" style="width: 100%;">
                     <h2 class="form-title">Set New Password</h2>
                     <form onsubmit="handleResetPassword(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
-                        <div class="input-group">
-                            <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('forgotNewPassInput', this)"></i>
+                        <div class="input-group mb-4 position-relative"><i class="fas fa-key left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="forgotOTPInput" class="form-control rounded-4 ps-5 py-3" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                        <div class="input-group mb-4 position-relative">
+                            <i class="fas fa-lock left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="password" id="forgotNewPassInput" class="form-control rounded-4 ps-5 py-3" placeholder="Enter New Password" autocomplete="new-password" required>
+                            <i class="fas fa-eye eye-icon position-absolute top-50 end-0 translate-middle-y me-3 z-3" style="cursor: pointer;" onclick="togglePass('forgotNewPassInput', this)"></i>
                         </div>
-                        <button type="submit" class="btn-submit">Reset Password</button>
+                        <button type="submit" class="btn-submit w-100 py-3">Reset Password</button>
                     </form>
-                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Cancel</span></div>
+                    <div class="toggle-text mt-4"><span onclick="showSubForm('loginForm')" style="cursor: pointer;">Cancel</span></div>
                 </div>
 
                 <div id="otpForm" class="hidden" style="width: 100%;">
                     <h2 class="form-title">Two-Factor Auth</h2>
                     <form onsubmit="handleVerifyOTP(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
-                        <button type="submit" class="btn-submit">Verify & Login</button>
+                        <div class="input-group mb-4 position-relative"><i class="fas fa-key left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="otpInput" class="form-control rounded-4 ps-5 py-3" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                        <button type="submit" class="btn-submit w-100 py-3">Verify & Login</button>
                     </form>
-                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
+                    <div class="toggle-text mt-4"><span onclick="showSubForm('loginForm')" style="cursor: pointer;">Back to Login</span></div>
                 </div>
 
                 <div id="registerForm" class="hidden" style="width: 100%;">
                     <h2 class="form-title">Create Account</h2>
                     <form onsubmit="handleRegister(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" autocomplete="off" required></div>
-                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" autocomplete="off" required></div>
-                        <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" autocomplete="off" required></div>
+                        <div class="input-group mb-3 position-relative"><i class="fas fa-user left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="regName" class="form-control rounded-4 ps-5 py-3" placeholder="Full Name" autocomplete="off" required></div>
+                        <div class="input-group mb-3 position-relative"><i class="fas fa-envelope left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="email" id="regEmail" class="form-control rounded-4 ps-5 py-3" placeholder="Email Address" autocomplete="off" required></div>
+                        <div class="input-group mb-3 position-relative"><i class="fas fa-phone left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="tel" id="regPhone" class="form-control rounded-4 ps-5 py-3" placeholder="Phone Number" autocomplete="off" required></div>
                         
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: var(--bg-input); border-radius: 12px; color: var(--text-muted);">
-                            <span style="font-size: 14px; font-weight: 500;"><i class="fas fa-venus-mars" style="margin-right: 10px;"></i>Gender:</span>
-                            <div style="display: flex; gap: 15px;">
-                                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 rounded-4" style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted);">
+                            <span class="fs-6 fw-medium"><i class="fas fa-venus-mars me-2"></i>Gender:</span>
+                            <div class="d-flex gap-3">
+                                <label class="d-flex align-items-center gap-2" style="cursor: pointer; color: var(--text-main); font-weight: 500;">
                                     <input type="radio" name="regGender" value="Male" required style="accent-color: var(--primary-color);"> Male
                                 </label>
-                                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
+                                <label class="d-flex align-items-center gap-2" style="cursor: pointer; color: var(--text-main); font-weight: 500;">
                                     <input type="radio" name="regGender" value="Female" style="accent-color: var(--primary-color);"> Female
                                 </label>
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <i class="fas fa-lock left-icon"></i>
-                            <input type="password" id="regPass" placeholder="Create Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('regPass', this)"></i>
+                        <div class="input-group mb-3 position-relative">
+                            <i class="fas fa-lock left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i>
+                            <input type="password" id="regPass" class="form-control rounded-4 ps-5 py-3" placeholder="Create Password" autocomplete="new-password" required>
+                            <i class="fas fa-eye eye-icon position-absolute top-50 end-0 translate-middle-y me-3 z-3" style="cursor: pointer;" onclick="togglePass('regPass', this)"></i>
                         </div>
-                        <div class="input-group">
-                            <i class="fas fa-lock left-icon"></i>
-                            <input type="password" id="regConfirmPass" placeholder="Confirm Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('regConfirmPass', this)"></i>
+                        <div class="input-group mb-4 position-relative">
+                            <i class="fas fa-lock left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i>
+                            <input type="password" id="regConfirmPass" class="form-control rounded-4 ps-5 py-3" placeholder="Confirm Password" autocomplete="new-password" required>
+                            <i class="fas fa-eye eye-icon position-absolute top-50 end-0 translate-middle-y me-3 z-3" style="cursor: pointer;" onclick="togglePass('regConfirmPass', this)"></i>
                         </div>
 
-                        <button type="submit" class="btn-submit">Verify Email</button>
+                        <button type="submit" class="btn-submit w-100 py-3">Verify Email</button>
                     </form>
-                    <div class="toggle-text">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
+                    <div class="toggle-text mt-4">Already have an account? <span onclick="showSubForm('loginForm')" style="cursor: pointer;">Login Here</span></div>
                 </div>
 
                 <div id="regOtpForm" class="hidden" style="width: 100%;">
                     <h2 class="form-title">Verify Email</h2>
                     <form onsubmit="handleVerifyRegOTP(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
-                        <button type="submit" class="btn-submit">Verify OTP</button>
+                        <div class="input-group mb-4 position-relative"><i class="fas fa-key left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="regOtpInput" class="form-control rounded-4 ps-5 py-3" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                        <button type="submit" class="btn-submit w-100 py-3">Verify OTP</button>
                     </form>
-                    <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
+                    <div class="toggle-text mt-4"><span onclick="showSubForm('registerForm')" style="cursor: pointer;">Back</span></div>
                 </div>
 
                 <div id="profileSetupForm" class="hidden" style="width: 100%;">
                     <h2 class="form-title">Complete Profile</h2>
                     <form onsubmit="handleProfileSave(event)" autocomplete="off">
-                        <div class="profile-pic-wrapper">
+                        <div class="profile-pic-wrapper d-flex flex-column align-items-center mb-4">
                             <div class="profile-pic-container" onclick="document.getElementById('profileInput').click()">
                                 <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile">
                             </div>
                             <input type="file" id="profileInput" accept="image/*" onchange="previewImage(event, 'profilePreview')" style="display:none;">
-                            <div style="display: flex; gap: 20px; margin-top: 15px; width: 100%; justify-content: center;">
-                                <div class="add-photo-btn" onclick="document.getElementById('profileInput').click()" style="margin-top: 0;"><i class="fas fa-image"></i> Upload File</div>
-                                <div class="add-photo-btn" onclick="startRegCamera()" style="margin-top: 0; color: #10b981;"><i class="fas fa-camera"></i> Live Camera</div>
+                            <div class="d-flex gap-3 mt-3 w-100 justify-content-center">
+                                <div class="add-photo-btn" onclick="document.getElementById('profileInput').click()"><i class="fas fa-image"></i> Upload File</div>
+                                <div class="add-photo-btn text-success border-success" onclick="startRegCamera()"><i class="fas fa-camera"></i> Live Camera</div>
                             </div>
                         </div>
 
-                        <div class="role-selection">
-                            <label class="role-box active" onclick="selectRole('teach')">
-                                <input type="radio" name="userRole" value="teach" checked style="display:none;">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <span>Teach & Learn</span>
-                            </label>
-                            <label class="role-box" onclick="selectRole('learn')">
-                                <input type="radio" name="userRole" value="learn" style="display:none;">
-                                <i class="fas fa-book-reader"></i>
-                                <span>Only Learner</span>
-                            </label>
+                        <div class="role-selection row g-3 mb-4">
+                            <div class="col-6">
+                                <label class="role-box active w-100 h-100" onclick="selectRole('teach')">
+                                    <input type="radio" name="userRole" value="teach" checked style="display:none;">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span>Teach & Learn</span>
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <label class="role-box w-100 h-100" onclick="selectRole('learn')">
+                                    <input type="radio" name="userRole" value="learn" style="display:none;">
+                                    <i class="fas fa-book-reader"></i>
+                                    <span>Only Learner</span>
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="profName" readonly></div>
-                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="profEmail" readonly></div>
-                        <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" autocomplete="off" required></div>
+                        <div class="input-group mb-3 position-relative"><i class="fas fa-user left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="profName" class="form-control rounded-4 ps-5 py-3" readonly></div>
+                        <div class="input-group mb-3 position-relative"><i class="fas fa-envelope left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="email" id="profEmail" class="form-control rounded-4 ps-5 py-3" readonly></div>
+                        <div class="input-group mb-3 position-relative"><i class="fas fa-map-marker-alt left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="profAddress" class="form-control rounded-4 ps-5 py-3" placeholder="e.g. Ahmedabad, Gujarat" autocomplete="off" required></div>
                         
-                        <div id="skillInputContainer">
-                            <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter" autocomplete="off"></div>
-                            <div id="skillsList" class="skills-list"></div>
+                        <div id="skillInputContainer" class="mb-4">
+                            <div class="input-group position-relative"><i class="fas fa-laptop-code left-icon position-absolute top-50 start-0 translate-middle-y ms-3 z-3"></i><input type="text" id="skillInput" class="form-control rounded-4 ps-5 py-3" placeholder="Type a skill & Press Enter" autocomplete="off"></div>
+                            <div id="skillsList" class="skills-list mt-3"></div>
                         </div>
 
-                        <button type="submit" class="btn-submit">Save Profile & Login</button>
+                        <button type="submit" class="btn-submit w-100 py-3">Save Profile & Login</button>
                     </form>
                 </div>
             </div>
 
-            <div id="aboutView" class="auth-view" style="justify-content: flex-start; padding-top: 40px; max-width: 1000px; padding-left: 20px; padding-right: 20px;">
-                <h2 class="info-header" style="text-align: center; margin-bottom: 30px;">About Skill Hub</h2>
+            <div id="aboutView" class="auth-view container-fluid py-5" style="max-width: 1000px;">
+                <h2 class="info-header text-center mb-5">About Skill Hub</h2>
                 
-                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 50px;">
-                    <div class="about-card" style="flex: 1; min-width: 250px;">
-                        <i class="fas fa-globe"></i>
-                        <h3>Our Vision</h3>
-                        <p>Skill Hub is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
+                <div class="row g-4 mb-5">
+                    <div class="col-12 col-md-4">
+                        <div class="about-card h-100 text-center">
+                            <i class="fas fa-globe"></i>
+                            <h3>Our Vision</h3>
+                            <p>Skill Hub is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
+                        </div>
                     </div>
                     
-                    <div class="about-card" style="flex: 1; min-width: 250px;">
-                        <i class="fas fa-users"></i>
-                        <h3>Community Driven</h3>
-                        <p>Whether you are a professional developer, a language enthusiast, or a beginner looking for guidance, our platform connects you with the right mentor without any money involved.</p>
+                    <div class="col-12 col-md-4">
+                        <div class="about-card h-100 text-center">
+                            <i class="fas fa-users"></i>
+                            <h3>Community Driven</h3>
+                            <p>Whether you are a professional developer, a language enthusiast, or a beginner looking for guidance, our platform connects you with the right mentor without any money involved.</p>
+                        </div>
                     </div>
 
-                    <div class="about-card" style="flex: 1; min-width: 250px;">
-                        <i class="fas fa-coins"></i>
-                        <h3>Time-Banking System</h3>
-                        <p>We use a unique Credit System. Earn credits by teaching your skills to others, and spend those credits to learn new skills from experts. It's a fair, time-for-time trade.</p>
+                    <div class="col-12 col-md-4">
+                        <div class="about-card h-100 text-center">
+                            <i class="fas fa-coins"></i>
+                            <h3>Time-Banking System</h3>
+                            <p>We use a unique Credit System. Earn credits by teaching your skills to others, and spend those credits to learn new skills from experts. It's a fair, time-for-time trade.</p>
+                        </div>
                     </div>
                 </div>
 
-                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">Why Choose Skill Hub?</h2>
-                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px; font-weight: 500;">Explore the detailed features and benefits of joining our platform.</p>
+                <h2 class="info-header text-center mb-2">Why Choose Skill Hub?</h2>
+                <p class="text-center text-muted mb-5 fs-6 fw-medium">Explore the detailed features and benefits of joining our platform.</p>
 
-                <div class="about-grid">
+                <div class="row g-4 mb-5">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="about-image-card h-100">
+                            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" class="img-fluid w-100" alt="Concept">
+                            <div class="card-content p-4">
+                                <h3><i class="fas fa-lightbulb"></i> The Core Concept</h3>
+                                <p>Skill Hub is a revolutionary time-banking platform where your knowledge is your currency. Exchange your expertise directly with others and grow together.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="about-image-card h-100">
+                            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=600&auto=format&fit=crop" class="img-fluid w-100" alt="Credits">
+                            <div class="card-content p-4">
+                                <h3><i class="fas fa-coins"></i> Time is Money</h3>
+                                <p>No actual money is involved. You earn virtual credits by dedicating your time to teach someone. Spend those exact credits to learn a new skill from another expert.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="about-image-card h-100">
+                            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop" class="img-fluid w-100" alt="Learn Anything">
+                            <div class="card-content p-4">
+                                <h3><i class="fas fa-book-reader"></i> Learn Anything</h3>
+                                <p>From complex programming languages like Python and Java to creative arts like UI/Design or cooking, find mentors for absolutely any skill you desire.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="about-image-card h-100">
+                            <img src="https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=600&auto=format&fit=crop" class="img-fluid w-100" alt="Mentoring">
+                            <div class="card-content p-4">
+                                <h3><i class="fas fa-chalkboard-teacher"></i> Teach Your Passion</h3>
+                                <p>Everyone is an expert at something. Share your unique talents, guide beginners, and build your reputation as a top-tier mentor in the community.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="about-image-card h-100">
+                            <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=600&auto=format&fit=crop" class="img-fluid w-100" alt="Live Chat">
+                            <div class="card-content p-4">
+                                <h3><i class="fas fa-comment-dots"></i> Real-Time Chat</h3>
+                                <p>Seamlessly connect with your swap partners using our built-in, WhatsApp-style instant messaging system. Discuss topics, share links, and schedule sessions easily.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="about-image-card h-100">
+                            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=600&auto=format&fit=crop" class="img-fluid w-100" alt="Security">
+                            <div class="card-content p-4">
+                                <h3><i class="fas fa-shield-alt"></i> Secure & Private</h3>
+                                <p>Your privacy is our priority. With robust Two-Factor Authentication (2FA) and encrypted databases, your personal information always remains safe.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-5 border-top border-2 border-dashed">
+                    <h2 class="info-header text-center mb-3">Meet The Creators</h2>
+                    <p class="text-center text-muted mb-5 fs-6 fw-medium">The minds behind Skill Hub.</p>
                     
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" alt="Concept">
-                        <div class="card-content">
-                            <h3><i class="fas fa-lightbulb"></i> The Core Concept</h3>
-                            <p>Skill Hub is a revolutionary time-banking platform where your knowledge is your currency. Exchange your expertise directly with others and grow together.</p>
+                    <div class="row justify-content-center g-4 text-center">
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <div class="team-member h-100">
+                                <img src="Shubham.jpeg" alt="Shubham Pareshbhai Suthar" class="img-fluid rounded-circle border border-4 mb-3">
+                                <h3>Shubham Pareshbhai Suthar</h3>
+                                <p>Developer</p>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=600&auto=format&fit=crop" alt="Credits">
-                        <div class="card-content">
-                            <h3><i class="fas fa-coins"></i> Time is Money</h3>
-                            <p>No actual money is involved. You earn virtual credits by dedicating your time to teach someone. Spend those exact credits to learn a new skill from another expert.</p>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <div class="team-member h-100">
+                                <img src="Jainam.jpeg" alt="Jainam Dwarkeshpuri Goswami" class="img-fluid rounded-circle border border-4 mb-3">
+                                <h3>Jainam Dwarkeshpuri Goswami</h3>
+                                <p>Developer</p>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&auto=format&fit=crop" alt="Learn Anything">
-                        <div class="card-content">
-                            <h3><i class="fas fa-book-reader"></i> Learn Anything</h3>
-                            <p>From complex programming languages like Python and Java to creative arts like UI/Design or cooking, find mentors for absolutely any skill you desire.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1544531586-fde5298cdd40?q=80&w=600&auto=format&fit=crop" alt="Mentoring">
-                        <div class="card-content">
-                            <h3><i class="fas fa-chalkboard-teacher"></i> Teach Your Passion</h3>
-                            <p>Everyone is an expert at something. Share your unique talents, guide beginners, and build your reputation as a top-tier mentor in the community.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?q=80&w=600&auto=format&fit=crop" alt="Live Chat">
-                        <div class="card-content">
-                            <h3><i class="fas fa-comment-dots"></i> Real-Time Chat</h3>
-                            <p>Seamlessly connect with your swap partners using our built-in, WhatsApp-style instant messaging system. Discuss topics, share links, and schedule sessions easily.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=600&auto=format&fit=crop" alt="Security">
-                        <div class="card-content">
-                            <h3><i class="fas fa-shield-alt"></i> Secure & Private</h3>
-                            <p>Your privacy is our priority. With robust Two-Factor Authentication (2FA) and encrypted databases, your personal information always remains safe.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=600&auto=format&fit=crop" alt="Community">
-                        <div class="card-content">
-                            <h3><i class="fas fa-users"></i> Global Network</h3>
-                            <p>Break geographical boundaries. Connect with lifelong learners and passionate educators from around the globe, expanding your perspective and network.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=600&auto=format&fit=crop" alt="PBL">
-                        <div class="card-content">
-                            <h3><i class="fas fa-project-diagram"></i> Perfect for PBL</h3>
-                            <p>Ideal for university students working on Project-Based Learning (PBL). Find teammates with complementary skills to build your next big academic project.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?q=80&w=600&auto=format&fit=crop" alt="Portfolio">
-                        <div class="card-content">
-                            <h3><i class="fas fa-briefcase"></i> Build Your Portfolio</h3>
-                            <p>Every successful swap is recorded on your public profile. Use this verified track record of teaching and learning to impress future employers and peers.</p>
-                        </div>
-                    </div>
-
-                    <div class="about-image-card">
-                        <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&auto=format&fit=crop" alt="Free Access">
-                        <div class="card-content">
-                            <h3><i class="fas fa-door-open"></i> 100% Free Access</h3>
-                            <p>We believe education should be accessible to everyone. Skill Hub completely removes financial barriers, making high-quality mentorship absolutely free.</p>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <div class="team-member h-100">
+                                <img src="Khushgiri.jpeg" alt="Khushgiri Sanjaygiri Goswami" class="img-fluid rounded-circle border border-4 mb-3">
+                                <h3>Khushgiri Sanjaygiri Goswami</h3>
+                                <p>Developer</p>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div style="margin-top: 60px; padding-top: 40px; border-top: 2px dashed #eee;">
-                    <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">Meet The Creators</h2>
-                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 15px; font-weight: 500;">The minds behind Skill Hub.</p>
-                    
-                    <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; text-align: center;">
-                        
-                        <div style="background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 260px; transition: transform 0.3s ease;">
-                            <img src="Shubham.jpeg" alt="Shubham Pareshbhai Suthar" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color, #007bff); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <h3 style="font-size: 17px; color: #333; margin-bottom: 5px; font-family: 'Montserrat', sans-serif;">Shubham Pareshbhai Suthar</h3>
-                            <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">Developer</p>
-                        </div>
-
-                        <div style="background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 260px; transition: transform 0.3s ease;">
-                            <img src="Jainam.jpeg" alt="Jainam Dwarkeshpuri Goswami" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color, #007bff); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <h3 style="font-size: 17px; color: #333; margin-bottom: 5px; font-family: 'Montserrat', sans-serif;">Jainam Dwarkeshpuri Goswami</h3>
-                            <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">Developer</p>
-                        </div>
-
-                        <div style="background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 260px; transition: transform 0.3s ease;">
-                            <img src="Khushgiri.jpeg" alt="Khushgiri Sanjaygiri Goswami" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color, #007bff); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <h3 style="font-size: 17px; color: #333; margin-bottom: 5px; font-family: 'Montserrat', sans-serif;">Khushgiri Sanjaygiri Goswami</h3>
-                            <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">Developer</p>
-                        </div>
-
-                    </div>
-                </div>
-                </div>
-
-            <div id="howItWorksView" class="auth-view" style="justify-content: flex-start; padding-top: 40px;">
-                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">How it Works</h2>
-                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px; font-weight: 500;">Your journey to mastering new skills in 3 simple steps.</p>
+            <div id="howItWorksView" class="auth-view container-fluid py-5">
+                <h2 class="info-header text-center mb-3">How it Works</h2>
+                <p class="text-center text-muted mb-5 fs-6 fw-medium">Your journey to mastering new skills in 3 simple steps.</p>
                 
-                <div class="step-card"><div class="step-icon"><i class="fas fa-user-plus"></i></div><div class="step-content"><h3>1. Create Profile</h3><p>Sign up, choose your role, and list the skills you want to teach or learn.</p></div></div>
-                <div class="step-card"><div class="step-icon"><i class="fas fa-search"></i></div><div class="step-content"><h3>2. Find a Match</h3><p>Discover users around the platform who match your learning interests.</p></div></div>
-                <div class="step-card"><div class="step-icon"><i class="fas fa-exchange-alt"></i></div><div class="step-content"><h3>3. Start Swapping</h3><p>Connect via live chat, exchange knowledge, and grow together.</p></div></div>
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="step-card d-flex align-items-center p-4">
+                            <div class="step-icon me-4"><i class="fas fa-user-plus"></i></div>
+                            <div class="step-content"><h3>1. Create Profile</h3><p class="mb-0">Sign up, choose your role, and list the skills you want to teach or learn.</p></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="step-card d-flex align-items-center p-4">
+                            <div class="step-icon me-4"><i class="fas fa-search"></i></div>
+                            <div class="step-content"><h3>2. Find a Match</h3><p class="mb-0">Discover users around the platform who match your learning interests.</p></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="step-card d-flex align-items-center p-4">
+                            <div class="step-icon me-4"><i class="fas fa-exchange-alt"></i></div>
+                            <div class="step-content"><h3>3. Start Swapping</h3><p class="mb-0">Connect via live chat, exchange knowledge, and grow together.</p></div>
+                        </div>
+                    </div>
+                </div>
                 
-                <div style="margin-top: 20px; text-align: center; background: var(--bg-input); padding: 25px; border-radius: 12px; border: 1px dashed var(--primary-color);">
-                    <h3 style="color: var(--primary-color); margin-bottom: 15px; font-size: 16px;"><i class="fas fa-rocket"></i> Ready to start your journey?</h3>
-                    <button class="btn-solid" style="width: auto; padding: 12px 30px; margin-top: 0; display: inline-block;" onclick="switchAuthView('homeView', document.querySelectorAll('.nav-links a')[0]); setTimeout(function(){ showSubForm('registerForm'); }, 50);">Join Skill Hub Now</button>
+                <div class="mt-5 text-center bg-light p-4 rounded-4 border border-primary border-dashed">
+                    <h3 class="text-primary mb-3 fs-5"><i class="fas fa-rocket"></i> Ready to start your journey?</h3>
+                    <button class="btn-solid px-5 py-3" onclick="switchAuthView('homeView', document.querySelectorAll('.nav-links a')[0]); setTimeout(function(){ showSubForm('registerForm'); }, 50);">Join Skill Hub Now</button>
                 </div>
             </div>
             
         </div>
     </div>
 
-    <div id="regCameraModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 99999; flex-direction: column; align-items: center; justify-content: center;">
-        <h3 style="color: white; margin-bottom: 20px; font-size: 24px;">Smile! 😊</h3>
-        <video id="regCameraFeed" autoplay playsinline style="width: 100%; max-width: 320px; border-radius: 50%; aspect-ratio: 1/1; object-fit: cover; border: 4px solid #10b981; background: #000; transform: scaleX(-1);"></video>
-        <div style="display: flex; gap: 20px; margin-top: 30px;">
-            <button type="button" class="btn-submit" onclick="takeRegSnapshot()" style="width: auto; padding: 12px 25px; margin: 0; background: #10b981;"><i class="fas fa-camera"></i> Capture</button>
-            <button type="button" class="btn-submit" onclick="stopRegCamera()" style="width: auto; padding: 12px 25px; margin: 0; background: #ef4444;"><i class="fas fa-times"></i> Cancel</button>
-        </div>
-    </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="config.js?v=7"></script>
     <script src="auth.js?v=7"></script>
 </body>
