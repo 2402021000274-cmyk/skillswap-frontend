@@ -372,7 +372,31 @@ function refreshDynamicData(isLiveUpdate = false) {
 
             let actionBtns = '';
             
-            if(swap.status === 'Requested') { 
+            // 🟢 NEW: 1 HOUR SESSION LOCK LOGIC
+            if(swap.status === 'Active') {
+                let isLocked = false;
+                let lockMessage = "";
+                if (swap.scheduledTime) {
+                    let timePassed = Date.now() - swap.scheduledTime;
+                    let oneHour = 60 * 60 * 1000;
+                    if (timePassed < oneHour) {
+                        isLocked = true;
+                        if (Date.now() < swap.scheduledTime) {
+                            lockMessage = "Starts at " + new Date(swap.scheduledTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        } else {
+                            let minsLeft = Math.ceil((oneHour - timePassed) / 60000);
+                            lockMessage = `Locked (${minsLeft}m left)`;
+                        }
+                    }
+                }
+                
+                if (isLocked) {
+                    actionBtns = `<button class="btn-outline" style="cursor:not-allowed; opacity:0.6; padding: 6px 12px; font-size: 12px; margin: 0; white-space: nowrap;" title="Session must run for 1 full hour."><i class="fas fa-lock"></i> ${lockMessage}</button>`;
+                } else {
+                    actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">End Swap</button>`;
+                }
+            }
+            else if(swap.status === 'Requested') { 
                 actionBtns = `<button class="btn-solid" style="padding: 6px 12px; font-size: 12px; margin: 0;" onclick="openScheduleModal(${idx}, '${swap.partner}', '${swap.skill}')">Accept & Schedule</button>
                               <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Decline</button>`;
             } 
@@ -387,9 +411,6 @@ function refreshDynamicData(isLiveUpdate = false) {
                     actionBtns = `<button class="btn-outline" style="padding: 6px 12px; font-size: 12px; margin: 0; cursor:not-allowed; opacity:0.6; border-color:var(--text-muted); color:var(--text-muted);"><i class="fas fa-hourglass-half"></i> Waiting for OK...</button>
                                   <button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">Cancel</button>`;
                 }
-            }
-            else { 
-                actionBtns = `<button class="btn-cancel" onclick="cancelSwap(${idx}, '${swap.partner}', '${swap.skill}')">End Swap</button>`;
             }
             
             let topicDisplay = swap.topic && swap.topic !== "General (Full Skill)" 
@@ -533,10 +554,9 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
     if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
 
     if(targetIndex !== -1) {
+        // 🟢 REMOVED: `usersDB[targetIndex].credits -= 1;` because credit is already put on HOLD during request!
         if(usersDB[targetIndex].credits === undefined) usersDB[targetIndex].credits = 5;
-        if(usersDB[targetIndex].credits < 1) { alert("The requester doesn't have enough credits anymore."); return; }
 
-        usersDB[targetIndex].credits -= 1; 
         let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
         
         if(partnerSwapIndex !== -1) { 
@@ -651,7 +671,10 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
 
     if(targetIndex === -1) return;
     if(usersDB[meIndex].credits === undefined) usersDB[meIndex].credits = 5;
+    
+    // 🟢 NEW: Credit Hold Logic
     if(usersDB[meIndex].credits < 1) { alert("❌ You don't have enough credits to request a swap!"); return; }
+    usersDB[meIndex].credits -= 1; // Deduct immediately and put on HOLD
 
     usersDB[meIndex].swaps = usersDB[meIndex].swaps || [];
     usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
@@ -673,7 +696,7 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     updateCloudUser(usersDB[meIndex]); 
     updateCloudUser(usersDB[targetIndex]); 
 
-    alert(`✅ Swap Request sent for ${skill} - ${topic}!`);
+    alert(`✅ Swap Request sent for ${skill} - ${topic}!\n🔒 1 Credit has been put on Hold.`);
     switchDashView('view-active-swaps', document.querySelectorAll('.sidebar-menu a')[2]);
 }
 
@@ -727,6 +750,13 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
             usersDB[reqIdx].credits += 1;
             usersDB[reqIdx].notifications = usersDB[reqIdx].notifications || [];
             usersDB[reqIdx].notifications.push({ text: `💰 Swap was not confirmed. 1 Credit refunded!`, isRead: false, id: Date.now() + Math.random() });
+        }
+        // 🟢 NEW: Refund credit if cancelled while on Hold (Pending/Requested)
+        else if (mySwap.status === 'Requested' || mySwap.status === 'Pending') {
+            let reqIdx = mySwap.role === 'Requester' ? meIndex : targetIndex;
+            usersDB[reqIdx].credits += 1;
+            usersDB[reqIdx].notifications = usersDB[reqIdx].notifications || [];
+            usersDB[reqIdx].notifications.push({ text: `💰 Swap request cancelled. 1 Held Credit refunded!`, isRead: false, id: Date.now() + Math.random() });
         }
 
         usersDB[targetIndex].swaps = usersDB[targetIndex].swaps.filter(s => !(s.partnerEmail === usersDB[meIndex].email && s.skill === skill));
