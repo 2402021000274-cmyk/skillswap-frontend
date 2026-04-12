@@ -1,13 +1,4 @@
 /* =========================================
-   BOOTSTRAP 5 OVERRIDES & PROTECTIONS
-   (Taaki Bootstrap custom design ko overwrite na kare)
-   ========================================= */
-a { text-decoration: none !important; }
-p, h1, h2, h3, h4, h5, h6 { margin-bottom: 0; }
-input:focus, button:focus { outline: none !important; box-shadow: none; }
-.badge { display: flex !important; line-height: normal; padding: 0; margin: 0; }
-
-/* =========================================
    PREMIUM SAAS THEME VARIABLES & ALL CSS
    ========================================= */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -95,7 +86,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .input-group { position: relative; margin-bottom: 22px; width: 100%; }
 .input-group i.left-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px; transition: 0.3s; }
 .input-group input { width: 100%; padding: 16px 20px 16px 50px; border: 2px solid var(--border-color); border-radius: 14px; font-size: 15px; outline: none; background: var(--bg-input); font-weight: 600; color: var(--text-main); transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
-.input-group input:focus { border-color: var(--primary-color); background: var(--bg-input); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02) !important; }
+.input-group input:focus { border-color: var(--primary-color); background: var(--bg-input); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02); }
 .input-group input:focus + i.left-icon, .input-group input:focus ~ i.left-icon { color: var(--primary-color); }
 .input-group input[readonly] { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 .input-group .eye-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 18px; }
@@ -104,7 +95,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 /* Premium Buttons */
 .btn-submit { width: 100%; padding: 16px; background: var(--primary-gradient); border: none; border-radius: 14px; color: white; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 15px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); position: relative; overflow: hidden; z-index: 1;}
 .btn-submit::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); opacity: 0; transition: opacity 0.3s ease; z-index: -1; }
-.btn-submit:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow); color: white;}
+.btn-submit:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow); }
 .btn-submit:hover::before { opacity: 1; }
 
 .toggle-text { margin-top: 30px; text-align: center; font-size: 15px; color: var(--text-muted); font-weight: 500;}
@@ -121,7 +112,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .profile-pic-container { width: 130px; height: 130px; border-radius: 50%; background: var(--bg-input); border: 4px solid var(--primary-color); overflow: hidden; position: relative; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: var(--shadow-glow); padding: 4px;}
 .profile-pic-container:hover { transform: scale(1.08) rotate(5deg); }
 .profile-pic-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-.add-photo-btn { margin-top: 15px; color: var(--primary-color); font-weight: 800; font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; background: var(--primary-light); padding: 8px 16px; border-radius: 20px; border: none;}
+.add-photo-btn { margin-top: 15px; color: var(--primary-color); font-weight: 800; font-size: 15px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; background: var(--primary-light); padding: 8px 16px; border-radius: 20px; }
 .add-photo-btn:hover { background: var(--primary-color); color: #fff; }
 
 /* Skills Tags */
@@ -163,13 +154,13 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .search-bar { position: relative; width: 400px; }
 .search-bar i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; transition: 0.3s;}
 .search-bar input { width: 100%; padding: 14px 20px 14px 50px; border: 2px solid var(--border-color); border-radius: 20px; font-size: 15px; font-weight: 600; outline: none; background: var(--bg-input); color: var(--text-main); transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
-.search-bar input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light) !important; }
+.search-bar input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light); }
 .search-bar input:focus + i { color: var(--primary-color); }
 
 .header-actions { display: flex; align-items: center; gap: 25px; }
 .icon-btn { font-size: 22px; color: var(--text-muted); cursor: pointer; position: relative; transition: 0.3s; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg-input); border: 1px solid var(--border-color); }
 .icon-btn:hover { color: var(--primary-color); border-color: var(--primary-color); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-.icon-btn .badge { position: absolute !important; top: -2px !important; right: -2px !important; background: #ef4444; color: white; font-size: 11px; font-weight: 800; width: 18px; height: 18px; display: flex !important; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid var(--bg-card); display: none;} 
+.icon-btn .badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 11px; font-weight: 800; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid var(--bg-card); display: none;} 
 
 .user-profile-mini { display: flex; align-items: center; gap: 15px; cursor: pointer; padding: 6px 20px; border-left: 2px solid var(--border-color); transition: 0.3s; }
 .user-profile-mini:hover { transform: translateX(-3px); }
@@ -224,7 +215,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .btn-outline { flex: 1; padding: 12px; background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color); border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 14px;}
 .btn-outline:hover { background: var(--primary-color); color: #fff; box-shadow: var(--shadow-glow); transform: translateY(-2px);}
 .btn-solid { flex: 1; padding: 12px; background: var(--primary-gradient); border: none; color: #fff; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.3s; font-size: 14px; box-shadow: 0 4px 15px rgba(99,102,241,0.3);}
-.btn-solid:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); color: white;}
+.btn-solid:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
 
 /* List Items (Swaps) */
 .list-item { background: var(--bg-input); padding: 20px 25px; border-radius: 16px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: all 0.3s ease; box-shadow: var(--shadow-sm);}
@@ -252,7 +243,7 @@ body { height: 100vh; width: 100%; background: var(--bg-main); color: var(--text
 .chat-bubble.received { align-self: flex-start; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-bottom-left-radius: 4px; }
 .chat-input-area { padding: 20px 25px; border-top: 1px solid var(--border-color); display: flex; gap: 15px; background: var(--bg-card); align-items: center;}
 .chat-input-area input { flex: 1; padding: 16px 25px; border: 2px solid var(--border-color); border-radius: 30px; outline: none; background: var(--bg-input); color: var(--text-main); font-size: 15px; font-weight: 600; transition: 0.3s;}
-.chat-input-area input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light) !important; }
+.chat-input-area input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light); }
 .chat-input-area button { background: var(--primary-gradient); color: #fff; border: none; width: 55px; height: 55px; border-radius: 50%; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 15px rgba(99,102,241,0.3);}
 .chat-input-area button:hover { transform: scale(1.1) rotate(-10deg); box-shadow: var(--shadow-glow); }
 
@@ -455,7 +446,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 /* 🟢 NEW: Calendar Input Styling */
 .schedule-inputs { display: flex; gap: 15px; margin-bottom: 20px; }
 .schedule-inputs input { flex: 1; padding: 14px 15px; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-input); color: var(--text-main); font-weight: 600; outline: none; font-size: 15px; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
-.schedule-inputs input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02) !important; }
+.schedule-inputs input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02); }
 
 /* 🟢 NEW: Mobile App Style Slide-Up Modal Animation */
 @keyframes slideUpApp { 
