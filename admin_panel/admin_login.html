@@ -15,14 +15,14 @@
         <h2>Admin Command Center</h2>
         <p>Authorized Personnel Only</p>
 
-        <form id="adminLoginForm">
+        <form id="adminLoginForm" autocomplete="off">
             <div class="input-group">
                 <i class="fas fa-envelope left-icon"></i>
-                <input type="text" id="adminEmail" placeholder="Admin ID / Email" required>
+                <input type="text" id="adminEmail" placeholder="Admin ID / Email" autocomplete="off" required>
             </div>
             <div class="input-group">
                 <i class="fas fa-lock left-icon"></i>
-                <input type="password" id="adminPass" placeholder="Master Password" required>
+                <input type="password" id="adminPass" placeholder="Master Password" autocomplete="new-password" required>
             </div>
             
             <button type="submit" class="btn-admin">Access System</button>
