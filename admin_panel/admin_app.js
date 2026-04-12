@@ -53,6 +53,9 @@ async function fetchAllUsers() {
         // 4. Fetch Maintenance Switch Status
         fetchMaintenanceStatus();
 
+        // 5. 🟢 NEW: Render Live Sessions Table
+        renderSessionsTable();
+
     } catch (err) {
         console.error("Error fetching users:", err);
         document.getElementById('userTableBody').innerHTML = "<tr><td colspan='5' style='color:#ef4444; text-align:center;'><i class='fas fa-exclamation-triangle'></i> Failed to connect to Backend Server. Make sure server is running.</td></tr>";
@@ -123,6 +126,71 @@ function renderNewestUsers() {
     });
 }
 
+// 🟢 NEW: DISPLAY SESSIONS TABLE
+function renderSessionsTable() {
+    const tbody = document.getElementById('sessionsTableBody');
+    if(!tbody) return;
+    tbody.innerHTML = "";
+    
+    let hasSessions = false;
+
+    allUsers.forEach((user) => {
+        if(user.swaps) {
+            user.swaps.forEach(swap => {
+                // To avoid duplicate rows, we only render from the Provider's perspective
+                if(swap.role === 'Provider' && (swap.status === 'Active' || swap.status === 'Pending Confirmation' || swap.status === 'Requested')) {
+                    hasSessions = true;
+                    let scheduleText = swap.scheduledTime ? new Date(swap.scheduledTime).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) : "<span style='color:#ef4444'>Not Scheduled</span>";
+                    
+                    let actionBtn = "";
+                    if(swap.status === 'Active') {
+                        actionBtn = `<button class="action-btn del-btn" style="background:#ef4444; color:white; border:none;" onclick="forceEndSession('${user.email}', '${swap.partnerEmail}', '${swap.skill}', '${swap.topic || ''}')"><i class="fas fa-power-off"></i> Force End</button>`;
+                    } else {
+                        actionBtn = `<span style="color:var(--text-muted); font-size:12px;">Waiting...</span>`;
+                    }
+                    
+                    tbody.innerHTML += `
+                        <tr class="user-row">
+                            <td><span style="font-weight: 800; color: #fff;">${swap.skill}</span><br><small style="color: var(--primary-color);">${swap.topic || 'General'}</small></td>
+                            <td>${user.name}<br><small style="color: var(--text-muted);">${user.email}</small></td>
+                            <td>${swap.partner}<br><small style="color: var(--text-muted);">${swap.partnerEmail}</small></td>
+                            <td style="color: #10b981; font-weight:600;">${scheduleText}</td>
+                            <td><span class="badge-role" style="${swap.status === 'Active' ? 'background:rgba(16,185,129,0.2); color:#10b981;' : 'background:rgba(245,158,11,0.2); color:#f59e0b;'}">${swap.status}</span></td>
+                            <td>${actionBtn}</td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+    });
+
+    if(!hasSessions) {
+        tbody.innerHTML = "<tr><td colspan='6' style='text-align: center; color: var(--text-muted); padding:30px;'>No live or scheduled sessions available.</td></tr>";
+    }
+}
+
+// 🟢 NEW: ADMIN FORCE END SESSION
+async function forceEndSession(providerEmail, requesterEmail, skill, topic) {
+    if(confirm(`🚨 ADMIN OVERRIDE 🚨\nAre you sure you want to FORCE END this session? The Mentor will receive 1 credit and the session will be closed for both users.`)) {
+        try {
+            const res = await fetch(API_BASE_URL + '/admin/force-end-swap', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '69420' },
+                body: JSON.stringify({ providerEmail, requesterEmail, skill, topic })
+            });
+            if(res.ok) {
+                alert("✅ Session forcefully ended and credits transferred!");
+                fetchAllUsers();
+            } else {
+                alert("❌ Failed to end session.");
+            }
+        } catch(e) {
+            alert("❌ Connection Error.");
+        }
+    }
+}
+
+
 // 🟢 SEARCH FUNCTION (Local filtering for table)
 function filterAdminTable() {
     let input = document.getElementById("adminSearch").value.toLowerCase();
@@ -181,7 +249,7 @@ async function deleteUser(email, name) {
     }
 }
 
-// 🟢 NEW: REAL MAINTENANCE MODE LOGIC
+// 🟢 REAL MAINTENANCE MODE LOGIC
 async function toggleMaintenance() {
     let isChecked = document.getElementById('maintenanceToggle').checked;
     try {
