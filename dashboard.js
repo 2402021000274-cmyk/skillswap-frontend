@@ -54,6 +54,7 @@ if(socket) {
         }
     });
 
+    // 🟢 VISITOR UPDATE LISTENER
     socket.on('visitor-update', (count) => {
         const visitorEl = document.getElementById('statVisitors');
         if(visitorEl) visitorEl.innerText = count;
@@ -71,7 +72,7 @@ if(socket) {
         syncWithDatabase(); 
     });
 
-    // 🟢 NEW: MAINTENANCE MODE LISTENER
+    // 🟢 MAINTENANCE MODE LISTENER
     socket.on('maintenance-mode', (isActive) => {
         if(isActive) {
             alert("🚧 Emergency: The Admin has put the system under Maintenance Mode. You will be logged out safely.");
@@ -127,7 +128,7 @@ if(socket) {
 
     // 🟢 SOCKET: AUTO/MANUAL SYNC PAGE (UPDATED FOR BOTH WAYS)
     socket.on('sync-note-page', (data) => {
-        if(currentNotePage !== data.pageIndex) { // Check to stop infinite loop
+        if(currentNotePage !== data.pageIndex) { 
             currentNotePage = data.pageIndex;
             document.getElementById('smartNotesPanel').style.display = 'flex';
             renderNotePage();
