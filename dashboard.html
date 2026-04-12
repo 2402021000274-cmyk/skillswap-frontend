@@ -48,7 +48,7 @@
             <div class="dashboard-header">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="globalSearchInput" placeholder="Search skills, users, or topics..." oninput="handleGlobalSearch(this.value)">
+                    <input type="text" id="globalSearchInput" placeholder="Search skills, users, or topics..." autocomplete="off" oninput="handleGlobalSearch(this.value)">
                 </div>
                 
                 <div class="header-actions">
@@ -108,7 +108,7 @@
                         </div>
 
                         <div style="display: flex; gap: 10px;">
-                            <input type="text" id="aiUserInput" placeholder="Type your problem here..." style="flex: 1; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); outline: none; font-size: 14px;" onkeydown="if(event.key === 'Enter') sendAIMessage()">
+                            <input type="text" id="aiUserInput" placeholder="Type your problem here..." autocomplete="off" style="flex: 1; padding: 12px 15px; border-radius: 10px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); outline: none; font-size: 14px;" onkeydown="if(event.key === 'Enter') sendAIMessage()">
                             <button onclick="sendAIMessage()" class="btn-solid" style="width: auto; padding: 0 20px; margin: 0; border-radius: 10px;"><i class="fas fa-paper-plane"></i></button>
                         </div>
 
@@ -154,7 +154,7 @@
                                 <div style="text-align:center; color:var(--text-muted); margin:auto;">Select a user to start messaging</div>
                             </div>
                             <div class="chat-input-area" id="chatInputArea" style="display:none;">
-                                <input type="text" id="chatMessageInput" placeholder="Type a message..." onkeydown="if(event.key === 'Enter') sendLiveMessage()">
+                                <input type="text" id="chatMessageInput" placeholder="Type a message..." autocomplete="off" onkeydown="if(event.key === 'Enter') sendLiveMessage()">
                                 <button onclick="sendLiveMessage()"><i class="fas fa-paper-plane"></i></button>
                             </div>
                         </div>
@@ -169,7 +169,7 @@
                 <div id="view-profile" class="view-section">
                     <div class="dashboard-title-row"><h2>Manage Profile</h2></div>
                     <div class="chart-section" style="max-width: 700px;">
-                        <form onsubmit="handleProfileUpdate(event)">
+                        <form onsubmit="handleProfileUpdate(event)" autocomplete="off">
                             <div class="profile-pic-wrapper">
                                 <div class="profile-pic-container" onclick="document.getElementById('editProfileInput').click()">
                                     <img id="editProfilePreview" src="" alt="Profile">
@@ -181,14 +181,14 @@
                                 </div>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-user left-icon"></i><input type="text" id="editName" required></div>
-                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-envelope left-icon"></i><input type="email" id="editEmail" required></div>
-                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-phone left-icon"></i><input type="tel" id="editPhone" required></div>
-                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="editAddress" required></div>
+                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-user left-icon"></i><input type="text" id="editName" autocomplete="off" required></div>
+                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-envelope left-icon"></i><input type="email" id="editEmail" autocomplete="off" required></div>
+                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-phone left-icon"></i><input type="tel" id="editPhone" autocomplete="off" required></div>
+                                <div class="input-group" style="margin-bottom: 0;"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="editAddress" autocomplete="off" required></div>
                             </div>
                             <div class="input-group" style="margin-top: 20px;">
                                 <i class="fas fa-laptop-code left-icon"></i>
-                                <input type="text" id="editSkillInput" placeholder="Add a new skill & Press Enter">
+                                <input type="text" id="editSkillInput" placeholder="Add a new skill & Press Enter" autocomplete="off">
                             </div>
                             <div id="editSkillsList" class="skills-list"></div>
                             <button type="submit" class="btn-submit" style="width: auto; padding: 12px 30px;">Update Profile</button>
@@ -233,10 +233,10 @@
                                 
                                 <div id="passwordChangeForm" class="hidden" style="margin-top: 20px; background: var(--bg-input); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
                                     <div class="input-group" style="margin-bottom: 15px;">
-                                        <i class="fas fa-key left-icon"></i><input type="text" id="passChangeOTP" placeholder="Enter 6-digit OTP sent to Email">
+                                        <i class="fas fa-key left-icon"></i><input type="text" id="passChangeOTP" placeholder="Enter 6-digit OTP sent to Email" autocomplete="off">
                                     </div>
                                     <div class="input-group" style="margin-bottom: 15px;">
-                                        <i class="fas fa-lock left-icon"></i><input type="password" id="newPassInput" placeholder="Enter New Password">
+                                        <i class="fas fa-lock left-icon"></i><input type="password" id="newPassInput" placeholder="Enter New Password" autocomplete="new-password">
                                         <i class="fas fa-eye eye-icon" onclick="togglePass('newPassInput', this)"></i>
                                     </div>
                                     <button class="btn-submit" style="padding: 10px; font-size: 14px; margin-top: 0;" onclick="verifyAndChangePassword()">Update Password</button>
