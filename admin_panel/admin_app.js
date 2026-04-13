@@ -13,6 +13,19 @@ function adminLogout() {
 
 let allUsers = [];
 
+// 🟢 NEW: Tab Switching Logic
+function switchAdminView(viewId, element) {
+    document.querySelectorAll('.admin-view').forEach(view => {
+        view.style.display = 'none';
+    });
+    document.getElementById(viewId).style.display = 'block';
+
+    document.querySelectorAll('.sidebar-menu a').forEach(link => {
+        link.classList.remove('active');
+    });
+    if(element) element.classList.add('active');
+}
+
 // 🟢 Fetch initial status of the toggle
 async function fetchMaintenanceStatus() {
     try {
@@ -53,7 +66,7 @@ async function fetchAllUsers() {
         // 4. Fetch Maintenance Switch Status
         fetchMaintenanceStatus();
 
-        // 5. 🟢 NEW: Render Live Sessions Table
+        // 5. Render Live Sessions Table
         renderSessionsTable();
 
     } catch (err) {
@@ -126,7 +139,7 @@ function renderNewestUsers() {
     });
 }
 
-// 🟢 NEW: DISPLAY SESSIONS TABLE
+// 🟢 DISPLAY SESSIONS TABLE
 function renderSessionsTable() {
     const tbody = document.getElementById('sessionsTableBody');
     if(!tbody) return;
@@ -169,7 +182,7 @@ function renderSessionsTable() {
     }
 }
 
-// 🟢 NEW: ADMIN FORCE END SESSION
+// 🟢 ADMIN FORCE END SESSION
 async function forceEndSession(providerEmail, requesterEmail, skill, topic) {
     if(confirm(`🚨 ADMIN OVERRIDE 🚨\nAre you sure you want to FORCE END this session? The Mentor will receive 1 credit and the session will be closed for both users.`)) {
         try {
@@ -180,7 +193,7 @@ async function forceEndSession(providerEmail, requesterEmail, skill, topic) {
             });
             if(res.ok) {
                 alert("✅ Session forcefully ended and credits transferred!");
-                fetchAllUsers();
+                fetchAllUsers(); // Table turant refresh ho jayegi
             } else {
                 alert("❌ Failed to end session.");
             }
@@ -189,7 +202,6 @@ async function forceEndSession(providerEmail, requesterEmail, skill, topic) {
         }
     }
 }
-
 
 // 🟢 SEARCH FUNCTION (Local filtering for table)
 function filterAdminTable() {
