@@ -18,7 +18,8 @@
             
             <div class="menu-label">Main Menu</div>
             <ul class="sidebar-menu">
-                <li><a class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a onclick="switchAdminView('view-dashboard', this)" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a onclick="switchAdminView('view-sessions', this)"><i class="fas fa-video"></i> Live Sessions</a></li>
                 <li><a onclick="alert('User Analytics coming soon!')"><i class="fas fa-chart-line"></i> Analytics</a></li>
                 <li><a onclick="alert('Platform Settings coming soon!')"><i class="fas fa-cog"></i> Settings</a></li>
             </ul>
@@ -50,128 +51,133 @@
                 </div>
             </div>
 
-            <div class="welcome-banner">
-                <div>
-                    <h2>Welcome back, Admin! 👋</h2>
-                    <p>Here is what's happening on your platform today.</p>
-                </div>
-                <div class="maintenance-control" style="background: rgba(0,0,0,0.2); border: none; margin: 0; padding: 10px 20px;">
-                    <div style="margin-right: 15px;">
-                        <h4 style="color: #fff; font-size: 14px;">Maintenance Mode</h4>
-                        <p style="color: rgba(255,255,255,0.6); font-size: 11px;">Lock site for updates</p>
+            <div id="view-dashboard" class="admin-view" style="display: block;">
+                <div class="welcome-banner">
+                    <div>
+                        <h2>Welcome back, Admin! 👋</h2>
+                        <p>Here is what's happening on your platform today.</p>
                     </div>
-                    <label class="switch">
-                        <input type="checkbox" id="maintenanceToggle" onchange="toggleMaintenance()">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3><i class="fas fa-users"></i> Total Users</h3>
-                    <div class="value" id="totalUsersCount">0</div>
-                    <div class="change up"><i class="fas fa-arrow-up"></i> Live Count</div>
-                </div>
-                <div class="stat-card">
-                    <h3><i class="fas fa-sync-alt"></i> Active Swaps</h3>
-                    <div class="value" id="totalSwapsCount">0</div>
-                    <div class="change up"><i class="fas fa-arrow-up"></i> Live Count</div>
-                </div>
-                <div class="stat-card">
-                    <h3><i class="fas fa-coins"></i> Total Credits Issued</h3>
-                    <div class="value" id="totalCreditsCount">0</div>
-                    <div class="change up"><i class="fas fa-arrow-up"></i> Economy</div>
-                </div>
-                <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.4);">
-                    <h3><i class="fas fa-server" style="color: #10b981;"></i> Server Status</h3>
-                    <div class="value" style="color: #10b981; font-size: 28px; margin-top: 10px;">Online</div>
-                    <div class="change" style="color: var(--text-muted);">Latency: 24ms</div>
-                </div>
-            </div>
-
-            <div class="dashboard-grid">
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-bolt" style="color: #eab308;"></i> Recent Activity (System Logs)</h2>
+                    <div class="maintenance-control" style="background: rgba(0,0,0,0.2); border: none; margin: 0; padding: 10px 20px;">
+                        <div style="margin-right: 15px;">
+                            <h4 style="color: #fff; font-size: 14px;">Maintenance Mode</h4>
+                            <p style="color: rgba(255,255,255,0.6); font-size: 11px;">Lock site for updates</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="maintenanceToggle" onchange="toggleMaintenance()">
+                            <span class="slider"></span>
+                        </label>
                     </div>
-                    <div class="activity-feed">
-                        <div class="activity-item admin-act">
-                            <div class="activity-icon"><i class="fas fa-user-shield"></i></div>
-                            <div class="activity-details">
-                                <p>Admin logged into the system</p>
-                                <span>Just now</span>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3><i class="fas fa-users"></i> Total Users</h3>
+                        <div class="value" id="totalUsersCount">0</div>
+                        <div class="change up"><i class="fas fa-arrow-up"></i> Live Count</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-sync-alt"></i> Active Swaps</h3>
+                        <div class="value" id="totalSwapsCount">0</div>
+                        <div class="change up"><i class="fas fa-arrow-up"></i> Live Count</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-coins"></i> Total Credits Issued</h3>
+                        <div class="value" id="totalCreditsCount">0</div>
+                        <div class="change up"><i class="fas fa-arrow-up"></i> Economy</div>
+                    </div>
+                    <div class="stat-card" style="border-color: rgba(16, 185, 129, 0.4);">
+                        <h3><i class="fas fa-server" style="color: #10b981;"></i> Server Status</h3>
+                        <div class="value" style="color: #10b981; font-size: 28px; margin-top: 10px;">Online</div>
+                        <div class="change" style="color: var(--text-muted);">Latency: 24ms</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-bolt" style="color: #eab308;"></i> Recent Activity (System Logs)</h2>
+                        </div>
+                        <div class="activity-feed">
+                            <div class="activity-item admin-act">
+                                <div class="activity-icon"><i class="fas fa-user-shield"></i></div>
+                                <div class="activity-details">
+                                    <p>Admin logged into the system</p>
+                                    <span>Just now</span>
+                                </div>
+                            </div>
+                            <div class="activity-item swap-act">
+                                <div class="activity-icon"><i class="fas fa-handshake"></i></div>
+                                <div class="activity-details">
+                                    <p>Database sync completed successfully</p>
+                                    <span>2 mins ago</span>
+                                </div>
+                            </div>
+                            <div class="activity-item user-reg">
+                                <div class="activity-icon"><i class="fas fa-user-check"></i></div>
+                                <div class="activity-details">
+                                    <p>Real-time socket connection established</p>
+                                    <span>5 mins ago</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="activity-item swap-act">
-                            <div class="activity-icon"><i class="fas fa-handshake"></i></div>
-                            <div class="activity-details">
-                                <p>Database sync completed successfully</p>
-                                <span>2 mins ago</span>
-                            </div>
+                    </div>
+
+                    <div class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-user-plus" style="color: var(--primary-color);"></i> Newest Users</h2>
                         </div>
-                        <div class="activity-item user-reg">
-                            <div class="activity-icon"><i class="fas fa-user-check"></i></div>
-                            <div class="activity-details">
-                                <p>Real-time socket connection established</p>
-                                <span>5 mins ago</span>
-                            </div>
+                        <div class="new-users-list" id="newUsersList">
+                            <div style="text-align: center; color: var(--text-muted); padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
                         </div>
                     </div>
                 </div>
 
-                <div class="content-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-user-plus" style="color: var(--primary-color);"></i> Newest Users</h2>
+                <div class="user-database-section">
+                    <div class="table-controls">
+                        <h2 style="font-size: 20px; font-weight: 800; color: #fff;">User Database Directory</h2>
+                        <button onclick="fetchAllUsers()" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;"><i class="fas fa-redo-alt"></i> Refresh Data</button>
                     </div>
-                    <div class="new-users-list" id="newUsersList">
-                        <div style="text-align: center; color: var(--text-muted); padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
-                    </div>
+                    
+                    <table id="adminUserTable">
+                        <thead>
+                            <tr>
+                                <th>User Profile</th>
+                                <th>Email Address</th>
+                                <th>Account Type</th>
+                                <th>Credits</th>
+                                <th>Admin Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching Live Data from Server...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="user-database-section">
-                <div class="table-controls">
-                    <h2 style="font-size: 20px; font-weight: 800; color: #fff;">User Database Directory</h2>
-                    <button onclick="fetchAllUsers()" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;"><i class="fas fa-redo-alt"></i> Refresh Data</button>
+            <div id="view-sessions" class="admin-view" style="display: none;">
+                <div class="user-database-section">
+                    <div class="table-controls">
+                        <h2 style="font-size: 20px; font-weight: 800; color: #fff;"><i class="fas fa-video"></i> Live & Scheduled Sessions</h2>
+                        <button onclick="fetchAllUsers()" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;"><i class="fas fa-redo-alt"></i> Refresh</button>
+                    </div>
+                    
+                    <table id="adminSessionsTable">
+                        <thead>
+                            <tr>
+                                <th>Skill & Topic</th>
+                                <th>Mentor (Provider)</th>
+                                <th>Learner (Requester)</th>
+                                <th>Scheduled Time</th>
+                                <th>Status</th>
+                                <th>Admin Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessionsTableBody">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching Sessions...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
-                
-                <table id="adminUserTable">
-                    <thead>
-                        <tr>
-                            <th>User Profile</th>
-                            <th>Email Address</th>
-                            <th>Account Type</th>
-                            <th>Credits</th>
-                            <th>Admin Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody">
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching Live Data from Server...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="user-database-section" style="margin-top: 30px;">
-                <div class="table-controls">
-                    <h2 style="font-size: 20px; font-weight: 800; color: #fff;"><i class="fas fa-video"></i> Live & Scheduled Sessions</h2>
-                </div>
-                
-                <table id="adminUserTable">
-                    <thead>
-                        <tr>
-                            <th>Skill & Topic</th>
-                            <th>Mentor (Provider)</th>
-                            <th>Learner (Requester)</th>
-                            <th>Scheduled Time</th>
-                            <th>Status</th>
-                            <th>Admin Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sessionsTableBody">
-                        <tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;"><i class="fas fa-spinner fa-spin"></i> Fetching Sessions...</td></tr>
-                    </tbody>
-                </table>
             </div>
 
         </div>
