@@ -6,8 +6,8 @@ document.getElementById('adminLoginForm').addEventListener('submit', function(e)
     const errorBox = document.getElementById('loginError');
 
     // 🟢 ADMIN MASTER CREDENTIALS
-    const ADMIN_ID = "admin@skillhub.com";
-    const ADMIN_PASS = "Admin@123";
+    const ADMIN_ID = "jainamgoswami2209";
+    const ADMIN_PASS = "jainamgoswami";
 
     if (email === ADMIN_ID && pass === ADMIN_PASS) {
         // Success State
