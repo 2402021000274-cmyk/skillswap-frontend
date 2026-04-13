@@ -3,202 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill Hub - Login</title>
+    <title>Skill Hub - Exchange Knowledge</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="authWrapper">
-        <nav class="navbar">
-            <a href="#" class="logo" style="background: transparent; padding: 0; box-shadow: none;">
-                <img src="logo.jpeg" alt="Skill Hub" style="height: 115px; width: auto; object-fit: contain; background: rgba(255, 255, 255, 0.95); padding: 5px 15px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: block;">
+    <div id="landingPage">
+        
+        <nav class="saas-navbar">
+            <a href="#" class="logo" style="display: flex; align-items: center;">
+                <img src="logo.jpeg" alt="Skill Hub" style="height: 60px; width: auto; object-fit: contain; transition: 0.3s; mix-blend-mode: multiply;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             </a>
-            <ul class="nav-links">
-                <li><a onclick="switchAuthView('homeView', this)" class="auth-nav-link active">Home</a></li>
-                <li><a onclick="switchAuthView('aboutView', this)" class="auth-nav-link">About Us</a></li>
-                <li><a onclick="switchAuthView('howItWorksView', this)" class="auth-nav-link">How it Works</a></li>
+            <ul class="saas-nav-links">
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How it Works</a></li>
             </ul>
+            <div class="saas-nav-buttons">
+                <button class="nav-btn-outline" onclick="openAuth('loginForm')">Login</button>
+                <button class="nav-btn-solid" onclick="openAuth('registerForm')">Register</button>
+            </div>
         </nav>
 
-        <div class="left-section">
-            <div class="overlay"></div>
-            <div class="content-box">
-                <h1>Learn New Skills.<br>Share Your Passion.</h1>
-                <p>Join the world's best community for skill exchange. Connect, collaborate, and grow together.</p>
-            </div>
-        </div>
-
-        <div class="right-section">
-            <div class="top-scroll-mask"></div>
-            <div id="messageBox" class="message-box" style="padding: 10px; margin: 0 auto 10px; max-width: 480px;"></div>
-
-            <div id="homeView" class="auth-view active">
-                <div id="loginForm">
-                    <h2 class="form-title">Welcome Back</h2>
-                    <p class="form-subtitle">Enter your details to access your account.</p>
-                    <form onsubmit="handleLogin(event)" autocomplete="off">
-                        <div class="input-group">
-                            <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" autocomplete="off" required>
-                        </div>
-                        <div class="input-group" style="margin-bottom: 5px;">
-                            <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('loginPass', this)"></i>
-                        </div>
-                        <div style="text-align: right; margin-bottom: 20px;">
-                            <span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span>
-                        </div>
-                        <button type="submit" class="btn-submit" style="margin-top: 0;">Login</button>
-                    </form>
-                    <div class="toggle-text">Don't have an account? <span onclick="showSubForm('registerForm')">Register Now</span></div>
-                </div>
-
-                <div id="forgotPasswordForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Reset Password</h2>
-                    <p class="form-subtitle">Enter your registered email to receive an OTP.</p>
-                    <form onsubmit="handleSendForgotOTP(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" autocomplete="off" required></div>
-                        <button type="submit" class="btn-submit">Send OTP</button>
-                    </form>
-                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
-                </div>
-
-                <div id="verifyForgotOTPForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Set New Password</h2>
-                    <form onsubmit="handleResetPassword(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
-                        <div class="input-group">
-                            <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('forgotNewPassInput', this)"></i>
-                        </div>
-                        <button type="submit" class="btn-submit">Reset Password</button>
-                    </form>
-                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Cancel</span></div>
-                </div>
-
-                <div id="otpForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Two-Factor Auth</h2>
-                    <form onsubmit="handleVerifyOTP(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
-                        <button type="submit" class="btn-submit">Verify & Login</button>
-                    </form>
-                    <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
-                </div>
-
-                <div id="registerForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Create Account</h2>
-                    <form onsubmit="handleRegister(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" autocomplete="off" required></div>
-                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" autocomplete="off" required></div>
-                        <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" autocomplete="off" required></div>
-                        
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: var(--bg-input); border-radius: 12px; color: var(--text-muted);">
-                            <span style="font-size: 14px; font-weight: 500;"><i class="fas fa-venus-mars" style="margin-right: 10px;"></i>Gender:</span>
-                            <div style="display: flex; gap: 15px;">
-                                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
-                                    <input type="radio" name="regGender" value="Male" required style="accent-color: var(--primary-color);"> Male
-                                </label>
-                                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
-                                    <input type="radio" name="regGender" value="Female" style="accent-color: var(--primary-color);"> Female
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <i class="fas fa-lock left-icon"></i>
-                            <input type="password" id="regPass" placeholder="Create Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('regPass', this)"></i>
-                        </div>
-                        <div class="input-group">
-                            <i class="fas fa-lock left-icon"></i>
-                            <input type="password" id="regConfirmPass" placeholder="Confirm Password" autocomplete="new-password" required>
-                            <i class="fas fa-eye eye-icon" onclick="togglePass('regConfirmPass', this)"></i>
-                        </div>
-
-                        <button type="submit" class="btn-submit">Verify Email</button>
-                    </form>
-                    <div class="toggle-text">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
-                </div>
-
-                <div id="regOtpForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Verify Email</h2>
-                    <form onsubmit="handleVerifyRegOTP(event)" autocomplete="off">
-                        <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
-                        <button type="submit" class="btn-submit">Verify OTP</button>
-                    </form>
-                    <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
-                </div>
-
-                <div id="profileSetupForm" class="hidden" style="width: 100%;">
-                    <h2 class="form-title">Complete Profile</h2>
-                    <form onsubmit="handleProfileSave(event)" autocomplete="off">
-                        <div class="profile-pic-wrapper">
-                            <div class="profile-pic-container" onclick="document.getElementById('profileInput').click()">
-                                <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile">
-                            </div>
-                            <input type="file" id="profileInput" accept="image/*" onchange="previewImage(event, 'profilePreview')" style="display:none;">
-                            <div style="display: flex; gap: 20px; margin-top: 15px; width: 100%; justify-content: center;">
-                                <div class="add-photo-btn" onclick="document.getElementById('profileInput').click()" style="margin-top: 0;"><i class="fas fa-image"></i> Upload File</div>
-                                <div class="add-photo-btn" onclick="startRegCamera()" style="margin-top: 0; color: #10b981;"><i class="fas fa-camera"></i> Live Camera</div>
-                            </div>
-                        </div>
-
-                        <div class="role-selection">
-                            <label class="role-box active" onclick="selectRole('teach')">
-                                <input type="radio" name="userRole" value="teach" checked style="display:none;">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                                <span>Teach & Learn</span>
-                            </label>
-                            <label class="role-box" onclick="selectRole('learn')">
-                                <input type="radio" name="userRole" value="learn" style="display:none;">
-                                <i class="fas fa-book-reader"></i>
-                                <span>Only Learner</span>
-                            </label>
-                        </div>
-
-                        <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="profName" readonly></div>
-                        <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="profEmail" readonly></div>
-                        <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" autocomplete="off" required></div>
-                        
-                        <div id="skillInputContainer">
-                            <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter" autocomplete="off"></div>
-                            <div id="skillsList" class="skills-list"></div>
-                        </div>
-
-                        <button type="submit" class="btn-submit">Save Profile & Login</button>
-                    </form>
+        <header id="hero" class="hero-section">
+            <div class="hero-content">
+                <h1>Master New Skills.<br><span style="color: var(--primary-color);">Exchange Knowledge.</span></h1>
+                <p>Join the world's best time-banking community. Connect with experts, teach what you know, and learn what you love—all for free.</p>
+                <div class="hero-actions">
+                    <button class="btn-solid hero-btn" onclick="openAuth('registerForm')">Get Started Free</button>
+                    <a href="#how-it-works" class="btn-outline hero-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">See How It Works</a>
                 </div>
             </div>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop" alt="Students Collaborating">
+            </div>
+        </header>
 
-            <div id="aboutView" class="auth-view" style="justify-content: flex-start; padding-top: 40px; max-width: 1000px; padding-left: 20px; padding-right: 20px;">
-                <h2 class="info-header" style="text-align: center; margin-bottom: 30px;">About Skill Hub</h2>
+        <section id="about" class="landing-section">
+            <h2 class="section-title">About Skill Hub</h2>
+            <p class="section-subtitle">Discover the vision and community driving our platform.</p>
+            
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 60px;">
+                <div class="about-card" style="flex: 1; min-width: 250px;">
+                    <i class="fas fa-globe"></i>
+                    <h3>Our Vision</h3>
+                    <p>Skill Hub is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
+                </div>
                 
-                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 50px;">
-                    <div class="about-card" style="flex: 1; min-width: 250px;">
-                        <i class="fas fa-globe"></i>
-                        <h3>Our Vision</h3>
-                        <p>Skill Hub is built on a simple idea: everyone has something to learn, and everyone has something to teach. We aim to create a global economy of knowledge exchange.</p>
-                    </div>
-                    
-                    <div class="about-card" style="flex: 1; min-width: 250px;">
-                        <i class="fas fa-users"></i>
-                        <h3>Community Driven</h3>
-                        <p>Whether you are a professional developer, a language enthusiast, or a beginner looking for guidance, our platform connects you with the right mentor without any money involved.</p>
-                    </div>
-
-                    <div class="about-card" style="flex: 1; min-width: 250px;">
-                        <i class="fas fa-coins"></i>
-                        <h3>Time-Banking System</h3>
-                        <p>We use a unique Credit System. Earn credits by teaching your skills to others, and spend those credits to learn new skills from experts. It's a fair, time-for-time trade.</p>
-                    </div>
+                <div class="about-card" style="flex: 1; min-width: 250px;">
+                    <i class="fas fa-users"></i>
+                    <h3>Community Driven</h3>
+                    <p>Whether you are a professional developer, a language enthusiast, or a beginner looking for guidance, our platform connects you with the right mentor without any money involved.</p>
                 </div>
 
-                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">Why Choose Skill Hub?</h2>
-                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px; font-weight: 500;">Explore the detailed features and benefits of joining our platform.</p>
+                <div class="about-card" style="flex: 1; min-width: 250px;">
+                    <i class="fas fa-coins"></i>
+                    <h3>Time-Banking System</h3>
+                    <p>We use a unique Credit System. Earn credits by teaching your skills to others, and spend those credits to learn new skills from experts. It's a fair, time-for-time trade.</p>
+                </div>
+            </div>
+
+            <div id="features" style="padding-top: 40px;">
+                <h2 class="section-title">Why Choose Skill Hub?</h2>
+                <p class="section-subtitle">Explore the detailed features and benefits of joining our platform.</p>
 
                 <div class="about-grid">
-                    
                     <div class="about-image-card">
                         <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" alt="Concept">
                         <div class="card-content">
@@ -279,49 +151,234 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div style="margin-top: 60px; padding-top: 40px; border-top: 2px dashed #eee;">
-                    <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">Meet The Creators</h2>
-                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 40px; font-size: 15px; font-weight: 500;">The minds behind Skill Hub.</p>
-                    
-                    <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; text-align: center;">
-                        
-                        <div style="background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 260px; transition: transform 0.3s ease;">
-                            <img src="Shubham.jpeg" alt="Shubham Pareshbhai Suthar" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color, #007bff); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <h3 style="font-size: 17px; color: #333; margin-bottom: 5px; font-family: 'Montserrat', sans-serif;">Shubham Pareshbhai Suthar</h3>
-                            <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">Developer</p>
-                        </div>
-
-                        <div style="background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 260px; transition: transform 0.3s ease;">
-                            <img src="Jainam.jpeg" alt="Jainam Dwarkeshpuri Goswami" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color, #007bff); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <h3 style="font-size: 17px; color: #333; margin-bottom: 5px; font-family: 'Montserrat', sans-serif;">Jainam Dwarkeshpuri Goswami</h3>
-                            <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">Developer</p>
-                        </div>
-
-                        <div style="background: white; padding: 25px 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 260px; transition: transform 0.3s ease;">
-                            <img src="Khushgiri.jpeg" alt="Khushgiri Sanjaygiri Goswami" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color, #007bff); margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                            <h3 style="font-size: 17px; color: #333; margin-bottom: 5px; font-family: 'Montserrat', sans-serif;">Khushgiri Sanjaygiri Goswami</h3>
-                            <p style="font-size: 14px; color: #6b7280; margin: 0; font-weight: 500;">Developer</p>
-                        </div>
-
+            <div class="team-section" style="margin-top: 60px;">
+                <h2 class="section-title">Meet The Creators</h2>
+                <div class="team-container">
+                    <div class="team-member">
+                        <img src="Jainam.jpeg" alt="Jainam Dwarkeshpuri Goswami">
+                        <h3>Jainam Dwarkeshpuri Goswami</h3>
+                        <p>Developer</p>
+                    </div>
+                     <div class="team-member">
+                        <img src="Shubham.jpeg" alt="Shubham Pareshbhai Suthar">
+                        <h3>Shubham Pareshbhai Suthar</h3>
+                        <p>Developer</p>
+			</div>
+                    <div class="team-member">
+                        <img src="khush.jpeg" alt="Khushgiri Sanjaygiri Goswami">
+                        <h3>Khushgiri Sanjaygiri Goswami</h3>
+                        <p>Developer</p>
                     </div>
                 </div>
-                </div>
+            </div>
+        </section>
 
-            <div id="howItWorksView" class="auth-view" style="justify-content: flex-start; padding-top: 40px;">
-                <h2 class="info-header" style="text-align: center; margin-bottom: 10px;">How it Works</h2>
-                <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 15px; font-weight: 500;">Your journey to mastering new skills in 3 simple steps.</p>
-                
+        <section id="how-it-works" class="landing-section" style="background: var(--bg-card);">
+            <h2 class="section-title">How it Works</h2>
+            <p class="section-subtitle">Your journey to mastering new skills in 3 simple steps.</p>
+            
+            <div style="max-width: 800px; margin: 0 auto;">
                 <div class="step-card"><div class="step-icon"><i class="fas fa-user-plus"></i></div><div class="step-content"><h3>1. Create Profile</h3><p>Sign up, choose your role, and list the skills you want to teach or learn.</p></div></div>
                 <div class="step-card"><div class="step-icon"><i class="fas fa-search"></i></div><div class="step-content"><h3>2. Find a Match</h3><p>Discover users around the platform who match your learning interests.</p></div></div>
                 <div class="step-card"><div class="step-icon"><i class="fas fa-exchange-alt"></i></div><div class="step-content"><h3>3. Start Swapping</h3><p>Connect via live chat, exchange knowledge, and grow together.</p></div></div>
-                
-                <div style="margin-top: 20px; text-align: center; background: var(--bg-input); padding: 25px; border-radius: 12px; border: 1px dashed var(--primary-color);">
-                    <h3 style="color: var(--primary-color); margin-bottom: 15px; font-size: 16px;"><i class="fas fa-rocket"></i> Ready to start your journey?</h3>
-                    <button class="btn-solid" style="width: auto; padding: 12px 30px; margin-top: 0; display: inline-block;" onclick="switchAuthView('homeView', document.querySelectorAll('.nav-links a')[0]); setTimeout(function(){ showSubForm('registerForm'); }, 50);">Join Skill Hub Now</button>
-                </div>
             </div>
             
+            <div style="margin-top: 40px; text-align: center;">
+                <button class="btn-solid" style="padding: 15px 40px; font-size: 16px;" onclick="openAuth('registerForm')">Join Skill Hub Now</button>
+            </div>
+        </section>
+
+        <footer class="saas-footer">
+            <div class="footer-content">
+                <div class="footer-logo-col">
+                    <img src="logo.jpeg" alt="Skill Hub" style="height: 70px; border-radius: 12px; background: white; padding: 8px; margin-bottom: 15px; object-fit: contain; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                    <p>The global economy of knowledge exchange. Learn, teach, and grow together without spending a dime.</p>
+                </div>
+                <div class="footer-links-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#how-it-works">How it Works</a></li>
+                        <li><a href="#" onclick="openAuth('loginForm')">Login to Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social-col">
+                    <h4>Connect With Us</h4>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Skill Hub. Developed by Shubham, Jainam & Khushgiri. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+
+    <div id="authContainer" class="hidden">
+        <div id="authWrapper">
+            
+            <button class="back-home-btn" onclick="closeAuth()">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </button>
+
+            <div class="left-section">
+                <div class="overlay"></div>
+                <div class="content-box">
+                    <h1>Welcome to<br>Skill Hub.</h1>
+                    <p>Enter your details to access your dashboard and start connecting with mentors globally.</p>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <div class="top-scroll-mask"></div>
+                <div id="messageBox" class="message-box" style="padding: 10px; margin: 0 auto 10px; max-width: 480px;"></div>
+
+                <div id="homeView" class="auth-view active">
+                    
+                    <div id="loginForm">
+                        <h2 class="form-title">Welcome Back</h2>
+                        <p class="form-subtitle">Enter your details to access your account.</p>
+                        <form onsubmit="handleLogin(event)" autocomplete="off">
+                            <div class="input-group">
+                                <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" autocomplete="off" required>
+                            </div>
+                            <div class="input-group" style="margin-bottom: 5px;">
+                                <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" autocomplete="new-password" required>
+                                <i class="fas fa-eye eye-icon" onclick="togglePass('loginPass', this)"></i>
+                            </div>
+                            <div style="text-align: right; margin-bottom: 20px;">
+                                <span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span>
+                            </div>
+                            <button type="submit" class="btn-submit" style="margin-top: 0;">Login</button>
+                        </form>
+                        <div class="toggle-text">Don't have an account? <span onclick="showSubForm('registerForm')">Register Now</span></div>
+                    </div>
+
+                    <div id="forgotPasswordForm" class="hidden" style="width: 100%;">
+                        <h2 class="form-title">Reset Password</h2>
+                        <p class="form-subtitle">Enter your registered email to receive an OTP.</p>
+                        <form onsubmit="handleSendForgotOTP(event)" autocomplete="off">
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" autocomplete="off" required></div>
+                            <button type="submit" class="btn-submit">Send OTP</button>
+                        </form>
+                        <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
+                    </div>
+
+                    <div id="verifyForgotOTPForm" class="hidden" style="width: 100%;">
+                        <h2 class="form-title">Set New Password</h2>
+                        <form onsubmit="handleResetPassword(event)" autocomplete="off">
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                            <div class="input-group">
+                                <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" autocomplete="new-password" required>
+                                <i class="fas fa-eye eye-icon" onclick="togglePass('forgotNewPassInput', this)"></i>
+                            </div>
+                            <button type="submit" class="btn-submit">Reset Password</button>
+                        </form>
+                        <div class="toggle-text"><span onclick="showSubForm('loginForm')">Cancel</span></div>
+                    </div>
+
+                    <div id="otpForm" class="hidden" style="width: 100%;">
+                        <h2 class="form-title">Two-Factor Auth</h2>
+                        <form onsubmit="handleVerifyOTP(event)" autocomplete="off">
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                            <button type="submit" class="btn-submit">Verify & Login</button>
+                        </form>
+                        <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
+                    </div>
+
+                    <div id="registerForm" class="hidden" style="width: 100%;">
+                        <h2 class="form-title">Create Account</h2>
+                        <form onsubmit="handleRegister(event)" autocomplete="off">
+                            <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" autocomplete="off" required></div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: var(--bg-input); border-radius: 12px; color: var(--text-muted);">
+                                <span style="font-size: 14px; font-weight: 500;"><i class="fas fa-venus-mars" style="margin-right: 10px;"></i>Gender:</span>
+                                <div style="display: flex; gap: 15px;">
+                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
+                                        <input type="radio" name="regGender" value="Male" required style="accent-color: var(--primary-color);"> Male
+                                    </label>
+                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
+                                        <input type="radio" name="regGender" value="Female" style="accent-color: var(--primary-color);"> Female
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="input-group">
+                                <i class="fas fa-lock left-icon"></i>
+                                <input type="password" id="regPass" placeholder="Create Password" autocomplete="new-password" required>
+                                <i class="fas fa-eye eye-icon" onclick="togglePass('regPass', this)"></i>
+                            </div>
+                            <div class="input-group">
+                                <i class="fas fa-lock left-icon"></i>
+                                <input type="password" id="regConfirmPass" placeholder="Confirm Password" autocomplete="new-password" required>
+                                <i class="fas fa-eye eye-icon" onclick="togglePass('regConfirmPass', this)"></i>
+                            </div>
+
+                            <button type="submit" class="btn-submit">Verify Email</button>
+                        </form>
+                        <div class="toggle-text">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
+                    </div>
+
+                    <div id="regOtpForm" class="hidden" style="width: 100%;">
+                        <h2 class="form-title">Verify Email</h2>
+                        <form onsubmit="handleVerifyRegOTP(event)" autocomplete="off">
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                            <button type="submit" class="btn-submit">Verify OTP</button>
+                        </form>
+                        <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
+                    </div>
+
+                    <div id="profileSetupForm" class="hidden" style="width: 100%;">
+                        <h2 class="form-title">Complete Profile</h2>
+                        <form onsubmit="handleProfileSave(event)" autocomplete="off">
+                            <div class="profile-pic-wrapper">
+                                <div class="profile-pic-container" onclick="document.getElementById('profileInput').click()">
+                                    <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile">
+                                </div>
+                                <input type="file" id="profileInput" accept="image/*" onchange="previewImage(event, 'profilePreview')" style="display:none;">
+                                <div style="display: flex; gap: 20px; margin-top: 15px; width: 100%; justify-content: center;">
+                                    <div class="add-photo-btn" onclick="document.getElementById('profileInput').click()" style="margin-top: 0;"><i class="fas fa-image"></i> Upload File</div>
+                                    <div class="add-photo-btn" onclick="startRegCamera()" style="margin-top: 0; color: #10b981;"><i class="fas fa-camera"></i> Live Camera</div>
+                                </div>
+                            </div>
+
+                            <div class="role-selection">
+                                <label class="role-box active" onclick="selectRole('teach')">
+                                    <input type="radio" name="userRole" value="teach" checked style="display:none;">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                    <span>Teach & Learn</span>
+                                </label>
+                                <label class="role-box" onclick="selectRole('learn')">
+                                    <input type="radio" name="userRole" value="learn" style="display:none;">
+                                    <i class="fas fa-book-reader"></i>
+                                    <span>Only Learner</span>
+                                </label>
+                            </div>
+
+                            <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="profName" readonly></div>
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="profEmail" readonly></div>
+                            <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" autocomplete="off" required></div>
+                            
+                            <div id="skillInputContainer">
+                                <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter" autocomplete="off"></div>
+                                <div id="skillsList" class="skills-list"></div>
+                            </div>
+
+                            <button type="submit" class="btn-submit">Save Profile & Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
