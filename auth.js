@@ -1,3 +1,17 @@
+// 🟢 NAYA LOGIC: Landing Page aur Auth Page me switch karne ke liye
+function openAuth(formId) {
+    document.getElementById('landingPage').classList.add('hidden');
+    document.getElementById('authContainer').classList.remove('hidden');
+    showSubForm(formId);
+}
+
+function closeAuth() {
+    document.getElementById('authContainer').classList.add('hidden');
+    document.getElementById('landingPage').classList.remove('hidden');
+    messageBox.innerText = "";
+}
+
+// 🟢 PURANA LOGIC (Ekdum Safe)
 let currentTempUser = {}; 
 let userSkillsArray = []; 
 let userTopicsObj = {}; 
@@ -9,17 +23,6 @@ let resetGeneratedOTP = null;
 let regGeneratedOTP = null;
 
 const messageBox = document.getElementById('messageBox');
-
-function switchAuthView(viewId, element) {
-    document.querySelectorAll('.auth-view').forEach(view => view.classList.remove('active'));
-    document.getElementById(viewId).classList.add('active');
-    if(element) {
-        document.querySelectorAll('.auth-nav-link').forEach(link => link.classList.remove('active'));
-        element.classList.add('active');
-    }
-    messageBox.innerText = "";
-    if(viewId === 'homeView') showSubForm('loginForm');
-}
 
 function showSubForm(formId) {
     const forms = ['loginForm', 'registerForm', 'regOtpForm', 'profileSetupForm', 'otpForm', 'forgotPasswordForm', 'verifyForgotOTPForm'];
@@ -113,7 +116,6 @@ function handleRegister(e) {
     const genderElement = document.querySelector('input[name="regGender"]:checked');
     const gender = genderElement ? genderElement.value : "Not Specified";
 
-    // 🟢 ADDED: acquiredSkills: [] taaki naye user me array ban jaye
     currentTempUser = { name: name, email: email, phone: phone, pass: pass, gender: gender, is2FAEnabled: false, isPublic: true, swaps: [], inbox: [], notifications: [], credits: 5, acquiredSkills: [] };
     userSkillsArray = []; 
     userTopicsObj = {}; 
@@ -269,7 +271,7 @@ async function handleProfileSave(e) {
                 skill: finalSkill,
                 skills: userSkillsArray, 
                 topics: userTopicsObj, 
-                acquiredSkills: [], // 🟢 ADDED: DB me bhi initialize hoga
+                acquiredSkills: [],
                 profilePic: currentProfilePic
             })
         });
