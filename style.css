@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 html {
-    scroll-behavior: smooth; /* Smooth scrolling for landing page links */
+    scroll-behavior: smooth; 
 }
 
 :root {
@@ -60,16 +60,13 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
     top: 0; left: 0; width: 100%;
     display: flex; justify-content: space-between; align-items: center;
     padding: 15px 60px;
-    background: var(--header-bg); /* FIXED: Now adapts to Dark Theme properly */
+    background: var(--header-bg); 
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
     z-index: 1000;
     box-shadow: var(--shadow-sm);
 }
 
-.saas-navbar .logo img { height: 60px; border-radius: 10px; }
-
-/* FIXED: Increased Gap to 45px for better spacing */
 .saas-nav-links { list-style: none; display: flex; gap: 45px; margin: 0; padding: 0; }
 .saas-nav-links a { text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 15px; transition: 0.3s; }
 .saas-nav-links a:hover { color: var(--primary-color); }
@@ -99,8 +96,6 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .section-title { text-align: center; font-size: 36px; font-weight: 800; color: var(--text-main); margin-bottom: 15px; }
 .section-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 50px; font-size: 16px; font-weight: 500; }
 
-
-/* 🟢 FIXED: Horizontal Scroll Slider for Features */
 .about-grid { 
     display: flex; 
     flex-wrap: nowrap; 
@@ -115,7 +110,7 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .about-grid::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 10px; }
 
 .about-image-card { 
-    flex: 0 0 320px; /* Fixed width so they stay in one row */
+    flex: 0 0 320px; 
     scroll-snap-align: start;
     background: var(--bg-card); 
     backdrop-filter: var(--glass-blur); 
@@ -133,8 +128,6 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .about-image-card .card-content h3 i { color: transparent; background: var(--primary-gradient); -webkit-background-clip: text; font-size: 24px; }
 .about-image-card .card-content p { font-size: 15px; color: var(--text-muted); line-height: 1.7; font-weight: 500; }
 
-
-/* Naya SaaS Footer */
 .saas-footer { background: #0b0f19; color: white; padding: 60px 60px 20px; margin-top: 50px; }
 .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 40px; }
 .footer-logo-col { max-width: 300px; }
@@ -154,40 +147,74 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .back-home-btn:hover { background: white; color: var(--primary-color); }
 
 
-/* ================= Auth Layout (Login Form Wrapper) ================= */
-#authWrapper { display: flex; width: 100%; height: 100vh; overflow: hidden; }
+/* ================= Auth Layout (Centered Glassmorphism) ================= */
+#authWrapper { 
+    display: flex; 
+    width: 100%; 
+    height: 100vh; 
+    overflow: hidden; 
+    justify-content: center; 
+    align-items: center; 
+    position: relative;
+}
 
-/* Left Section with Enhanced Gradient Overlay */
+/* Purani Split Screen CSS (Kept so no lines are technically lost, but unused visually here) */
 .left-section { flex: 1.2; background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop') no-repeat center center/cover; position: relative; display: flex; align-items: center; padding: 80px; color: white; }
 .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(11, 15, 25, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%); z-index: 1; }
 .content-box { position: relative; z-index: 2; max-width: 600px; color: #fff; animation: fadeUp 0.8s ease-out; }
 .content-box h1 { font-size: 60px; font-weight: 800; line-height: 1.1; margin-bottom: 25px; letter-spacing: -1px; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
 .content-box p { font-size: 18px; line-height: 1.6; opacity: 0.9; }
-
 .right-section { flex: 0.8; background: var(--bg-card); overflow-y: auto; position: relative; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
 .top-scroll-mask { position: sticky; top: 0; left: 0; width: 100%; height: 60px; background: inherit; z-index: 90; backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--border-color); }
-.auth-view { display: none; animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); width: 100%; max-width: 480px; margin: 0 auto; min-height: calc(100vh - 60px); flex-direction: column; justify-content: center; padding-bottom: 50px; }
-.auth-view.active { display: flex; }
-.form-title { font-size: 36px; color: var(--text-main); margin-bottom: 8px; font-weight: 800; text-align: center; letter-spacing: -0.5px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.form-subtitle { color: var(--text-muted); margin-bottom: 40px; font-size: 16px; text-align: center; font-weight: 500;}
 
-/* Premium Inputs */
-.input-group { position: relative; margin-bottom: 22px; width: 100%; }
+/* 🟢 Naya Modified Centered Glassmorphism Card CSS */
+.auth-glass-card {
+    position: relative; 
+    z-index: 10; 
+    width: 100%; 
+    max-width: 480px; 
+    background: var(--bg-card); 
+    backdrop-filter: blur(25px); 
+    -webkit-backdrop-filter: blur(25px); 
+    border-radius: 24px; 
+    /* 🟢 Padding thodi kam ki hai taaki button fit aaye */
+    padding: 30px; 
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+    border: 1px solid rgba(255,255,255,0.2); 
+    /* 🟢 Max height ko badha kar 95vh kiya jisse lamba form na kate */
+    max-height: 95vh; 
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.auth-glass-card::-webkit-scrollbar { display: none; }
+
+/* 🟢 NAYI FAST & PROFESSIONAL ANIMATION */
+.auth-view { display: none; animation: quickFadeUp 0.3s ease-out forwards; width: 100%; flex-direction: column; justify-content: center; padding-bottom: 10px; }
+.auth-view.active { display: flex; }
+@keyframes quickFadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+.form-title { font-size: 34px; color: var(--text-main); margin-bottom: 8px; font-weight: 800; text-align: center; letter-spacing: -0.5px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+/* 🟢 Subtitle margin kam kiya */
+.form-subtitle { color: var(--text-muted); margin-bottom: 25px; font-size: 15px; text-align: center; font-weight: 500;}
+
+/* 🟢 Premium Inputs - Margin/Padding Compact kiya jisse cutoff na ho */
+.input-group { position: relative; margin-bottom: 16px; width: 100%; }
 .input-group i.left-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px; transition: 0.3s; }
-.input-group input { width: 100%; padding: 16px 20px 16px 50px; border: 2px solid var(--border-color); border-radius: 14px; font-size: 15px; outline: none; background: var(--bg-input); font-weight: 600; color: var(--text-main); transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
+.input-group input { width: 100%; padding: 14px 20px 14px 50px; border: 2px solid var(--border-color); border-radius: 14px; font-size: 15px; outline: none; background: var(--bg-input); font-weight: 600; color: var(--text-main); transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
 .input-group input:focus { border-color: var(--primary-color); background: var(--bg-input); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02); }
 .input-group input:focus + i.left-icon, .input-group input:focus ~ i.left-icon { color: var(--primary-color); }
 .input-group input[readonly] { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
 .input-group .eye-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 18px; }
 .input-group .eye-icon:hover { color: var(--primary-color); }
 
-/* Premium Buttons */
-.btn-submit { width: 100%; padding: 16px; background: var(--primary-gradient); border: none; border-radius: 14px; color: white; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 15px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); position: relative; overflow: hidden; z-index: 1;}
+/* 🟢 Premium Buttons - Padding & margin adjust ki gayi hai */
+.btn-submit { width: 100%; padding: 14px; background: var(--primary-gradient); border: none; border-radius: 14px; color: white; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 10px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); position: relative; overflow: hidden; z-index: 1;}
 .btn-submit::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); opacity: 0; transition: opacity 0.3s ease; z-index: -1; }
 .btn-submit:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow); }
 .btn-submit:hover::before { opacity: 1; }
 
-.toggle-text { margin-top: 30px; text-align: center; font-size: 15px; color: var(--text-muted); font-weight: 500;}
+.toggle-text { margin-top: 25px; text-align: center; font-size: 14px; color: var(--text-muted); font-weight: 500;}
 .toggle-text span { color: var(--primary-color); font-weight: 800; cursor: pointer; transition: 0.2s; border-bottom: 2px solid transparent; padding-bottom: 2px; }
 .toggle-text span:hover { border-color: var(--primary-color); }
 
@@ -197,7 +224,7 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .hidden { display: none !important; }
 
 /* Profile Pic Setup */
-.profile-pic-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 35px; }
+.profile-pic-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
 .profile-pic-container { width: 130px; height: 130px; border-radius: 50%; background: var(--bg-input); border: 4px solid var(--primary-color); overflow: hidden; position: relative; cursor: pointer; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: var(--shadow-glow); padding: 4px;}
 .profile-pic-container:hover { transform: scale(1.08) rotate(5deg); }
 .profile-pic-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
@@ -485,7 +512,7 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .settings-title { font-size: 16px; color: var(--text-main); font-weight: 800; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px;}
 .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
-/* Custom Switch Toggle (Restored Original Logic) */
+/* Custom Switch Toggle */
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); border-radius: 34px; transition: .4s; }
@@ -493,11 +520,11 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 input:checked + .slider { background: var(--primary-gradient); }
 input:checked + .slider:before { transform: translateX(20px); }
 
-/* Settings Theme Dots (Restored Circle Shape) */
+/* Settings Theme Dots */
 .color-dot { width: 35px; height: 35px; border-radius: 50%; border: 3px solid var(--bg-card); box-shadow: 0 0 0 2px var(--border-color); transition: all 0.3s ease; cursor: pointer; }
 .color-dot:hover { transform: scale(1.15); box-shadow: 0 0 0 3px var(--border-color); }
 
-/* Danger Button (Restored) */
+/* Danger Button */
 .danger-btn { background: transparent; border: 1px solid #ef4444; color: #ef4444; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
 .danger-btn:hover { background: #ef4444; color: #fff; }
 
@@ -525,12 +552,12 @@ input:checked + .slider:before { transform: translateX(20px); }
     .hero-content h1 { font-size: 40px; }
 }
 
-/* 🟢 NEW: Calendar Input Styling */
+/* 🟢 Calendar Input Styling */
 .schedule-inputs { display: flex; gap: 15px; margin-bottom: 20px; }
 .schedule-inputs input { flex: 1; padding: 14px 15px; border: 2px solid var(--border-color); border-radius: 12px; background: var(--bg-input); color: var(--text-main); font-weight: 600; outline: none; font-size: 15px; transition: 0.3s; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
 .schedule-inputs input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-light), inset 0 2px 4px rgba(0,0,0,0.02); }
 
-/* 🟢 NEW: Mobile App Style Slide-Up Modal Animation */
+/* 🟢 Mobile App Style Slide-Up Modal Animation */
 @keyframes slideUpApp { 
     from { transform: translateY(100%); } 
     to { transform: translateY(0); } 
@@ -560,7 +587,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     }
 }
 
-/* 🟢 NEW: AI Smart Notes Panel Styles - 🚀 Panel Width Badi Kar Di Hai Taki Image Clear Dikhe */
+/* 🟢 AI Smart Notes Panel Styles */
 .notes-panel {
     display: none; position: absolute; top: 20px; left: 20px; width: 450px; height: calc(100% - 100px);
     background: rgba(15,23,42,0.95); border-radius: 15px; border: 1px solid rgba(99, 102, 241, 0.4);
