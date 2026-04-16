@@ -323,12 +323,20 @@ function refreshDynamicData(isLiveUpdate = false) {
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
                     : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages if the swap is Active!')"><i class="fas fa-lock"></i> Message</button>`;
 
+                // 🟢 NAYA LOGIC: Badi Profile Photo Discover card mein
+                let userProfilePic = otherUser.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
                         <div class="top-badge">Available</div>
-                        <div class="card-icon"><i class="fab ${icon} fas"></i></div>
-                        <h3>${skill}</h3>
-                        <p style="margin-bottom: 20px;">User: <strong>${otherUser.name}</strong></p>
+                        
+                        <div style="width: 85px; height: 85px; margin: 0 auto 15px; border-radius: 50%; padding: 4px; background: var(--primary-gradient); box-shadow: var(--shadow-glow); transition: 0.4s;" onmouseover="this.style.transform='scale(1.1) rotate(5deg)'" onmouseout="this.style.transform='scale(1)'">
+                            <img src="${userProfilePic}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--bg-card);">
+                        </div>
+
+                        <h3 style="margin-bottom: 5px;">${skill}</h3>
+                        <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-muted); font-weight: 600;">By <strong style="color: var(--primary-color);">${otherUser.name}</strong></p>
+
                         <div class="card-buttons">
                             <button class="btn-solid" onclick="openTopicSelection('${otherUser.email}', '${skill}')">Swap</button>
                             ${messageBtnHTML}
@@ -554,7 +562,6 @@ function acceptSwapWithSchedule(mySwapIndex, partnerName, skill, scheduledTimest
     if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
 
     if(targetIndex !== -1) {
-        // 🟢 REMOVED: `usersDB[targetIndex].credits -= 1;` because credit is already put on HOLD during request!
         if(usersDB[targetIndex].credits === undefined) usersDB[targetIndex].credits = 5;
 
         let partnerSwapIndex = usersDB[targetIndex].swaps.findIndex(s => s.partnerEmail === usersDB[meIndex].email && s.skill === skill);
@@ -672,7 +679,6 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     if(targetIndex === -1) return;
     if(usersDB[meIndex].credits === undefined) usersDB[meIndex].credits = 5;
     
-    // 🟢 NEW: Credit Hold Logic
     if(usersDB[meIndex].credits < 1) { alert("❌ You don't have enough credits to request a swap!"); return; }
     usersDB[meIndex].credits -= 1; // Deduct immediately and put on HOLD
 
@@ -751,7 +757,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
             usersDB[reqIdx].notifications = usersDB[reqIdx].notifications || [];
             usersDB[reqIdx].notifications.push({ text: `💰 Swap was not confirmed. 1 Credit refunded!`, isRead: false, id: Date.now() + Math.random() });
         }
-        // 🟢 NEW: Refund credit if cancelled while on Hold (Pending/Requested)
         else if (mySwap.status === 'Requested' || mySwap.status === 'Pending') {
             let reqIdx = mySwap.role === 'Requester' ? meIndex : targetIndex;
             usersDB[reqIdx].credits += 1;
