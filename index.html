@@ -248,10 +248,12 @@
                         <p class="form-subtitle">Enter your details to access your account.</p>
                         <form onsubmit="handleLogin(event)" autocomplete="off">
                             <div class="input-group">
-                                <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" required>
+                                <i class="fas fa-envelope left-icon"></i>
+                                <input type="email" id="loginEmail" placeholder="Email Address" autocomplete="new-password" required>
                             </div>
                             <div class="input-group">
-                                <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" required>
+                                <i class="fas fa-lock left-icon"></i>
+                                <input type="password" id="loginPass" placeholder="Password" autocomplete="new-password" required>
                                 <i class="fas fa-eye eye-icon" onclick="togglePass('loginPass', this)"></i>
                             </div>
                             <div style="text-align: right; margin-bottom: 15px;"><span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span></div>
@@ -264,7 +266,7 @@
                         <h2 class="form-title">Reset Password</h2>
                         <p class="form-subtitle">Enter your registered email to receive an OTP.</p>
                         <form onsubmit="handleSendForgotOTP(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" required></div>
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" autocomplete="new-password" required></div>
                             <button type="submit" class="btn-submit">Send OTP</button>
                         </form>
                         <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
@@ -273,9 +275,9 @@
                     <div id="verifyForgotOTPForm" class="hidden">
                         <h2 class="form-title">Set New Password</h2>
                         <form onsubmit="handleResetPassword(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" required></div>
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
                             <div class="input-group">
-                                <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" required>
+                                <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" autocomplete="new-password" required>
                                 <i class="fas fa-eye eye-icon" onclick="togglePass('forgotNewPassInput', this)"></i>
                             </div>
                             <button type="submit" class="btn-submit">Reset Password</button>
@@ -286,7 +288,7 @@
                     <div id="otpForm" class="hidden">
                         <h2 class="form-title">Two-Factor Auth</h2>
                         <form onsubmit="handleVerifyOTP(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" required></div>
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
                             <button type="submit" class="btn-submit">Verify & Login</button>
                         </form>
                         <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
@@ -295,18 +297,18 @@
                     <div id="registerForm" class="hidden">
                         <h2 class="form-title">Create Account</h2>
                         <form onsubmit="handleRegister(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" required></div>
-                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" required></div>
-                            <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" required></div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 10px 15px; background: var(--bg-input); border-radius: 12px; border: 2px solid var(--border-color);">
+                            <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" autocomplete="new-password" required></div>
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" autocomplete="new-password" required></div>
+                            <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" autocomplete="new-password" required></div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: var(--bg-input); border-radius: 12px; border: 2px solid var(--border-color);">
                                 <span style="font-size: 14px; font-weight: 500;">Gender:</span>
                                 <div style="display: flex; gap: 15px;">
                                     <label style="cursor: pointer; font-size: 14px;"><input type="radio" name="regGender" value="Male" required> Male</label>
                                     <label style="cursor: pointer; font-size: 14px;"><input type="radio" name="regGender" value="Female"> Female</label>
                                 </div>
                             </div>
-                            <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regPass" placeholder="Create Password" required></div>
-                            <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regConfirmPass" placeholder="Confirm Password" required></div>
+                            <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regPass" placeholder="Create Password" autocomplete="new-password" required></div>
+                            <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regConfirmPass" placeholder="Confirm Password" autocomplete="new-password" required></div>
                             <button type="submit" class="btn-submit">Verify Email</button>
                         </form>
                         <div class="toggle-text" style="margin-top: 20px;">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
@@ -315,7 +317,7 @@
                     <div id="regOtpForm" class="hidden">
                         <h2 class="form-title">Verify Email</h2>
                         <form onsubmit="handleVerifyRegOTP(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" required></div>
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
                             <button type="submit" class="btn-submit">Verify OTP</button>
                         </form>
                         <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
@@ -350,10 +352,10 @@
 
                             <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="profName" readonly></div>
                             <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="profEmail" readonly></div>
-                            <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" required></div>
+                            <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" autocomplete="new-password" required></div>
                             
                             <div id="skillInputContainer">
-                                <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter"></div>
+                                <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter" autocomplete="off"></div>
                                 <div id="skillsList" class="skills-list"></div>
                             </div>
 
