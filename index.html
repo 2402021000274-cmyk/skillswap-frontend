@@ -13,8 +13,11 @@
     <div id="landingPage">
         
         <nav class="saas-navbar">
-            <a href="#" class="logo" style="display: flex; align-items: center;">
-                <img src="logo.jpeg" alt="Skill Hub" style="height: 60px; width: auto; object-fit: contain; transition: 0.3s; mix-blend-mode: multiply;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <a href="#" class="logo" style="display: flex; align-items: center; text-decoration: none; transition: 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                <div style="background: white; padding: 4px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102,241,0.2);">
+                    <img src="logo.jpeg" alt="Skill Hub" style="height: 38px; width: 38px; border-radius: 8px; object-fit: contain;">
+                </div>
+                <span style="font-size: 22px; font-weight: 800; color: var(--text-main); margin-left: 12px; letter-spacing: -0.5px;">Skill<span style="color: var(--primary-color);">Hub</span></span>
             </a>
             <ul class="saas-nav-links">
                 <li><a href="#hero">Home</a></li>
@@ -156,16 +159,17 @@
             <div class="team-section" style="margin-top: 60px;">
                 <h2 class="section-title">Meet The Creators</h2>
                 <div class="team-container">
-                    <div class="team-member">
+                     <div class="team-member">
                         <img src="Jainam.jpeg" alt="Jainam Dwarkeshpuri Goswami">
                         <h3>Jainam Dwarkeshpuri Goswami</h3>
                         <p>Developer</p>
                     </div>
-                     <div class="team-member">
+			        <div class="team-member">
                         <img src="Shubham.jpeg" alt="Shubham Pareshbhai Suthar">
                         <h3>Shubham Pareshbhai Suthar</h3>
                         <p>Developer</p>
-			</div>
+                    </div>
+
                     <div class="team-member">
                         <img src="khush.jpeg" alt="Khushgiri Sanjaygiri Goswami">
                         <h3>Khushgiri Sanjaygiri Goswami</h3>
@@ -190,94 +194,88 @@
             </div>
         </section>
 
-        <footer class="saas-footer">
-            <div class="footer-content">
+        <footer class="saas-footer" style="background: #0b0f19; color: white; padding: 60px 60px 20px;">
+            <div class="footer-content" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 40px; margin-bottom: 40px;">
                 <div class="footer-logo-col">
-                    <img src="logo.jpeg" alt="Skill Hub" style="height: 70px; border-radius: 12px; background: white; padding: 8px; margin-bottom: 15px; object-fit: contain; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                    <p>The global economy of knowledge exchange. Learn, teach, and grow together without spending a dime.</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="background: white; padding: 4px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                            <img src="logo.jpeg" alt="Skill Hub" style="height: 35px; width: 35px; border-radius: 8px; object-fit: contain;">
+                        </div>
+                        <span style="font-size: 22px; font-weight: 800; color: white; margin-left: 12px;">Skill<span style="color: var(--primary-color);">Hub</span></span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 14px; max-width: 300px;">The global economy of knowledge exchange. Learn, teach, and grow together without spending a dime.</p>
                 </div>
                 <div class="footer-links-col">
                     <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="#hero">Home</a></li>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#how-it-works">How it Works</a></li>
-                        <li><a href="#" onclick="openAuth('loginForm')">Login to Account</a></li>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="#hero" style="color: #94a3b8; text-decoration: none;">Home</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#about" style="color: #94a3b8; text-decoration: none;">About Us</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#how-it-works" style="color: #94a3b8; text-decoration: none;">How it Works</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" onclick="openAuth('loginForm')" style="color: #94a3b8; text-decoration: none;">Login to Account</a></li>
                     </ul>
                 </div>
                 <div class="footer-social-col">
                     <h4>Connect With Us</h4>
-                    <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    <div class="social-icons" style="display: flex; gap: 15px;">
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;"><i class="fab fa-twitter"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" style="width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none;"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Skill Hub. Developed by Jainam Goswami , Shubham & Khushgiri. All rights reserved.</p>
+            <div class="footer-bottom" style="text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <p>&copy; 2026 Skill Hub. Developed by Jainam Goswami, Shubham & Khushgiri. All rights reserved.</p>
             </div>
         </footer>
     </div>
 
-
     <div id="authContainer" class="hidden">
-        <div id="authWrapper">
+        <div id="authWrapper" style="background: url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=2070&auto=format&fit=crop') no-repeat center center/cover;">
             
-            <button class="back-home-btn" onclick="closeAuth()">
+            <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(11, 15, 25, 0.8) 0%, rgba(99, 102, 241, 0.6) 100%); backdrop-filter: blur(8px);"></div>
+
+            <button class="back-home-btn" onclick="closeAuth()" style="position: absolute; top: 30px; left: 30px; z-index: 100; padding: 10px 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white; border-radius: 10px; cursor: pointer; font-weight: bold; backdrop-filter: blur(10px); transition: 0.3s;">
                 <i class="fas fa-arrow-left"></i> Back to Home
             </button>
 
-            <div class="left-section">
-                <div class="overlay"></div>
-                <div class="content-box">
-                    <h1>Welcome to<br>Skill Hub.</h1>
-                    <p>Enter your details to access your dashboard and start connecting with mentors globally.</p>
-                </div>
-            </div>
-
-            <div class="right-section">
-                <div class="top-scroll-mask"></div>
-                <div id="messageBox" class="message-box" style="padding: 10px; margin: 0 auto 10px; max-width: 480px;"></div>
+            <div class="auth-glass-card">
+                <div id="messageBox" class="message-box"></div>
 
                 <div id="homeView" class="auth-view active">
-                    
                     <div id="loginForm">
                         <h2 class="form-title">Welcome Back</h2>
                         <p class="form-subtitle">Enter your details to access your account.</p>
                         <form onsubmit="handleLogin(event)" autocomplete="off">
                             <div class="input-group">
-                                <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" autocomplete="off" required>
+                                <i class="fas fa-envelope left-icon"></i><input type="email" id="loginEmail" placeholder="Email Address" required>
                             </div>
-                            <div class="input-group" style="margin-bottom: 5px;">
-                                <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" autocomplete="new-password" required>
+                            <div class="input-group">
+                                <i class="fas fa-lock left-icon"></i><input type="password" id="loginPass" placeholder="Password" required>
                                 <i class="fas fa-eye eye-icon" onclick="togglePass('loginPass', this)"></i>
                             </div>
-                            <div style="text-align: right; margin-bottom: 20px;">
-                                <span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span>
-                            </div>
-                            <button type="submit" class="btn-submit" style="margin-top: 0;">Login</button>
+                            <div style="text-align: right; margin-bottom: 15px;"><span onclick="showSubForm('forgotPasswordForm')" style="font-size: 13px; color: var(--primary-color); font-weight: 700; cursor: pointer;">Forgot Password?</span></div>
+                            <button type="submit" class="btn-submit">Login</button>
                         </form>
                         <div class="toggle-text">Don't have an account? <span onclick="showSubForm('registerForm')">Register Now</span></div>
                     </div>
 
-                    <div id="forgotPasswordForm" class="hidden" style="width: 100%;">
+                    <div id="forgotPasswordForm" class="hidden">
                         <h2 class="form-title">Reset Password</h2>
                         <p class="form-subtitle">Enter your registered email to receive an OTP.</p>
                         <form onsubmit="handleSendForgotOTP(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="forgotIdentifier" placeholder="Email Address" required></div>
                             <button type="submit" class="btn-submit">Send OTP</button>
                         </form>
                         <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
                     </div>
 
-                    <div id="verifyForgotOTPForm" class="hidden" style="width: 100%;">
+                    <div id="verifyForgotOTPForm" class="hidden">
                         <h2 class="form-title">Set New Password</h2>
                         <form onsubmit="handleResetPassword(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="forgotOTPInput" placeholder="Enter 6-digit OTP" required></div>
                             <div class="input-group">
-                                <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" autocomplete="new-password" required>
+                                <i class="fas fa-lock left-icon"></i><input type="password" id="forgotNewPassInput" placeholder="Enter New Password" required>
                                 <i class="fas fa-eye eye-icon" onclick="togglePass('forgotNewPassInput', this)"></i>
                             </div>
                             <button type="submit" class="btn-submit">Reset Password</button>
@@ -285,63 +283,48 @@
                         <div class="toggle-text"><span onclick="showSubForm('loginForm')">Cancel</span></div>
                     </div>
 
-                    <div id="otpForm" class="hidden" style="width: 100%;">
+                    <div id="otpForm" class="hidden">
                         <h2 class="form-title">Two-Factor Auth</h2>
                         <form onsubmit="handleVerifyOTP(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="otpInput" placeholder="Enter 6-digit OTP" required></div>
                             <button type="submit" class="btn-submit">Verify & Login</button>
                         </form>
                         <div class="toggle-text"><span onclick="showSubForm('loginForm')">Back to Login</span></div>
                     </div>
 
-                    <div id="registerForm" class="hidden" style="width: 100%;">
+                    <div id="registerForm" class="hidden">
                         <h2 class="form-title">Create Account</h2>
                         <form onsubmit="handleRegister(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" autocomplete="off" required></div>
-                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" autocomplete="off" required></div>
-                            <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" autocomplete="off" required></div>
-                            
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px 15px; background: var(--bg-input); border-radius: 12px; color: var(--text-muted);">
-                                <span style="font-size: 14px; font-weight: 500;"><i class="fas fa-venus-mars" style="margin-right: 10px;"></i>Gender:</span>
+                            <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="regName" placeholder="Full Name" required></div>
+                            <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="regEmail" placeholder="Email Address" required></div>
+                            <div class="input-group"><i class="fas fa-phone left-icon"></i><input type="tel" id="regPhone" placeholder="Phone Number" required></div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 10px 15px; background: var(--bg-input); border-radius: 12px; border: 2px solid var(--border-color);">
+                                <span style="font-size: 14px; font-weight: 500;">Gender:</span>
                                 <div style="display: flex; gap: 15px;">
-                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
-                                        <input type="radio" name="regGender" value="Male" required style="accent-color: var(--primary-color);"> Male
-                                    </label>
-                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px; color: var(--text-main); font-weight: 500; font-size: 14px;">
-                                        <input type="radio" name="regGender" value="Female" style="accent-color: var(--primary-color);"> Female
-                                    </label>
+                                    <label style="cursor: pointer; font-size: 14px;"><input type="radio" name="regGender" value="Male" required> Male</label>
+                                    <label style="cursor: pointer; font-size: 14px;"><input type="radio" name="regGender" value="Female"> Female</label>
                                 </div>
                             </div>
-
-                            <div class="input-group">
-                                <i class="fas fa-lock left-icon"></i>
-                                <input type="password" id="regPass" placeholder="Create Password" autocomplete="new-password" required>
-                                <i class="fas fa-eye eye-icon" onclick="togglePass('regPass', this)"></i>
-                            </div>
-                            <div class="input-group">
-                                <i class="fas fa-lock left-icon"></i>
-                                <input type="password" id="regConfirmPass" placeholder="Confirm Password" autocomplete="new-password" required>
-                                <i class="fas fa-eye eye-icon" onclick="togglePass('regConfirmPass', this)"></i>
-                            </div>
-
+                            <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regPass" placeholder="Create Password" required></div>
+                            <div class="input-group"><i class="fas fa-lock left-icon"></i><input type="password" id="regConfirmPass" placeholder="Confirm Password" required></div>
                             <button type="submit" class="btn-submit">Verify Email</button>
                         </form>
-                        <div class="toggle-text">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
+                        <div class="toggle-text" style="margin-top: 20px;">Already have an account? <span onclick="showSubForm('loginForm')">Login Here</span></div>
                     </div>
 
-                    <div id="regOtpForm" class="hidden" style="width: 100%;">
+                    <div id="regOtpForm" class="hidden">
                         <h2 class="form-title">Verify Email</h2>
                         <form onsubmit="handleVerifyRegOTP(event)" autocomplete="off">
-                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-key left-icon"></i><input type="text" id="regOtpInput" placeholder="Enter 6-digit OTP" required></div>
                             <button type="submit" class="btn-submit">Verify OTP</button>
                         </form>
                         <div class="toggle-text"><span onclick="showSubForm('registerForm')">Back</span></div>
                     </div>
 
-                    <div id="profileSetupForm" class="hidden" style="width: 100%;">
+                    <div id="profileSetupForm" class="hidden">
                         <h2 class="form-title">Complete Profile</h2>
                         <form onsubmit="handleProfileSave(event)" autocomplete="off">
-                            <div class="profile-pic-wrapper">
+                            <div class="profile-pic-wrapper" style="margin-bottom: 20px;">
                                 <div class="profile-pic-container" onclick="document.getElementById('profileInput').click()">
                                     <img id="profilePreview" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile">
                                 </div>
@@ -367,10 +350,10 @@
 
                             <div class="input-group"><i class="fas fa-user left-icon"></i><input type="text" id="profName" readonly></div>
                             <div class="input-group"><i class="fas fa-envelope left-icon"></i><input type="email" id="profEmail" readonly></div>
-                            <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" autocomplete="off" required></div>
+                            <div class="input-group"><i class="fas fa-map-marker-alt left-icon"></i><input type="text" id="profAddress" placeholder="e.g. Ahmedabad, Gujarat" required></div>
                             
                             <div id="skillInputContainer">
-                                <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter" autocomplete="off"></div>
+                                <div class="input-group"><i class="fas fa-laptop-code left-icon"></i><input type="text" id="skillInput" placeholder="Type a skill & Press Enter"></div>
                                 <div id="skillsList" class="skills-list"></div>
                             </div>
 
