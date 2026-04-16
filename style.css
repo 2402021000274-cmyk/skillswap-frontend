@@ -158,7 +158,6 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
     position: relative;
 }
 
-/* Purani Split Screen CSS (Kept so no lines are technically lost, but unused visually here) */
 .left-section { flex: 1.2; background: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop') no-repeat center center/cover; position: relative; display: flex; align-items: center; padding: 80px; color: white; }
 .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(11, 15, 25, 0.9) 0%, rgba(99, 102, 241, 0.8) 100%); z-index: 1; }
 .content-box { position: relative; z-index: 2; max-width: 600px; color: #fff; animation: fadeUp 0.8s ease-out; }
@@ -167,7 +166,6 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .right-section { flex: 0.8; background: var(--bg-card); overflow-y: auto; position: relative; backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); }
 .top-scroll-mask { position: sticky; top: 0; left: 0; width: 100%; height: 60px; background: inherit; z-index: 90; backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--border-color); }
 
-/* 🟢 Naya Modified Centered Glassmorphism Card CSS */
 .auth-glass-card {
     position: relative; 
     z-index: 10; 
@@ -177,11 +175,9 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
     backdrop-filter: blur(25px); 
     -webkit-backdrop-filter: blur(25px); 
     border-radius: 24px; 
-    /* 🟢 Padding thodi kam ki hai taaki button fit aaye */
     padding: 30px; 
     box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
     border: 1px solid rgba(255,255,255,0.2); 
-    /* 🟢 Max height ko badha kar 95vh kiya jisse lamba form na kate */
     max-height: 95vh; 
     overflow-y: auto;
     scrollbar-width: none;
@@ -189,16 +185,24 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 
 .auth-glass-card::-webkit-scrollbar { display: none; }
 
-/* 🟢 NAYI FAST & PROFESSIONAL ANIMATION */
 .auth-view { display: none; animation: quickFadeUp 0.3s ease-out forwards; width: 100%; flex-direction: column; justify-content: center; padding-bottom: 10px; }
 .auth-view.active { display: flex; }
 @keyframes quickFadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
 .form-title { font-size: 34px; color: var(--text-main); margin-bottom: 8px; font-weight: 800; text-align: center; letter-spacing: -0.5px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-/* 🟢 Subtitle margin kam kiya */
 .form-subtitle { color: var(--text-muted); margin-bottom: 25px; font-size: 15px; text-align: center; font-weight: 500;}
 
-/* 🟢 Premium Inputs - Margin/Padding Compact kiya jisse cutoff na ho */
+/* 🟢 CSS AUTOFILL BYPASS HACK */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bg-input) inset !important;
+    -webkit-text-fill-color: var(--text-main) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Premium Inputs */
 .input-group { position: relative; margin-bottom: 16px; width: 100%; }
 .input-group i.left-icon { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 18px; transition: 0.3s; }
 .input-group input { width: 100%; padding: 14px 20px 14px 50px; border: 2px solid var(--border-color); border-radius: 14px; font-size: 15px; outline: none; background: var(--bg-input); font-weight: 600; color: var(--text-main); transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);}
@@ -208,7 +212,7 @@ body { width: 100%; background: var(--bg-main); color: var(--text-main); transit
 .input-group .eye-icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 18px; }
 .input-group .eye-icon:hover { color: var(--primary-color); }
 
-/* 🟢 Premium Buttons - Padding & margin adjust ki gayi hai */
+/* Premium Buttons */
 .btn-submit { width: 100%; padding: 14px; background: var(--primary-gradient); border: none; border-radius: 14px; color: white; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); margin-top: 10px; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); position: relative; overflow: hidden; z-index: 1;}
 .btn-submit::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); opacity: 0; transition: opacity 0.3s ease; z-index: -1; }
 .btn-submit:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow); }
