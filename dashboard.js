@@ -14,9 +14,6 @@ let isFirstDataLoad = true;
 let isSyncPaused = false;
 let cloudUpdateTimeout = null;
 
-// ==========================================
-// 🟢 WEBRTC VIDEO CALL VARIABLES (LAG FIX)
-// ==========================================
 let peerConnection;
 let localStream;
 let remoteStream;
@@ -24,7 +21,6 @@ let incomingCallPartner = null;
 let isCalling = false;
 let pendingIceCandidates = []; 
 
-// 🟢 AI SMART NOTES VARIABLES
 let sessionNotes = [];
 let currentNotePage = 0;
 let currentCallRole = null;
@@ -54,7 +50,6 @@ if(socket) {
         }
     });
 
-    // 🟢 VISITOR UPDATE LISTENER
     socket.on('visitor-update', (count) => {
         const visitorEl = document.getElementById('statVisitors');
         if(visitorEl) visitorEl.innerText = count;
@@ -72,7 +67,6 @@ if(socket) {
         syncWithDatabase(); 
     });
 
-    // 🟢 MAINTENANCE MODE LISTENER
     socket.on('maintenance-mode', (isActive) => {
         if(isActive) {
             alert("🚧 Emergency: The Admin has put the system under Maintenance Mode. You will be logged out safely.");
@@ -114,7 +108,6 @@ if(socket) {
         }
     });
 
-    // 🟢 SOCKET: RECEIVING NOTES
     socket.on('receive-notes', (data) => {
         sessionNotes = data.notes;
         showToast(`📚 Mentor shared ${sessionNotes.length} pages of Notes!`);
@@ -126,7 +119,6 @@ if(socket) {
         renderNotePage();
     });
 
-    // 🟢 SOCKET: AUTO/MANUAL SYNC PAGE (UPDATED FOR BOTH WAYS)
     socket.on('sync-note-page', (data) => {
         if(currentNotePage !== data.pageIndex) { 
             currentNotePage = data.pageIndex;
@@ -323,8 +315,13 @@ function refreshDynamicData(isLiveUpdate = false) {
                     ? `<button class="btn-outline" onclick="openChatFromDiscover('${otherUser.email}')">Message</button>`
                     : `<button class="btn-outline" style="opacity:0.6; cursor:not-allowed; border-color:var(--text-muted); color:var(--text-muted);" onclick="showToast('🔒 You can only send messages if the swap is Active!')"><i class="fas fa-lock"></i> Message</button>`;
 
-                // 🟢 NAYA LOGIC: Badi Profile Photo Discover card mein
                 let userProfilePic = otherUser.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+
+                // 🟢 NEW: Rating Display Logic
+                let ratingDisplay = '';
+                if (otherUser.totalReviews && otherUser.totalReviews > 0) {
+                    ratingDisplay = `<span style="background: #fef08a; color: #854d0e; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">⭐ ${otherUser.averageRating}</span>`;
+                }
 
                 newDiscoverHTML += `
                     <div class="crisp-card discover-card">
@@ -335,7 +332,7 @@ function refreshDynamicData(isLiveUpdate = false) {
                         </div>
 
                         <h3 style="margin-bottom: 5px;">${skill}</h3>
-                        <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-muted); font-weight: 600;">By <strong style="color: var(--primary-color);">${otherUser.name}</strong></p>
+                        <p style="margin-bottom: 20px; font-size: 14px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; justify-content: center;">By <strong style="color: var(--primary-color); margin-left: 4px;">${otherUser.name}</strong> ${ratingDisplay}</p>
 
                         <div class="card-buttons">
                             <button class="btn-solid" onclick="openTopicSelection('${otherUser.email}', '${skill}')">Swap</button>
@@ -380,7 +377,6 @@ function refreshDynamicData(isLiveUpdate = false) {
 
             let actionBtns = '';
             
-            // 🟢 NEW: 1 HOUR SESSION LOCK LOGIC
             if(swap.status === 'Active') {
                 let isLocked = false;
                 let lockMessage = "";
@@ -627,7 +623,6 @@ function confirmSwapSchedule(mySwapIndex, partnerName, skill) {
     }
 }
 
-
 function openTopicSelection(targetEmail, skill) {
     const targetUser = usersDB.find(u => u.email === targetEmail);
     if(!targetUser) return;
@@ -657,8 +652,6 @@ function openTopicSelection(targetEmail, skill) {
     if(modal) {
         modal.classList.remove('hidden'); 
         modal.style.display = "flex";
-    } else {
-        console.error("Modal block missing from HTML!");
     }
 }
 
@@ -680,7 +673,7 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     if(usersDB[meIndex].credits === undefined) usersDB[meIndex].credits = 5;
     
     if(usersDB[meIndex].credits < 1) { alert("❌ You don't have enough credits to request a swap!"); return; }
-    usersDB[meIndex].credits -= 1; // Deduct immediately and put on HOLD
+    usersDB[meIndex].credits -= 1; 
 
     usersDB[meIndex].swaps = usersDB[meIndex].swaps || [];
     usersDB[targetIndex].notifications = usersDB[targetIndex].notifications || [];
@@ -706,17 +699,104 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     switchDashView('view-active-swaps', document.querySelectorAll('.sidebar-menu a')[2]);
 }
 
+// 🟢 NEW: REVIEW MODAL FUNCTIONS
+let pendingEndSwapData = null;
+
+function closeReviewModal() {
+    document.getElementById('reviewModal').style.display = 'none';
+    document.getElementById('reviewModal').classList.add('hidden');
+}
+
+function setRating(val) {
+    document.getElementById('selectedRating').value = val;
+    for(let i=1; i<=5; i++) {
+        let star = document.getElementById(`star-${i}`);
+        if (i <= val) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+        } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+        }
+    }
+}
+
+async function submitReviewAndEnd() {
+    let rating = document.getElementById('selectedRating').value;
+    let comment = document.getElementById('reviewComment').value.trim();
+
+    if (rating == 0) {
+        showToast('❌ Please select a star rating to end the session.');
+        return;
+    }
+
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const me = usersDB.find(u => u.email === myEmail);
+    
+    let btn = document.getElementById('submitReviewBtn');
+    btn.innerText = "Submitting...";
+    btn.disabled = true;
+
+    try {
+        await fetch(API_BASE_URL + '/submit-review', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '69420' },
+            body: JSON.stringify({
+                targetEmail: pendingEndSwapData.partnerEmail,
+                reviewerEmail: myEmail,
+                reviewerName: me.name,
+                rating: rating,
+                comment: comment
+            })
+        });
+    } catch(e) { console.error("Review Submit Error", e); }
+
+    document.getElementById('reviewModal').style.display = 'none';
+    document.getElementById('reviewModal').classList.add('hidden');
+    
+    btn.innerText = "Submit & End Session";
+    btn.disabled = false;
+    
+    // Resume End Process
+    executeSwapCancellation(pendingEndSwapData.mySwapIndex, pendingEndSwapData.partnerName, pendingEndSwapData.skill);
+}
+
+// 🟢 MODIFIED: Cancel Swap ab Review Intercept Karega
 function cancelSwap(mySwapIndex, partnerName, skill) {
-    if(!confirm("Are you sure you want to cancel/decline/end this swap?")) return;
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
+    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
     
+    if (mySwap.status === 'Active') {
+        // Stop process, show review modal
+        pendingEndSwapData = { mySwapIndex, partnerName, skill, partnerEmail: mySwap.partnerEmail };
+        document.getElementById('reviewPartnerName').innerText = partnerName;
+        
+        setRating(0); // Reset stars
+        document.getElementById('reviewComment').value = '';
+        
+        const modal = document.getElementById('reviewModal');
+        if(modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+        return; 
+    }
+
+    if(!confirm("Are you sure you want to cancel/decline this swap?")) return;
+    executeSwapCancellation(mySwapIndex, partnerName, skill);
+}
+
+// Yahan purana cancel swap logic shift kiya gaya hai
+function executeSwapCancellation(mySwapIndex, partnerName, skill) {
+    const myEmail = sessionStorage.getItem('loggedInUserEmail');
+    const meIndex = usersDB.findIndex(u => u.email === myEmail);
     let mySwap = usersDB[meIndex].swaps[mySwapIndex];
     let targetIndex = usersDB.findIndex(u => u.email === mySwap.partnerEmail);
+    
     if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
 
     if(targetIndex !== -1) {
-        
         if (mySwap.status === 'Active') {
             let providerIndex = mySwap.role === 'Provider' ? meIndex : targetIndex;
             let requesterIndex = mySwap.role === 'Requester' ? meIndex : targetIndex;
@@ -1394,11 +1474,6 @@ function showLogoutConfirm(e) {
     document.getElementById('logoutConfirmBox').style.display = 'flex';
 }
 
-function hideLogoutConfirm() {
-    document.getElementById('logoutConfirmBox').style.display = 'none';
-}
-
-// 🟢 NEW: SMART NOTES SETUP LOGIC (UPDATED FOR BOTH WAYS)
 function setupNotesUI() {
     if (currentCallRole === 'Provider') {
         document.getElementById('uploadNotesBtn').style.display = 'flex';
@@ -1428,7 +1503,6 @@ async function handleNotesUpload(event) {
     let partnerEmail = currentChatPartnerEmail || incomingCallPartner;
     socket.emit('share-notes', { to: partnerEmail, notes: sessionNotes });
     
-    // 🟢 Provider ko bhi turant panel dikhega
     document.getElementById('viewNotesBtn').style.display = 'flex';
     document.getElementById('viewNotesBtn').style.opacity = '1';
     currentNotePage = 0;
@@ -1465,7 +1539,6 @@ function renderNotePage() {
     document.getElementById('notePageIndicator').innerText = `${currentNotePage + 1} / ${sessionNotes.length}`;
 }
 
-// 🟢 NEW: MANUAL TWO-WAY SYNC FUNCTION
 function syncPageWithPartner() {
     let partnerEmail = currentChatPartnerEmail || incomingCallPartner;
     if(partnerEmail) {
@@ -1477,7 +1550,7 @@ function prevNote() {
     if(currentNotePage > 0) { 
         currentNotePage--; 
         renderNotePage(); 
-        syncPageWithPartner(); // 🟢 Partner ko bhi notify karega
+        syncPageWithPartner(); 
     }
 }
 
@@ -1485,7 +1558,7 @@ function nextNote() {
     if(currentNotePage < sessionNotes.length - 1) { 
         currentNotePage++; 
         renderNotePage(); 
-        syncPageWithPartner(); // 🟢 Partner ko bhi notify karega
+        syncPageWithPartner(); 
     }
 }
 
@@ -1620,7 +1693,6 @@ function endCall(isLocalAction = true) {
     document.getElementById('videoCallModal').style.display = "none";
     document.getElementById('incomingCallModal').style.display = "none";
     
-    // Reset Notes Data
     sessionNotes = [];
     currentNotePage = 0;
     document.getElementById('smartNotesPanel').style.display = 'none';
@@ -1729,7 +1801,6 @@ function startAITranslationProcess() {
         const spokenText = event.results[lastIndex][0].transcript;
         const targetLang = document.getElementById('targetLanguage').value || 'en-US';
 
-        // 🟢 AI SMART NOTES AUTO-SYNC (THE MAGIC)
         if (currentCallRole === 'Provider' && sessionNotes.length > 0) {
             let lowerSpoken = spokenText.toLowerCase();
             for(let i = 0; i < sessionNotes.length; i++) {
@@ -1778,9 +1849,6 @@ socket.on('receive-translation', (data) => {
     if(statusText) { statusText.innerText = `💬 Translation: ${data.text}`; }
 });
 
-// ==========================================
-// 🟢 AI TROUBLESHOOTER LOGIC 
-// ==========================================
 function addAIMessage(text, type) {
     let chat = document.getElementById("aiChatBox");
     let div = document.createElement("div");
