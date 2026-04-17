@@ -127,6 +127,43 @@ if(socket) {
             showToast(`🔄 Screen Synced: Switched to Page ${currentNotePage + 1}`);
         }
     });
+
+    // 🟢 HOD DEMO: Admin Dwara Review Popup Kholne Wala Listener
+    socket.on('force-review-modal', (data) => {
+        const myEmail = sessionStorage.getItem('loggedInUserEmail');
+        if (myEmail === data.providerEmail || myEmail === data.requesterEmail) {
+            const meIndex = usersDB.findIndex(u => u.email === myEmail);
+            if (meIndex !== -1 && usersDB[meIndex].swaps) {
+                const mySwapIndex = usersDB[meIndex].swaps.findIndex(s => 
+                    s.skill === data.skill && 
+                    s.status === 'Active' && 
+                    (s.partnerEmail === data.providerEmail || s.partnerEmail === data.requesterEmail)
+                );
+
+                if (mySwapIndex !== -1) {
+                    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
+                    
+                    pendingEndSwapData = { 
+                        mySwapIndex: mySwapIndex, 
+                        partnerName: mySwap.partner, 
+                        skill: data.skill, 
+                        partnerEmail: mySwap.partnerEmail 
+                    };
+                    
+                    document.getElementById('reviewPartnerName').innerText = mySwap.partner;
+                    setRating(0); 
+                    document.getElementById('reviewComment').value = '';
+                    
+                    const modal = document.getElementById('reviewModal');
+                    if(modal) {
+                        modal.classList.remove('hidden');
+                        modal.style.display = 'flex';
+                    }
+                    showToast("⚠️ Admin has ended the session. Please submit your review to finish!");
+                }
+            }
+        }
+    });
 }
 
 const style = document.createElement('style');
@@ -317,22 +354,17 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let userProfilePic = otherUser.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-                // 🟢 NEW: Premium Rating Display Logic (Stars + Average)
                 let ratingDisplay = '';
                 if (otherUser.totalReviews && otherUser.totalReviews > 0) {
                     let starsHTML = '';
                     let avg = Number(otherUser.averageRating);
-                    
-                    // 5 Stars draw karne ka loop
                     for(let i=1; i<=5; i++) {
                         if(i <= Math.round(avg)) {
-                            starsHTML += '<i class="fas fa-star" style="color:#d97706; font-size:11px;"></i>'; // Filled Star
+                            starsHTML += '<i class="fas fa-star" style="color:#d97706; font-size:11px;"></i>';
                         } else {
-                            starsHTML += '<i class="far fa-star" style="color:#d97706; font-size:11px;"></i>'; // Empty Star
+                            starsHTML += '<i class="far fa-star" style="color:#d97706; font-size:11px;"></i>';
                         }
                     }
-                    
-                    // Final UI design: ⭐⭐⭐⭐⭐ 4.5/5
                     ratingDisplay = `<div style="display:inline-flex; align-items:center; margin-left:8px; background: #fef08a; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: #854d0e; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         <div style="display:flex; gap:2px; margin-top:1px; margin-right:4px;">${starsHTML}</div>
                         <span>${avg}/5</span>
@@ -765,7 +797,6 @@ async function submitReviewAndEnd() {
             })
         });
 
-        // 🟢 NAYA ADD KIYA HAI: Server se turant naya rating data laane ke liye!
         await syncWithDatabase(); 
 
     } catch(e) { console.error("Review Submit Error", e); }
@@ -776,7 +807,6 @@ async function submitReviewAndEnd() {
     btn.innerText = "Submit & End Session";
     btn.disabled = false;
     
-    // Resume End Process
     executeSwapCancellation(pendingEndSwapData.mySwapIndex, pendingEndSwapData.partnerName, pendingEndSwapData.skill);
 }
 
@@ -786,11 +816,10 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     let mySwap = usersDB[meIndex].swaps[mySwapIndex];
     
     if (mySwap.status === 'Active') {
-        // Stop process, show review modal
         pendingEndSwapData = { mySwapIndex, partnerName, skill, partnerEmail: mySwap.partnerEmail };
         document.getElementById('reviewPartnerName').innerText = partnerName;
         
-        setRating(0); // Reset stars
+        setRating(0); 
         document.getElementById('reviewComment').value = '';
         
         const modal = document.getElementById('reviewModal');
