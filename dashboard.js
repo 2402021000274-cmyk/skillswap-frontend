@@ -128,39 +128,35 @@ if(socket) {
         }
     });
 
-    // 🟢 HOD DEMO: Admin Dwara Review Popup Kholne Wala Listener
+    // 🟢 BUG FIX 1: Sirf Learner ko popup dikhega (chahe admin/mentor koi bhi end kare)
     socket.on('force-review-modal', (data) => {
         const myEmail = sessionStorage.getItem('loggedInUserEmail');
-        if (myEmail === data.providerEmail || myEmail === data.requesterEmail) {
+        if (myEmail === data.requesterEmail) { // Strictly checking Learner Role
             const meIndex = usersDB.findIndex(u => u.email === myEmail);
             if (meIndex !== -1 && usersDB[meIndex].swaps) {
                 const mySwapIndex = usersDB[meIndex].swaps.findIndex(s => 
                     s.skill === data.skill && 
-                    s.status === 'Active' && 
-                    (s.partnerEmail === data.providerEmail || s.partnerEmail === data.requesterEmail)
+                    s.partnerEmail === data.providerEmail
                 );
 
-                if (mySwapIndex !== -1) {
-                    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
-                    
-                    pendingEndSwapData = { 
-                        mySwapIndex: mySwapIndex, 
-                        partnerName: mySwap.partner, 
-                        skill: data.skill, 
-                        partnerEmail: mySwap.partnerEmail 
-                    };
-                    
-                    document.getElementById('reviewPartnerName').innerText = mySwap.partner;
-                    setRating(0); 
-                    document.getElementById('reviewComment').value = '';
-                    
-                    const modal = document.getElementById('reviewModal');
-                    if(modal) {
-                        modal.classList.remove('hidden');
-                        modal.style.display = 'flex';
-                    }
-                    showToast("⚠️ Admin has ended the session. Please submit your review to finish!");
+                // Setup the data cleanly so it doesn't crash if DB is synced fast
+                pendingEndSwapData = { 
+                    mySwapIndex: mySwapIndex, 
+                    partnerName: usersDB.find(u => u.email === data.providerEmail)?.name || "Mentor", 
+                    skill: data.skill, 
+                    partnerEmail: data.providerEmail 
+                };
+                
+                document.getElementById('reviewPartnerName').innerText = pendingEndSwapData.partnerName;
+                setRating(0); 
+                document.getElementById('reviewComment').value = '';
+                
+                const modal = document.getElementById('reviewModal');
+                if(modal) {
+                    modal.classList.remove('hidden');
+                    modal.style.display = 'flex';
                 }
+                showToast("⚠️ The session has ended. Please submit your review to finish!");
             }
         }
     });
@@ -354,10 +350,13 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let userProfilePic = otherUser.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
+                // 🟢 BUG FIX 2: Rating sirf specific skill ke liye dikhega
                 let ratingDisplay = '';
-                if (otherUser.totalReviews && otherUser.totalReviews > 0) {
+                let sRatings = otherUser.skillRatings && otherUser.skillRatings[skill] ? otherUser.skillRatings[skill] : null;
+                
+                if (sRatings && sRatings.totalReviews > 0) {
                     let starsHTML = '';
-                    let avg = Number(otherUser.averageRating);
+                    let avg = Number(sRatings.averageRating);
                     for(let i=1; i<=5; i++) {
                         if(i <= Math.round(avg)) {
                             starsHTML += '<i class="fas fa-star" style="color:#d97706; font-size:11px;"></i>';
@@ -555,7 +554,6 @@ function applySearchFilter() {
         }
     } else if (noResultMsg) { noResultMsg.style.display = 'none'; }
 }
-
 
 let pendingScheduleSwapIndex = -1;
 let pendingSchedulePartner = "";
@@ -793,7 +791,8 @@ async function submitReviewAndEnd() {
                 reviewerEmail: myEmail,
                 reviewerName: me.name,
                 rating: rating,
-                comment: comment
+                comment: comment,
+                skill: pendingEndSwapData.skill // BUG FIX 2: Specific skill sent!
             })
         });
 
@@ -807,27 +806,49 @@ async function submitReviewAndEnd() {
     btn.innerText = "Submit & End Session";
     btn.disabled = false;
     
-    executeSwapCancellation(pendingEndSwapData.mySwapIndex, pendingEndSwapData.partnerName, pendingEndSwapData.skill);
+    // Safety check bypass if already deleted
+    if (pendingEndSwapData.mySwapIndex !== -1) {
+        executeSwapCancellation(pendingEndSwapData.mySwapIndex, pendingEndSwapData.partnerName, pendingEndSwapData.skill);
+    } else {
+        refreshDynamicData();
+    }
 }
 
+// 🟢 BUG FIX 1: Role based cancel behavior
 function cancelSwap(mySwapIndex, partnerName, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
     let mySwap = usersDB[meIndex].swaps[mySwapIndex];
     
     if (mySwap.status === 'Active') {
-        pendingEndSwapData = { mySwapIndex, partnerName, skill, partnerEmail: mySwap.partnerEmail };
-        document.getElementById('reviewPartnerName').innerText = partnerName;
-        
-        setRating(0); 
-        document.getElementById('reviewComment').value = '';
-        
-        const modal = document.getElementById('reviewModal');
-        if(modal) {
-            modal.classList.remove('hidden');
-            modal.style.display = 'flex';
+        if (mySwap.role === 'Requester') {
+            // Learner sees popup
+            pendingEndSwapData = { mySwapIndex, partnerName, skill, partnerEmail: mySwap.partnerEmail };
+            document.getElementById('reviewPartnerName').innerText = partnerName;
+            
+            setRating(0); 
+            document.getElementById('reviewComment').value = '';
+            
+            const modal = document.getElementById('reviewModal');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.style.display = 'flex';
+            }
+            return; 
+        } else {
+            // Mentor can only end without review. Learner gets prompt via socket.
+            if(!confirm("Are you sure you want to end this session? The learner will be asked to submit a review.")) return;
+            
+            if(socket) {
+                socket.emit('trigger-user-review', { 
+                    providerEmail: myEmail, 
+                    requesterEmail: mySwap.partnerEmail, 
+                    skill: skill 
+                });
+            }
+            executeSwapCancellation(mySwapIndex, partnerName, skill);
+            return;
         }
-        return; 
     }
 
     if(!confirm("Are you sure you want to cancel/decline this swap?")) return;
@@ -837,9 +858,19 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
 function executeSwapCancellation(mySwapIndex, partnerName, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
-    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
-    let targetIndex = usersDB.findIndex(u => u.email === mySwap.partnerEmail);
     
+    let mySwap = usersDB[meIndex].swaps[mySwapIndex];
+    if (!mySwap || mySwap.skill !== skill) {
+        mySwap = usersDB[meIndex].swaps.find(s => s.skill === skill && (s.partnerEmail === partnerName || s.partner === partnerName));
+    }
+    
+    // DB sync can cause it to be undefined
+    if (!mySwap) {
+        refreshDynamicData();
+        return;
+    }
+
+    let targetIndex = usersDB.findIndex(u => u.email === mySwap.partnerEmail);
     if(targetIndex === -1) targetIndex = usersDB.findIndex(u => u.name === partnerName); 
 
     if(targetIndex !== -1) {
@@ -902,7 +933,12 @@ function executeSwapCancellation(mySwapIndex, partnerName, skill) {
         updateCloudUser(usersDB[targetIndex]); 
     }
     
-    usersDB[meIndex].swaps.splice(mySwapIndex, 1);
+    // Safely remove the swap locally
+    let realIndex = usersDB[meIndex].swaps.findIndex(s => s.skill === skill && s.partnerEmail === mySwap.partnerEmail);
+    if(realIndex !== -1) {
+        usersDB[meIndex].swaps.splice(realIndex, 1);
+    }
+    
     localStorage.setItem('skillSwapUsers', JSON.stringify(usersDB));
     updateCloudUser(usersDB[meIndex]); 
     
