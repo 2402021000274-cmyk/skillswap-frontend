@@ -317,10 +317,26 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let userProfilePic = otherUser.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-                // 🟢 NEW: Rating Display Logic
+                // 🟢 NEW: Premium Rating Display Logic (Stars + Average)
                 let ratingDisplay = '';
                 if (otherUser.totalReviews && otherUser.totalReviews > 0) {
-                    ratingDisplay = `<span style="background: #fef08a; color: #854d0e; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-left: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">⭐ ${otherUser.averageRating}</span>`;
+                    let starsHTML = '';
+                    let avg = Number(otherUser.averageRating);
+                    
+                    // 5 Stars draw karne ka loop
+                    for(let i=1; i<=5; i++) {
+                        if(i <= Math.round(avg)) {
+                            starsHTML += '<i class="fas fa-star" style="color:#d97706; font-size:11px;"></i>'; // Filled Star
+                        } else {
+                            starsHTML += '<i class="far fa-star" style="color:#d97706; font-size:11px;"></i>'; // Empty Star
+                        }
+                    }
+                    
+                    // Final UI design: ⭐⭐⭐⭐⭐ 4.5/5
+                    ratingDisplay = `<div style="display:inline-flex; align-items:center; margin-left:8px; background: #fef08a; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: #854d0e; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="display:flex; gap:2px; margin-top:1px; margin-right:4px;">${starsHTML}</div>
+                        <span>${avg}/5</span>
+                    </div>`;
                 }
 
                 newDiscoverHTML += `
@@ -699,7 +715,6 @@ function requestSwap(targetEmail, skill, topic = "General (Full Skill)") {
     switchDashView('view-active-swaps', document.querySelectorAll('.sidebar-menu a')[2]);
 }
 
-// 🟢 NEW: REVIEW MODAL FUNCTIONS
 let pendingEndSwapData = null;
 
 function closeReviewModal() {
@@ -749,6 +764,10 @@ async function submitReviewAndEnd() {
                 comment: comment
             })
         });
+
+        // 🟢 NAYA ADD KIYA HAI: Server se turant naya rating data laane ke liye!
+        await syncWithDatabase(); 
+
     } catch(e) { console.error("Review Submit Error", e); }
 
     document.getElementById('reviewModal').style.display = 'none';
@@ -761,7 +780,6 @@ async function submitReviewAndEnd() {
     executeSwapCancellation(pendingEndSwapData.mySwapIndex, pendingEndSwapData.partnerName, pendingEndSwapData.skill);
 }
 
-// 🟢 MODIFIED: Cancel Swap ab Review Intercept Karega
 function cancelSwap(mySwapIndex, partnerName, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -787,7 +805,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     executeSwapCancellation(mySwapIndex, partnerName, skill);
 }
 
-// Yahan purana cancel swap logic shift kiya gaya hai
 function executeSwapCancellation(mySwapIndex, partnerName, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
