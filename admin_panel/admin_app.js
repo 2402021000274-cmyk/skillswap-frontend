@@ -157,7 +157,8 @@ function renderSessionsTable() {
                     
                     let actionBtn = "";
                     if(swap.status === 'Active') {
-                        actionBtn = `<button class="action-btn del-btn" style="background:#ef4444; color:white; border:none;" onclick="forceEndSession('${user.email}', '${swap.partnerEmail}', '${swap.skill}', '${swap.topic || ''}')"><i class="fas fa-power-off"></i> Force End</button>`;
+                        // 🟢 HOD DEMO UPDATE: Button UI aur Action Change
+                        actionBtn = `<button class="action-btn del-btn" style="background:#8b5cf6; color:white; border:none; padding:8px 12px;" onclick="forceEndSession('${user.email}', '${swap.partnerEmail}', '${swap.skill}', '${swap.topic || ''}')"><i class="fas fa-star"></i> End & Review</button>`;
                     } else {
                         actionBtn = `<span style="color:var(--text-muted); font-size:12px;">Waiting...</span>`;
                     }
@@ -182,20 +183,19 @@ function renderSessionsTable() {
     }
 }
 
-// 🟢 ADMIN FORCE END SESSION
+// 🟢 ADMIN FORCE END SESSION -> Trigger Review Modal (HOD DEMO)
 async function forceEndSession(providerEmail, requesterEmail, skill, topic) {
-    if(confirm(`🚨 ADMIN OVERRIDE 🚨\nAre you sure you want to FORCE END this session? The Mentor will receive 1 credit and the session will be closed for both users.`)) {
+    if(confirm(`🚨 HOD DEMO FEATURE 🚨\nSend 'End & Review' prompt to both users?\nThis will magically open the Review Popup on their screens to close the session!`)) {
         try {
-            const res = await fetch(API_BASE_URL + '/admin/force-end-swap', {
+            const res = await fetch(API_BASE_URL + '/admin/trigger-review', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': '69420' },
                 body: JSON.stringify({ providerEmail, requesterEmail, skill, topic })
             });
             if(res.ok) {
-                alert("✅ Session forcefully ended and credits transferred!");
-                fetchAllUsers(); // Table turant refresh ho jayegi
+                alert("✅ Magic successful! Check the user screens, the Review Popup has appeared.");
             } else {
-                alert("❌ Failed to end session.");
+                alert("❌ Failed to trigger review.");
             }
         } catch(e) {
             alert("❌ Connection Error.");
