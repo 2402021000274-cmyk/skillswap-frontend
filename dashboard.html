@@ -13,10 +13,9 @@
     <div id="dashboardWrapper">
         <div class="sidebar">
             <div class="sidebar-logo" style="padding-left: 0; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; margin-top: 15px; cursor: pointer; text-decoration: none;">
-                <div style="background: white; padding: 4px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(99,102,241,0.2); transition: 0.3s;" onmouseover="this.parentElement.style.transform='scale(1.05)'" onmouseout="this.parentElement.style.transform='scale(1)'">
-                    <img src="logo.jpeg" alt="Skill Hub" style="height: 42px; width: 42px; border-radius: 8px; object-fit: contain;">
+                <div style="display: flex; align-items: center; justify-content: center; transition: 0.3s; width: 100%;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="logo.jpeg" alt="Skill Hub" style="height: 70px; width: auto; max-width: 95%; object-fit: contain; mix-blend-mode: multiply;">
                 </div>
-                <span style="font-size: 24px; font-weight: 800; color: var(--text-main); margin-left: 12px; letter-spacing: -0.5px;">Skill<span style="color: var(--primary-color);">Hub</span></span>
             </div>
             
             <div class="menu-label">Menu</div>
@@ -301,6 +300,27 @@
                 <button class="btn-outline" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="closeScheduleModal()">Cancel</button>
                 <button class="btn-solid" style="width: auto; margin-top: 0; padding: 10px 20px;" onclick="confirmSchedule()">Send Request</button>
             </div>
+        </div>
+    </div>
+
+    <div id="reviewModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display:none; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="crisp-card" style="width: 90%; max-width: 400px; padding: 30px; position: relative; animation: popIn 0.3s ease;">
+            <i class="fas fa-times" style="position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-muted);" onclick="closeReviewModal()"></i>
+            <h2 style="margin-bottom: 10px; color: var(--primary-color);">Rate Your Session</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Please rate your experience with <strong id="reviewPartnerName"></strong>. This is compulsory to end the session.</p>
+            
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;" id="starRatingContainer">
+                <i class="far fa-star review-star" id="star-1" onclick="setRating(1)" style="font-size: 30px; cursor: pointer; color: #fbbf24;"></i>
+                <i class="far fa-star review-star" id="star-2" onclick="setRating(2)" style="font-size: 30px; cursor: pointer; color: #fbbf24;"></i>
+                <i class="far fa-star review-star" id="star-3" onclick="setRating(3)" style="font-size: 30px; cursor: pointer; color: #fbbf24;"></i>
+                <i class="far fa-star review-star" id="star-4" onclick="setRating(4)" style="font-size: 30px; cursor: pointer; color: #fbbf24;"></i>
+                <i class="far fa-star review-star" id="star-5" onclick="setRating(5)" style="font-size: 30px; cursor: pointer; color: #fbbf24;"></i>
+            </div>
+            <input type="hidden" id="selectedRating" value="0">
+            
+            <textarea id="reviewComment" placeholder="Write a short review... (Optional)" style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); outline: none; margin-bottom: 20px;"></textarea>
+            
+            <button id="submitReviewBtn" class="btn-solid" style="width: 100%; padding: 12px; margin: 0;" onclick="submitReviewAndEnd()">Submit & End Session</button>
         </div>
     </div>
 
