@@ -1418,8 +1418,18 @@ function handleProfileUpdate(e) {
 
 function toggleDarkMode() {
     const isDark = document.getElementById('darkModeToggle').checked;
-    if(isDark) { document.body.classList.add('dark-theme'); localStorage.setItem('skillSwapTheme', 'dark'); } 
-    else { document.body.classList.remove('dark-theme'); localStorage.setItem('skillSwapTheme', 'light'); }
+    const logoImg = document.querySelector('.sidebar-logo img'); // 🟢 Target logo for instant switch
+    
+    if(isDark) { 
+        document.body.classList.add('dark-theme'); 
+        localStorage.setItem('skillSwapTheme', 'dark');
+        if(logoImg) logoImg.style.mixBlendMode = "normal"; // Dark mode mein mix-blend nahi chahiye filter fix ke sath
+    } 
+    else { 
+        document.body.classList.remove('dark-theme'); 
+        localStorage.setItem('skillSwapTheme', 'light');
+        if(logoImg) logoImg.style.mixBlendMode = "multiply"; // Light mode mein white patch hatane ke liye
+    }
 }
 
 function update2FASetting(isChecked) {
