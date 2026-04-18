@@ -11,6 +11,20 @@ function closeAuth() {
     messageBox.innerText = "";
 }
 
+// 🟢 NEW: Password Show/Hide (Eye Icon) Logic Added!
+function togglePass(inputId, iconElement) {
+    const inputField = document.getElementById(inputId);
+    if (inputField.type === "password") {
+        inputField.type = "text";
+        iconElement.classList.remove("fa-eye");
+        iconElement.classList.add("fa-eye-slash");
+    } else {
+        inputField.type = "password";
+        iconElement.classList.remove("fa-eye-slash");
+        iconElement.classList.add("fa-eye");
+    }
+}
+
 // 🟢 PURANA LOGIC (Ekdum Safe)
 let currentTempUser = {}; 
 let userSkillsArray = []; 
