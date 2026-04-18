@@ -10,6 +10,8 @@
 </head>
 <body>
 
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleMobileMenu()"></div>
+
     <div id="dashboardWrapper">
         <div class="sidebar">
             <div class="sidebar-logo" style="padding-left: 0; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; margin-top: 15px; cursor: pointer; text-decoration: none;">
@@ -48,9 +50,13 @@
 
         <div class="main-content">
             <div class="dashboard-header">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="globalSearchInput" placeholder="Search skills, users, or topics..." autocomplete="off" oninput="handleGlobalSearch(this.value)">
+                
+                <div class="header-left" style="display: flex; align-items: center; gap: 15px; flex: 1; max-width: 600px;">
+                    <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+                    <div class="search-bar" style="width: 100%;">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="globalSearchInput" placeholder="Search skills, users, or topics..." autocomplete="off" oninput="handleGlobalSearch(this.value)">
+                    </div>
                 </div>
                 
                 <div class="header-actions">
@@ -87,7 +93,7 @@
                         <div class="metric-card orange"><div class="metric-top"><span class="metric-title">Total Users</span><div class="metric-icon"><i class="fas fa-users"></i></div></div><div class="metric-value" id="statUsers">0</div></div>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                    <div class="dashboard-split-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
                         <div class="chart-section" style="margin-bottom: 0;">
                             <div class="chart-header"><h3>🔥 Trending Skills on Platform</h3></div>
                             <div class="skills-list" id="trendingSkillsList" style="margin-top: 10px;"></div>
