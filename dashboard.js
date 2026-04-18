@@ -1,3 +1,11 @@
+// 🟢 NEW FIX: Mobile Menu Toggle Logic
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    if(sidebar) sidebar.classList.toggle('mobile-open');
+    if(overlay) overlay.classList.toggle('active');
+}
+
 let editSkillsArray = [];
 let editTopicsObj = {}; 
 let editProfilePic = "";
@@ -128,10 +136,9 @@ if(socket) {
         }
     });
 
-    // 🟢 BUG FIX 1: Sirf Learner ko popup dikhega (chahe admin/mentor koi bhi end kare)
     socket.on('force-review-modal', (data) => {
         const myEmail = sessionStorage.getItem('loggedInUserEmail');
-        if (myEmail === data.requesterEmail) { // Strictly checking Learner Role
+        if (myEmail === data.requesterEmail) { 
             const meIndex = usersDB.findIndex(u => u.email === myEmail);
             if (meIndex !== -1 && usersDB[meIndex].swaps) {
                 const mySwapIndex = usersDB[meIndex].swaps.findIndex(s => 
@@ -139,7 +146,6 @@ if(socket) {
                     s.partnerEmail === data.providerEmail
                 );
 
-                // Setup the data cleanly so it doesn't crash if DB is synced fast
                 pendingEndSwapData = { 
                     mySwapIndex: mySwapIndex, 
                     partnerName: usersDB.find(u => u.email === data.providerEmail)?.name || "Mentor", 
@@ -250,6 +256,15 @@ function switchDashView(viewId, element) {
             updateCloudUser(db[idx]); 
         }
     }
+    
+    // 🟢 NEW FIX: Mobile me click karne par menu auto-close ho jayega
+    if (window.innerWidth <= 1100) {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if(sidebar) sidebar.classList.remove('mobile-open');
+        if(overlay) overlay.classList.remove('active');
+    }
+
     refreshDynamicData();
 }
 
@@ -350,7 +365,6 @@ function refreshDynamicData(isLiveUpdate = false) {
 
                 let userProfilePic = otherUser.profilePic || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-                // 🟢 BUG FIX 2: Rating sirf specific skill ke liye dikhega
                 let ratingDisplay = '';
                 let sRatings = otherUser.skillRatings && otherUser.skillRatings[skill] ? otherUser.skillRatings[skill] : null;
                 
@@ -792,7 +806,7 @@ async function submitReviewAndEnd() {
                 reviewerName: me.name,
                 rating: rating,
                 comment: comment,
-                skill: pendingEndSwapData.skill // BUG FIX 2: Specific skill sent!
+                skill: pendingEndSwapData.skill 
             })
         });
 
@@ -806,7 +820,6 @@ async function submitReviewAndEnd() {
     btn.innerText = "Submit & End Session";
     btn.disabled = false;
     
-    // Safety check bypass if already deleted
     if (pendingEndSwapData.mySwapIndex !== -1) {
         executeSwapCancellation(pendingEndSwapData.mySwapIndex, pendingEndSwapData.partnerName, pendingEndSwapData.skill);
     } else {
@@ -814,7 +827,6 @@ async function submitReviewAndEnd() {
     }
 }
 
-// 🟢 BUG FIX 1: Role based cancel behavior
 function cancelSwap(mySwapIndex, partnerName, skill) {
     const myEmail = sessionStorage.getItem('loggedInUserEmail');
     const meIndex = usersDB.findIndex(u => u.email === myEmail);
@@ -822,7 +834,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
     
     if (mySwap.status === 'Active') {
         if (mySwap.role === 'Requester') {
-            // Learner sees popup
             pendingEndSwapData = { mySwapIndex, partnerName, skill, partnerEmail: mySwap.partnerEmail };
             document.getElementById('reviewPartnerName').innerText = partnerName;
             
@@ -836,7 +847,6 @@ function cancelSwap(mySwapIndex, partnerName, skill) {
             }
             return; 
         } else {
-            // Mentor can only end without review. Learner gets prompt via socket.
             if(!confirm("Are you sure you want to end this session? The learner will be asked to submit a review.")) return;
             
             if(socket) {
@@ -864,7 +874,6 @@ function executeSwapCancellation(mySwapIndex, partnerName, skill) {
         mySwap = usersDB[meIndex].swaps.find(s => s.skill === skill && (s.partnerEmail === partnerName || s.partner === partnerName));
     }
     
-    // DB sync can cause it to be undefined
     if (!mySwap) {
         refreshDynamicData();
         return;
@@ -933,7 +942,6 @@ function executeSwapCancellation(mySwapIndex, partnerName, skill) {
         updateCloudUser(usersDB[targetIndex]); 
     }
     
-    // Safely remove the swap locally
     let realIndex = usersDB[meIndex].swaps.findIndex(s => s.skill === skill && s.partnerEmail === mySwap.partnerEmail);
     if(realIndex !== -1) {
         usersDB[meIndex].swaps.splice(realIndex, 1);
@@ -1418,17 +1426,17 @@ function handleProfileUpdate(e) {
 
 function toggleDarkMode() {
     const isDark = document.getElementById('darkModeToggle').checked;
-    const logoImg = document.querySelector('.sidebar-logo img'); // 🟢 Target logo for instant switch
+    const logoImg = document.querySelector('.sidebar-logo img');
     
     if(isDark) { 
         document.body.classList.add('dark-theme'); 
         localStorage.setItem('skillSwapTheme', 'dark');
-        if(logoImg) logoImg.style.mixBlendMode = "normal"; // Dark mode mein mix-blend nahi chahiye filter fix ke sath
+        if(logoImg) logoImg.style.mixBlendMode = "normal"; 
     } 
     else { 
         document.body.classList.remove('dark-theme'); 
         localStorage.setItem('skillSwapTheme', 'light');
-        if(logoImg) logoImg.style.mixBlendMode = "multiply"; // Light mode mein white patch hatane ke liye
+        if(logoImg) logoImg.style.mixBlendMode = "multiply"; 
     }
 }
 
